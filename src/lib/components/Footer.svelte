@@ -15,6 +15,7 @@
 		<div class="footer-links">
 			<a href="/playgrounds">{$t('footer.links.playgrounds')}</a>
 			<a href="/waitlist">{$t('footer.links.waitlist')}</a>
+			<a href="/privacy">Privacy</a>
 		</div>
 
 		<p class="footer-copy">{copyright}</p>
