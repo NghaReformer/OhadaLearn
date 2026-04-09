@@ -1,8 +1,17 @@
 <script lang="ts">
-	import { locale, setLocale, t } from '$lib/i18n';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { locale, t } from '$lib/i18n';
 
 	let currentLocale = $derived($locale);
 	let label = $derived($t('lang.switch'));
+
+	function switchTo(targetLang: 'en' | 'fr') {
+		if (targetLang === currentLocale) return;
+		const currentPath = page.url.pathname;
+		const newPath = currentPath.replace(/^\/[a-z]{2}(\/|$)/, `/${targetLang}$1`);
+		goto(newPath);
+	}
 </script>
 
 <div class="lang-toggle" role="radiogroup" aria-label={label}>
@@ -11,7 +20,7 @@
 		class:active={currentLocale === 'en'}
 		aria-checked={currentLocale === 'en'}
 		role="radio"
-		onclick={() => setLocale('en')}
+		onclick={() => switchTo('en')}
 	>
 		EN
 	</button>
@@ -20,7 +29,7 @@
 		class:active={currentLocale === 'fr'}
 		aria-checked={currentLocale === 'fr'}
 		role="radio"
-		onclick={() => setLocale('fr')}
+		onclick={() => switchTo('fr')}
 	>
 		FR
 	</button>

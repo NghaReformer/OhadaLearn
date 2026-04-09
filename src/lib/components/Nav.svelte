@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 	import LanguageToggle from './LanguageToggle.svelte';
 
 	let { hideLanguageToggle = false }: { hideLanguageToggle?: boolean } = $props();
 
 	let mobileOpen = $state(false);
+	let lang = $derived(page.params.lang || 'en');
 
 	function closeMobile() {
 		mobileOpen = false;
@@ -13,7 +15,7 @@
 
 <nav class="nav" aria-label="Main navigation">
 	<div class="nav-inner">
-		<a href="/" class="brand" onclick={closeMobile}>
+		<a href={`/${lang}/`} class="brand" onclick={closeMobile}>
 			<span class="logo-mark" aria-hidden="true">OL</span>
 			<span class="wordmark">OhadaLearn</span>
 		</a>
@@ -32,15 +34,15 @@
 
 		<div class="nav-body" class:open={mobileOpen}>
 			<div class="nav-links">
-				<a href="/" class="nav-link" onclick={closeMobile}>{$t('nav.home')}</a>
-				<a href="/playgrounds" class="nav-link" onclick={closeMobile}>{$t('nav.playgrounds')}</a>
+				<a href={`/${lang}/`} class="nav-link" onclick={closeMobile}>{$t('nav.home')}</a>
+				<a href={`/${lang}/playgrounds`} class="nav-link" onclick={closeMobile}>{$t('nav.playgrounds')}</a>
 			</div>
 
 			<div class="nav-actions">
 				{#if !hideLanguageToggle}
 					<LanguageToggle />
 				{/if}
-				<a href="/waitlist" class="cta-btn" onclick={closeMobile}>{$t('nav.waitlist')}</a>
+				<a href="#waitlist" class="cta-btn" onclick={closeMobile}>{$t('nav.waitlist')}</a>
 			</div>
 		</div>
 	</div>
