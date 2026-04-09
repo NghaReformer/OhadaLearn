@@ -26,6 +26,11 @@ export const landingEn: TranslationMap = {
 	'waitlist.role.instructor': 'Instructor',
 	'waitlist.role.professional': 'Professional',
 	'waitlist.role.other': 'Other',
+	'waitlist.name.placeholder': 'Your name',
+	'waitlist.institution.placeholder': 'Institution (optional)',
+	'waitlist.role': 'Select your role',
+	'waitlist.role.admin': 'Administrator',
 	'waitlist.submit': 'Join Waitlist',
 	'waitlist.success': 'You\'re on the list! We\'ll be in touch.',
+	'waitlist.error': 'Something went wrong. Please try again.',
 };

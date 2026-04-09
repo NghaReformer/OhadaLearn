@@ -26,6 +26,11 @@ export const landingFr: TranslationMap = {
 	'waitlist.role.instructor': 'Enseignant(e) / Formateur(rice)',
 	'waitlist.role.professional': 'Professionnel(le)',
 	'waitlist.role.other': 'Autre',
+	'waitlist.name.placeholder': 'Votre nom',
+	'waitlist.institution.placeholder': 'Institution (optionnel)',
+	'waitlist.role': 'Sélectionnez votre rôle',
+	'waitlist.role.admin': 'Administrateur(rice)',
 	'waitlist.submit': "Rejoindre la liste d'attente",
 	'waitlist.success': 'Vous êtes sur la liste ! Nous vous contacterons bientôt.',
+	'waitlist.error': 'Une erreur est survenue. Veuillez réessayer.',
 };
