@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 	import { locale$, currency$ } from '$lib/stores/preferences';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+	let lang = $derived(page.params.lang);
 	let pg = $derived(data.pg);
 	let iframeEl: HTMLIFrameElement | undefined = $state();
 	let iframeLoaded = $state(false);
@@ -49,7 +51,7 @@
 <div class="pg-wrapper">
 	<header class="pg-header">
 		<div class="pg-header-left">
-			<a href="/playgrounds" class="back-link">
+			<a href={`/${lang}/playgrounds`} class="back-link">
 				<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 					<path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 				</svg>

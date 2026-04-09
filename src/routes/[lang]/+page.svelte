@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 	import { playgrounds } from '$lib/data/playgrounds';
 	import PlaygroundCard from '$lib/components/PlaygroundCard.svelte';
 	import WaitlistForm from '$lib/components/WaitlistForm.svelte';
+
+	let lang = $derived(page.params.lang);
 
 	const previewPlaygrounds = playgrounds.slice(0, 3);
 
@@ -26,7 +29,7 @@
 		<h1 class="hero-title">{$t('hero.title')}</h1>
 		<p class="hero-subtitle">{$t('hero.subtitle')}</p>
 		<div class="hero-ctas">
-			<a href="/playgrounds" class="btn btn-primary">{$t('hero.cta.playgrounds')}</a>
+			<a href={`/${lang}/playgrounds`} class="btn btn-primary">{$t('hero.cta.playgrounds')}</a>
 			<a href="#waitlist" class="btn btn-secondary">{$t('hero.cta.waitlist')}</a>
 		</div>
 	</div>
@@ -60,7 +63,7 @@
 			{/each}
 		</div>
 		<div class="section-cta">
-			<a href="/playgrounds" class="link-arrow">
+			<a href={`/${lang}/playgrounds`} class="link-arrow">
 				{$t('hero.cta.playgrounds')}
 				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 					<path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

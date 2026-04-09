@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 	import type { PlaygroundMeta } from '$lib/data/playgrounds';
 
 	let { pg }: { pg: PlaygroundMeta } = $props();
+
+	let lang = $derived(page.params.lang || 'en');
 </script>
 
-<a href="/playgrounds/{pg.slug}" class="card">
+<a href={`/${lang}/playgrounds/${pg.slug}`} class="card">
 	<span class="badge">{$t('badge.free')}</span>
 	<span class="icon" aria-hidden="true">{pg.icon}</span>
 	<h3 class="title">{$t(pg.titleKey)}</h3>

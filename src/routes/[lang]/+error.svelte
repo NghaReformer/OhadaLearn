@@ -12,7 +12,7 @@
 <div class="error-page">
 	<span class="error-code">{status}</span>
 	<p class="error-message">{message}</p>
-	<a href="/" class="error-link">{$t('error.back_home')}</a>
+	<a href={`/${page.params.lang || 'en'}/`} class="error-link">{$t('error.back_home')}</a>
 </div>
 
 <style>
