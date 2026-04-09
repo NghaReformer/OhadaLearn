@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { supabase } from '$lib/server/supabase';
+import { insertEntry } from '$lib/server/db/waitlist';
 import type { RequestHandler } from './$types';
 
 // Simple in-memory rate limiter (per IP, resets on redeploy — sufficient for Phase 1)
@@ -42,15 +42,16 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		return json({ error: 'Invalid email address' }, { status: 400 });
 	}
 
-	const { error } = await supabase.from('waitlist').insert({
-		name: body.name.trim().slice(0, 200),
-		email,
-		institution: body.institution?.trim().slice(0, 300) || null,
-		role: body.role,
-	});
-
-	if (error) {
-		if (error.code === '23505') {
+	try {
+		await insertEntry({
+			name: body.name.trim().slice(0, 200),
+			email,
+			institution: body.institution?.trim().slice(0, 300) || null,
+			role: body.role
+		});
+	} catch (error: unknown) {
+		const dbError = error as { code?: string };
+		if (dbError.code === '23505') {
 			return json({ error: 'This email is already on the waitlist' }, { status: 409 });
 		}
 		console.error('Waitlist insert error:', error);
