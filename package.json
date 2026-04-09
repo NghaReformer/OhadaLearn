@@ -11,10 +11,13 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"i18n:check": "tsx scripts/generate-i18n-types.ts",
-		"prebuild": "tsx scripts/generate-i18n-types.ts"
+		"prebuild": "tsx scripts/generate-i18n-types.ts",
+		"test:e2e": "npm run build && npx playwright test"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.59.1",
 		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@testing-library/svelte": "^5.3.1",
