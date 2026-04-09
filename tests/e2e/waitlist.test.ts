@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Waitlist form', () => {
   test('form has all required fields', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     await expect(page.locator('input[type="text"]').first()).toBeVisible();
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('select')).toBeVisible();
@@ -10,12 +10,9 @@ test.describe('Waitlist form', () => {
   });
 
   test('form submits successfully with valid data', async ({ page }) => {
-    // Intercept the waitlist API call to prevent polluting production Supabase.
-    // We verify the form submits correctly without inserting real data.
     await page.route('**/api/waitlist', async (route) => {
       const request = route.request();
       const body = JSON.parse(request.postData() || '{}');
-      // Verify the request payload is well-formed
       expect(body.name).toBeTruthy();
       expect(body.email).toContain('@');
       expect(body.role).toBeTruthy();
@@ -26,7 +23,7 @@ test.describe('Waitlist form', () => {
       });
     });
 
-    await page.goto('/');
+    await page.goto('/en/');
     const form = page.locator('#waitlist form');
     await expect(form).toBeVisible();
 
@@ -36,7 +33,6 @@ test.describe('Waitlist form', () => {
     await form.locator('select').selectOption('student');
     await form.locator('button[type="submit"]').click();
 
-    // Should show success message
     await expect(page.locator('.waitlist-success')).toBeVisible({ timeout: 5000 });
   });
 });

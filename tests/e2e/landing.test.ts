@@ -1,30 +1,41 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Landing page', () => {
-  test('renders hero section', async ({ page }) => {
+  test('root redirects to /en/ or /fr/', async ({ page }) => {
     await page.goto('/');
+    await page.waitForURL(/\/(en|fr)\//);
+    expect(page.url()).toMatch(/\/(en|fr)\/$/);
+  });
+
+  test('renders hero section', async ({ page }) => {
+    await page.goto('/en/');
     await expect(page.locator('h1')).toBeVisible();
   });
 
-  test('language toggle switches to French', async ({ page }) => {
-    await page.goto('/');
-    // Find and click the FR option in the language toggle
-    const frButton = page.locator('[aria-label*="lang"], [aria-label*="Switch"], .lang-toggle').first();
-    if (await frButton.isVisible()) {
-      await frButton.click();
-    }
-    // After clicking, some text should change — just verify the page doesn't crash
-    await expect(page.locator('body')).toBeVisible();
+  test('language toggle navigates to /fr/', async ({ page }) => {
+    await page.goto('/en/');
+    const frButton = page.locator('.lang-option:text("FR")');
+    await frButton.click();
+    await page.waitForURL(/\/fr\//);
+    expect(page.url()).toContain('/fr/');
   });
 
   test('waitlist form is visible', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/en/');
     await expect(page.locator('form')).toBeVisible();
   });
 
-  test('playground cards link to playground pages', async ({ page }) => {
-    await page.goto('/');
-    const card = page.locator('a[href*="/playgrounds/"]').first();
+  test('playground cards link to lang-prefixed pages', async ({ page }) => {
+    await page.goto('/en/');
+    const card = page.locator('a[href*="/en/playgrounds/"]').first();
     await expect(card).toBeVisible();
+  });
+
+  test('hreflang tags are present', async ({ page }) => {
+    await page.goto('/en/');
+    const enAlt = page.locator('link[hreflang="en"]');
+    const frAlt = page.locator('link[hreflang="fr"]');
+    await expect(enAlt).toHaveAttribute('href', /\/en\//);
+    await expect(frAlt).toHaveAttribute('href', /\/fr\//);
   });
 });
