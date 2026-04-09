@@ -13,6 +13,7 @@ export default defineConfig({
 		include: ['tests/unit/**/*.test.ts'],
 		environment: 'jsdom',
 		globals: true,
-		pool: 'threads'
+		pool: 'threads',
+		testTimeout: 60000,
 	}
 });

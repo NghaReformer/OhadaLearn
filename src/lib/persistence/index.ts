@@ -9,7 +9,7 @@ const isBrowser = typeof localStorage !== 'undefined';
  * - Silently handles corrupt data and quota errors
  * - Versioning via key naming convention (e.g., 'tvm_v1')
  */
-export function createPersistentStore<T extends Record<string, unknown>>(
+export function createPersistentStore<T extends object>(
 	key: string,
 	defaults: T,
 ): Writable<T> {
@@ -29,7 +29,7 @@ export function createPersistentStore<T extends Record<string, unknown>>(
 	return store;
 }
 
-function loadAndMerge<T extends Record<string, unknown>>(key: string, defaults: T): T {
+function loadAndMerge<T extends object>(key: string, defaults: T): T {
 	if (!isBrowser) return { ...defaults };
 
 	try {
@@ -47,11 +47,12 @@ function loadAndMerge<T extends Record<string, unknown>>(key: string, defaults: 
 	}
 }
 
-function deepMerge<T extends Record<string, unknown>>(defaults: T, saved: Record<string, unknown>): T {
+function deepMerge<T extends object>(defaults: T, saved: Record<string, unknown>): T {
 	const result = { ...defaults };
-	for (const key of Object.keys(defaults)) {
+	const defaultsRec = defaults as Record<string, unknown>;
+	for (const key of Object.keys(defaultsRec)) {
 		if (!(key in saved)) continue;
-		const defVal = defaults[key];
+		const defVal = defaultsRec[key];
 		const savedVal = saved[key];
 		if (
 			defVal !== null &&
