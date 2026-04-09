@@ -4,19 +4,15 @@
 	import '../app.css';
 	import Nav from '$lib/components/Nav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import {
-		defaultTheme,
-		buildGoogleFontsUrl,
-		buildPreconnectLinks,
-		generateCssVars,
-	} from '$lib/theme';
+	import { defaultTheme, generateCssVars } from '$lib/theme';
+	import { buildFontFaceCss } from '$lib/theme/fonts';
 	import { locale } from '$lib/i18n';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children }: { children: Snippet } = $props();
 
-	const preconnects = buildPreconnectLinks();
-	const fontsUrl = buildGoogleFontsUrl(defaultTheme);
+	// Theme-derived values (self-hosted fonts, no CDN dependency)
+	const fontFaceCss = buildFontFaceCss(defaultTheme);
 	const cssVars = generateCssVars(defaultTheme);
 
 	let isPlaygroundPage = $derived(
@@ -28,13 +24,10 @@
 	});
 </script>
 
+<!-- Theme injection: self-hosted fonts + CSS variables from centralized token system -->
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	{#each preconnects as href}
-		<link rel="preconnect" href={href} crossorigin="anonymous" />
-	{/each}
-	<link rel="stylesheet" href={fontsUrl} />
-	{@html `<style>:root{${cssVars}}</style>`}
+	{@html `<style>${fontFaceCss}\n:root{${cssVars}}</style>`}
 </svelte:head>
 
 <div class="app-shell">

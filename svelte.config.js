@@ -7,10 +7,10 @@ const config = {
 		runes: ({ filename }) => (filename.split(/[/\\]/).includes('node_modules') ? undefined : true)
 	},
 	kit: {
-		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-		adapter: adapter()
+		adapter: adapter(),
+		// CSRF protection is enabled by default in SvelteKit 2 (csrf.checkOrigin = true).
+		// This checks the Origin header on all non-GET requests, preventing cross-site form submissions.
+		// Do NOT disable this — the waitlist endpoint depends on it.
 	}
 };
 

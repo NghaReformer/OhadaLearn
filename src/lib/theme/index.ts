@@ -1,15 +1,15 @@
-import { writable } from 'svelte/store';
 import { defaultTheme, type ThemeTokens } from './tokens';
-import { buildGoogleFontsUrl, buildPreconnectLinks } from './fonts';
+import { buildFontFaceCss, buildGoogleFontsUrl, buildPreconnectLinks } from './fonts';
 import { generateCssVars } from './css-generator';
 
 export { defaultTheme, type ThemeTokens } from './tokens';
 export type { FontDef } from './tokens';
-export { buildGoogleFontsUrl, buildPreconnectLinks } from './fonts';
+export { buildFontFaceCss, buildGoogleFontsUrl, buildPreconnectLinks } from './fonts';
 export { generateCssVars } from './css-generator';
 
-export const theme = writable<ThemeTokens>(defaultTheme);
-
-export function getTheme(): ThemeTokens {
-	return defaultTheme;
-}
+/**
+ * Active theme — currently a static const export.
+ * There is one theme. If Phase 2+ needs dynamic theming,
+ * promote to a writable store at that time.
+ */
+export const theme: ThemeTokens = defaultTheme;

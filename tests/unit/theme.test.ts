@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { defaultTheme, type ThemeTokens } from '$lib/theme/tokens';
-import { buildGoogleFontsUrl } from '$lib/theme/fonts';
+import { buildGoogleFontsUrl, buildFontFaceCss } from '$lib/theme/fonts';
 import { generateCssVars } from '$lib/theme/css-generator';
 
 describe('theme tokens', () => {
@@ -30,7 +30,27 @@ describe('theme tokens', () => {
 	});
 });
 
-describe('font URL builder', () => {
+describe('self-hosted font face CSS', () => {
+	it('generates @font-face declarations for all three families', () => {
+		const css = buildFontFaceCss(defaultTheme);
+		expect(css).toContain('@font-face');
+		expect(css).toContain('Fraunces');
+		expect(css).toContain('DM Sans');
+		expect(css).toContain('JetBrains Mono');
+		expect(css).toContain('/fonts/');
+		expect(css).toContain('woff2');
+	});
+
+	it('includes unicode-range for latin and latin-ext', () => {
+		const css = buildFontFaceCss(defaultTheme);
+		expect(css).toContain('unicode-range');
+		// Should have 6 @font-face blocks (2 per family: latin + latin-ext)
+		const fontFaceCount = (css.match(/@font-face/g) || []).length;
+		expect(fontFaceCount).toBe(6);
+	});
+});
+
+describe('font URL builder (deprecated)', () => {
 	it('generates valid Google Fonts URL from theme', () => {
 		const url = buildGoogleFontsUrl(defaultTheme);
 		expect(url).toContain('fonts.googleapis.com');

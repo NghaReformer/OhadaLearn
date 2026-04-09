@@ -16,7 +16,12 @@ const __dirname = path.dirname(__filename);
 const NAMESPACES_DIR = path.resolve(__dirname, '../src/lib/i18n/namespaces');
 const OUTPUT_FILE = path.resolve(__dirname, '../src/lib/i18n/generated.ts');
 
-const KEY_REGEX = /['"]([a-zA-Z0-9_.]+)['"]\s*:/g;
+// NOTE: This regex is intentionally simple for Phase 1 (~40 keys).
+// Known limitations for Phase 2 (1000+ keys):
+//   - May false-match colons in translation values
+//   - Does not handle comments containing colons
+// Phase 2 TODO: Replace with AST parsing (ts-morph or similar) when key count exceeds ~100.
+const KEY_REGEX = /['"]([a-zA-Z0-9_.-]+)['"]\s*:/g;
 
 function extractKeys(filePath: string): Set<string> {
 	const content = fs.readFileSync(filePath, 'utf-8');

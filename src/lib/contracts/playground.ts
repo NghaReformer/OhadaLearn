@@ -2,8 +2,12 @@
  * Playground Plugin Contracts — defines how playground modules integrate with the platform.
  * In Phase 2, each playground (TVM, CVP, JE, etc.) will implement PlaygroundModule.
  * DO NOT import implementation code in this file — only types.
+ *
+ * ⚠ DEPENDENCY DIRECTION: preferences → i18n/types → this file (one-way only).
+ *   Do NOT import from $lib/stores or $lib/i18n/index here — it creates circular imports.
  */
 
+import type { Component } from 'svelte';
 import type { TranslationNamespace } from '$lib/i18n/types';
 
 export interface PlaygroundManifest {
@@ -62,6 +66,6 @@ export interface PlaygroundModule {
 	manifest: PlaygroundManifest;
 	translations: TranslationNamespace;
 	exerciseTypes: ExerciseTypeDef[];
-	loadPlaygroundComponent: () => Promise<{ default: unknown }>;
-	loadLearnComponent: () => Promise<{ default: unknown }>;
+	loadPlaygroundComponent: () => Promise<{ default: Component }>;
+	loadLearnComponent: () => Promise<{ default: Component }>;
 }

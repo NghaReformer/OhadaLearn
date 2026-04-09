@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
+	import { locale$, currency$ } from '$lib/stores/preferences';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -8,8 +9,25 @@
 	let iframeLoaded = $state(false);
 	let isFullscreen = $state(false);
 
+	// ─── Sync shell language/currency into iframe playgrounds ───
+	// The existing HTML playgrounds have independent i18n/currency selectors.
+	// This postMessage bridge keeps them in sync with the SvelteKit shell.
+	function syncIframeSettings() {
+		if (!iframeEl?.contentWindow || !iframeLoaded) return;
+		iframeEl.contentWindow.postMessage(
+			{ type: 'ohadalearn:settings', locale: $locale$, currency: $currency$ },
+			'*'
+		);
+	}
+
+	$effect(() => {
+		// Re-sync whenever locale or currency changes
+		if ($locale$ && $currency$ && iframeLoaded) syncIframeSettings();
+	});
+
 	function onIframeLoad() {
 		iframeLoaded = true;
+		syncIframeSettings();
 	}
 
 	function toggleFullscreen() {

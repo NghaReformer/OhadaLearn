@@ -51,4 +51,12 @@ describe('createPersistentStore', () => {
 		const store = createPersistentStore('corrupt_v1', { count: 0 });
 		expect(get(store)).toEqual({ count: 0 });
 	});
+
+	it('ignores type-mismatched saved fields (uses default instead)', () => {
+		mockStorage['typemismatch_v1'] = JSON.stringify({ count: 'not-a-number', name: 'valid' });
+		const store = createPersistentStore('typemismatch_v1', { count: 0, name: 'default' });
+		const val = get(store);
+		expect(val.count).toBe(0); // default — saved was string, default is number
+		expect(val.name).toBe('valid'); // merged — types match
+	});
 });

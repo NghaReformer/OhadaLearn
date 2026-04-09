@@ -54,6 +54,10 @@ function deepMerge<T extends object>(defaults: T, saved: Record<string, unknown>
 		if (!(key in saved)) continue;
 		const defVal = defaultsRec[key];
 		const savedVal = saved[key];
+		// Type guard: only merge if the saved value's type matches the default's type.
+		// Prevents localStorage containing { count: "not-a-number" } when defaults have { count: 0 }.
+		if (typeof defVal !== typeof savedVal) continue;
+
 		if (
 			defVal !== null &&
 			typeof defVal === 'object' &&
