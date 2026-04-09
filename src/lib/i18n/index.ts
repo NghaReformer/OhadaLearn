@@ -1,13 +1,14 @@
 import { writable, derived } from 'svelte/store';
 import type { Locale, TranslationMap, TranslationNamespace } from './types';
 import type { TranslationKey } from './generated';
+import { preferences } from '$lib/stores/preferences';
 
 // --- Internal registry ---
 const registry: Record<Locale, TranslationMap> = { en: {}, fr: {} };
 const _registryVersion = writable(0);
 
 // --- Public stores ---
-export const locale = writable<Locale>('en');
+export const locale = derived(preferences, (p) => p.locale);
 
 export function registerNamespace(name: string, ns: TranslationNamespace): void {
 	Object.assign(registry.en, ns.en);
@@ -16,19 +17,11 @@ export function registerNamespace(name: string, ns: TranslationNamespace): void 
 }
 
 export function setLocale(l: Locale): void {
-	locale.set(l);
-	if (typeof localStorage !== 'undefined') {
-		localStorage.setItem('ohadalearn:locale', l);
-	}
+	preferences.update((p) => ({ ...p, locale: l }));
 }
 
 export function initLocale(): void {
-	if (typeof localStorage !== 'undefined') {
-		const saved = localStorage.getItem('ohadalearn:locale') as Locale | null;
-		if (saved === 'en' || saved === 'fr') {
-			locale.set(saved);
-		}
-	}
+	/* preferences store handles loading */
 }
 
 /**
