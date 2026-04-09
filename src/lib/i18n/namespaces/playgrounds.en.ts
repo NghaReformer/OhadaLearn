@@ -14,4 +14,8 @@ export const playgroundsEn: TranslationMap = {
 	'pg.amort.desc': 'French, linear, bullet, and progressive amortization schedules.',
 	'pg.deprec.title': 'Asset Depreciation',
 	'pg.deprec.desc': 'Straight-line, declining balance, SYD, and MACRS methods.',
+	'playgrounds.back': 'Playgrounds',
+	'playgrounds.loading': 'Loading playground…',
+	'playgrounds.fullscreen': 'Fullscreen',
+	'playgrounds.exit_fullscreen': 'Exit Fullscreen',
 };

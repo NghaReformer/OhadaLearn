@@ -14,4 +14,8 @@ export const playgroundsFr: TranslationMap = {
 	'pg.amort.desc': "Tableaux d'amortissement : français, linéaire, in fine et progressif.",
 	'pg.deprec.title': 'Amortissement des immobilisations',
 	'pg.deprec.desc': 'Méthodes linéaire, dégressive, SOFTY et MACRS.',
+	'playgrounds.back': 'Playgrounds',
+	'playgrounds.loading': 'Chargement du playground…',
+	'playgrounds.fullscreen': 'Plein écran',
+	'playgrounds.exit_fullscreen': 'Quitter le plein écran',
 };
