@@ -9,4 +9,12 @@ export const commonEn: TranslationMap = {
 	'footer.copyright': '© {year} OhadaLearn. All rights reserved.',
 	'badge.coming_soon': 'Coming Soon',
 	'badge.free': 'Free',
+	'error.back_home': 'Back to Home',
+	'error.not_found': 'Page not found',
+	'error.generic': 'Something went wrong',
+	'lang.switch': 'Switch language',
+	'footer.privacy': 'Privacy',
+	'footer.links.playgrounds': 'Playgrounds',
+	'footer.links.waitlist': 'Join Waitlist',
+	'footer.links.privacy': 'Privacy',
 };
