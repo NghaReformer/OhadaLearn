@@ -1,0 +1,3086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DepreciCalc — Depreciation Educational Playground</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #1a1d2e;
+    --border: #2d3148;
+    --accent: #6366f1;
+    --amber: #f59e0b;
+    --green: #22c55e;
+    --error: #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: #e2e8f0;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── TOP NAV ─── */
+  .top-nav {
+    display: flex;
+    align-items: center;
+    height: 52px;
+    padding: 0 18px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-right: 18px;
+    white-space: nowrap;
+  }
+  .nav-tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab:hover { color: #94a3b8; background: #1e293b; }
+  .nav-tab.active { background: var(--accent); color: #fff; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .mode-toggle {
+    display: flex;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 2px;
+    border: 1px solid var(--border);
+  }
+  .mode-btn {
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    color: #64748b;
+    transition: all 0.2s;
+  }
+  .mode-btn.active { background: var(--accent); color: #fff; }
+  .teacher-btn {
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #1e293b;
+    color: #94a3b8;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .teacher-btn:hover { background: #0f766e; color: #fff; }
+
+  /* ─── PAGES ─── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ─── LEARN PAGE ─── */
+  .learn-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 48px 20px 40px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #6366f122 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #e2e8f0, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    font-size: 16px;
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin: 48px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  /* ─── DECISION FLOW ─── */
+  .flow-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 30px 10px;
+    overflow-x: auto;
+  }
+  .flow-node {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 160px;
+    max-width: 260px;
+    position: relative;
+  }
+  .flow-start {
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .flow-question {
+    background: var(--panel);
+    border: 2px solid var(--accent);
+    color: #e2e8f0;
+  }
+  .flow-result {
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 8px;
+  }
+  .flow-arrow {
+    width: 2px;
+    height: 22px;
+    background: var(--border);
+    position: relative;
+  }
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 50%; transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--border);
+  }
+  .flow-arrow-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 4px 0;
+  }
+  .flow-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .flow-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-horiz-line {
+    width: 40px;
+    height: 2px;
+    background: var(--border);
+    align-self: center;
+    margin-top: 20px;
+  }
+  .flow-label-yes { color: var(--green); }
+  .flow-label-no { color: var(--error); }
+
+  .res-sld { background: #1e3a5f; border: 1px solid #60a5fa; }
+  .res-rb { background: #1e3a2f; border: 1px solid #4ade80; }
+  .res-ddb { background: #3a1e1e; border: 1px solid #f87171; }
+  .res-syd { background: #3a2a1e; border: 1px solid #fb923c; }
+  .res-uop { background: #2a1e3a; border: 1px solid #c084fc; }
+  .res-rev { background: #1e3a3a; border: 1px solid #34d399; }
+
+  /* ─── METHOD CARDS ─── */
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .method-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .method-card:hover {
+    transform: translateY(-2px);
+    border-color: #4b5078;
+  }
+  .method-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .method-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .method-card-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+  .method-card-abbr {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 10px;
+    padding-left: 46px;
+  }
+  .method-card-desc {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+  .method-card-formula {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 12px;
+    color: #a5b4fc;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .method-card-tips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tip-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #1e293b;
+    color: #94a3b8;
+    border: 1px solid var(--border);
+  }
+
+  /* ─── COMPARISON TABLE ─── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 10px;
+  }
+  .grid-table { width: 100%; border-collapse: collapse; }
+  .grid-table th, .grid-table td { border: 1px solid var(--border); padding: 8px 12px; }
+  .grid-table th {
+    background: var(--bg);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .grid-table td { font-size: 12px; color: #cbd5e1; }
+  .grid-table tr:nth-child(even) td { background: #1e293b55; }
+  .grid-table tr:hover td { background: #2d314866; }
+  .grid-table .total-row td { border-top: 2px solid var(--accent); font-weight: 700; color: #fff; }
+  .check-yes { color: var(--green); font-weight: 700; }
+  .check-no { color: #475569; }
+  .check-extra { color: var(--amber); font-weight: 700; }
+
+  /* ─── CTA ─── */
+  .cta-wrap {
+    text-align: center;
+    margin-top: 48px;
+    padding-bottom: 20px;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px #6366f144;
+  }
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px #6366f166;
+  }
+
+  /* ─── PLAYGROUND LAYOUT ─── */
+  .playground { display: flex; height: calc(100vh - 52px); overflow: hidden; }
+  .left-panel { width: 228px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--border); overflow-y: auto; padding: 14px; }
+  .center-panel { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-width: 0; }
+  .right-panel { width: 280px; min-width: 180px; max-width: 600px; flex-shrink: 0; background: var(--panel); border-left: 1px solid var(--border); overflow-y: auto; padding: 14px; position: relative; }
+  .right-panel-resize {
+    position: absolute; left: -4px; top: 0; bottom: 0; width: 8px; cursor: col-resize; z-index: 10;
+    background: transparent; transition: background .15s;
+  }
+  .right-panel-resize:hover, .right-panel-resize.dragging { background: var(--accent); opacity: 0.4; }
+  .right-panel-resize::after {
+    content: '⋮'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: #64748b; font-size: 14px; pointer-events: none;
+  }
+
+  /* ─── METHOD TABS ─── */
+  .method-tabs { display: flex; gap: 3px; padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .method-tab { padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; background: var(--bg); color: #64748b; transition: all .2s; }
+  .method-tab.active { background: var(--accent); color: #fff; }
+  .method-tab.whif { background: #2d1a00; color: var(--amber); border: 1px solid #78350f; }
+  .method-tab.compare { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+  /* ─── INPUT STYLES ─── */
+  .panel-section { margin-bottom: 18px; }
+  .panel-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-bottom: 8px; }
+  .input-group { margin-bottom: 9px; }
+  .input-label { font-size: 11px; color: #94a3b8; margin-bottom: 3px; display: flex; justify-content: space-between; }
+  .input-label .unit { color: var(--accent); font-weight: 600; }
+  .ctrl-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 6px 9px; color: #e2e8f0; font-size: 12px; outline: none; }
+  .ctrl-input:focus { border-color: var(--accent); }
+  .ctrl-input.error { border-color: var(--error); }
+  .error-msg { font-size: 10px; color: var(--error); margin-top: 2px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* ─── CHARTS ─── */
+  .chart-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  .chart-card h5 { font-size: 10px; font-weight: 700; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .05em; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+  /* ─── WHAT-IF PANEL ─── */
+  .whif-panel { background: var(--panel); border: 2px solid var(--amber); border-radius: 16px; overflow: hidden; margin-bottom: 14px; }
+  .whif-header { background: linear-gradient(135deg, #2d1a00, #1a1400); padding: 14px 18px; border-bottom: 1px solid #78350f; }
+  .whif-vars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+  .var-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; position: relative; cursor: pointer; transition: all .2s; }
+  .var-card.known { border-color: #4338ca; background: #1e1b4b22; }
+  .var-card.solving { border-color: var(--amber); background: #2d1a0022; box-shadow: 0 0 12px #f59e0b44; }
+  .var-card.solving::after { content: 'SOLVING FOR'; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: var(--amber); color: #000; font-size: 8px; font-weight: 800; padding: 1px 6px; border-radius: 4px; }
+  .var-card-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .var-input { width: 100%; background: transparent; border: none; border-bottom: 1.5px solid #334155; padding: 4px 0; color: #e2e8f0; font-size: 16px; font-weight: 700; outline: none; }
+  .var-card.solving .var-input { color: var(--amber); border-bottom-color: var(--amber); }
+  .solve-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #d97706, #b45309); border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
+  .whif-result { background: #052e16; border: 1.5px solid #16a34a; border-radius: 12px; padding: 16px; margin-top: 16px; }
+
+  /* ─── RIGHT PANEL ─── */
+  .explain-card { background: var(--bg); border-radius: 9px; padding: 12px; margin-bottom: 12px; }
+  .explain-card h5 { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 7px; }
+  .explain-card p { font-size: 11px; color: #94a3b8; line-height: 1.7; }
+  .formula-step { margin-bottom: 7px; }
+  .formula-step-label { font-size: 9px; color: #64748b; margin-bottom: 2px; }
+  .formula-step-val { background: var(--panel); padding: 5px 9px; border-radius: 5px; font-family: monospace; font-size: 11px; color: #a5b4fc; border-left: 2px solid var(--accent); }
+  .callout { background: #1c1917; border: 1px solid #78350f; border-radius: 7px; padding: 9px 11px; font-size: 11px; color: #fcd34d; line-height: 1.6; }
+  .callout-title { font-weight: 700; margin-bottom: 3px; font-size: 10px; color: var(--amber); }
+
+  /* ─── TEACHER MODE ─── */
+  .scenario-box { background: #0f766e22; border: 1px solid #0f766e; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: none; }
+  .teacher-active .scenario-box { display: block; }
+  .teacher-active .export-btns { display: flex !important; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .left-panel, .right-panel { display: none; }
+    .playground { flex-direction: column; }
+    .center-panel { width: 100%; }
+    .whif-vars { grid-template-columns: repeat(2, 1fr); }
+    .methods-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .methods-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 24px; }
+    .nav-tab { font-size: 10px; padding: 5px 8px; }
+    .brand { font-size: 14px; margin-right: 8px; }
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: #fff; color: #000; }
+    .top-nav, .left-panel, .right-panel, .export-btns, .scenario-box { display: none !important; }
+    .center-panel { width: 100%; }
+    .grid-table th, .grid-table td { border-color: #ccc; color: #000; }
+    .page { display: block !important; }
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4b5078; }
+
+  /* ─── PLAYGROUND EXTRA ─── */
+  .check-row { display:flex; align-items:center; gap:8px; font-size:11px; color:#cbd5e1; cursor:pointer; padding:4px 0; }
+  .check-row input[type="checkbox"] { accent-color:var(--accent); }
+  .method-check { display:flex; align-items:center; gap:8px; padding:6px 9px; background:var(--bg); border-radius:7px; border:1px solid var(--border); cursor:pointer; margin-bottom:4px; }
+  .method-check:has(input:checked) { border-color:var(--accent); background:#1e1b4b22; }
+  .auto-badge { font-size:9px; background:var(--accent); color:#fff; padding:1px 6px; border-radius:10px; cursor:pointer; margin-left:6px; }
+  .auto-badge.manual { background:#334155; color:#64748b; }
+  .uop-row, .rev-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+  .uop-row label, .rev-row label { font-size:10px; color:#64748b; min-width:36px; }
+  .uop-row input, .rev-row input { flex:1; }
+  .warn-banner { background:#2d1a00; border:1px solid #78350f; border-radius:6px; padding:6px 8px; font-size:10px; color:#fcd34d; margin-top:6px; display:none; }
+  .table-card { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px; }
+  .table-card-header { padding:11px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .table-card-header h4 { font-size:13px; font-weight:700; color:#fff; }
+  .export-btns { display:none; gap:5px; }
+  .export-btn { padding:4px 9px; font-size:10px; font-weight:600; border-radius:5px; cursor:pointer; border:none; }
+  .export-btn.csv { background:#1e3a1e; color:#4ade80; }
+  .export-btn.pdf { background:#3a1e1e; color:#f87171; }
+  .copy-btn { padding:4px 10px; font-size:10px; font-weight:600; border-radius:5px; cursor:pointer; border:1px solid #334155; background:#1e293b; color:#94a3b8; transition:all .2s; }
+  .copy-btn:hover { border-color:var(--accent); color:#a5b4fc; }
+  .copy-btn.copied { background:#052e16; border-color:#16a34a; color:#4ade80; }
+  .copy-btn-sm { padding:2px 6px; font-size:10px; cursor:pointer; border:1px solid #334155; background:transparent; color:#64748b; border-radius:4px; transition:all .2s; line-height:1; }
+  .copy-btn-sm:hover { border-color:var(--accent); color:#a5b4fc; }
+  .copy-btn-sm.copied { color:#4ade80; border-color:#16a34a; }
+  .chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .chart-header h5 { margin-bottom:0; }
+  .center-body { padding:14px; flex:1; }
+  .overlay-pills { display:flex; gap:4px; margin-bottom:8px; flex-wrap:wrap; }
+  .overlay-pill { padding:3px 10px; border-radius:12px; font-size:10px; font-weight:600; cursor:pointer; border:1.5px solid #334155; background:var(--bg); color:#64748b; transition:all .2s; }
+  .overlay-pill.active { opacity:1; }
+  .preset-btn { padding:5px 12px; background:#1e293b; border:1px solid #334155; border-radius:8px; font-size:11px; color:#94a3b8; cursor:pointer; transition:all .2s; }
+  .preset-btn:hover { border-color:var(--accent); color:#a5b4fc; }
+  .whif-method-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+  .whif-method-label { font-size:11px; color:#94a3b8; font-weight:600; }
+  .whif-method-btn { padding:5px 14px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; border:1.5px solid #334155; background:var(--bg); color:#94a3b8; }
+  .whif-method-btn.active { border-color:var(--amber); background:#2d1a0044; color:#fbbf24; }
+  .result-workings { font-family:monospace; font-size:11px; color:#86efac; line-height:2; background:var(--bg); padding:12px; border-radius:8px; margin-top:10px; }
+
+  /* ─── JOURNAL ENTRIES ─── */
+  .journal-entry-card { background: #0a1628; border: 1.5px solid #1e3a5f; border-radius: 9px; padding: 12px; margin-bottom: 12px; }
+  .journal-entry-card h5 { font-size: 11px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; }
+  .je-section-label { font-size: 10px; font-weight: 700; color: #60a5fa; margin-top: 12px; margin-bottom: 4px; padding-top: 8px; border-top: 1px dashed #1e3a5f; }
+  .journal-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .journal-table td { padding: 4px 6px; color: #cbd5e1; }
+  .je-debit td:first-child { color: #60a5fa; font-weight: 600; }
+  .je-credit td:nth-child(2) { color: #94a3b8; font-style: italic; }
+  .je-amount { text-align: right; font-weight: 700; font-family: monospace; color: #e2e8f0; }
+  .je-narration { font-size: 10px; color: #64748b; font-style: italic; margin-top: 6px; border-top: 1px solid #1e293b; padding-top: 6px; }
+  .je-year-select { background: var(--bg); border: 1px solid #1e3a5f; border-radius: 5px; color: #60a5fa; font-size: 11px; font-weight: 700; padding: 2px 6px; margin-left: 4px; outline: none; cursor: pointer; }
+  .je-year-select:focus { border-color: #60a5fa; }
+
+  /* ─── DISPOSAL / CESSION ─── */
+  .disposal-result-card { background: #0f1a0a; border: 1.5px solid #166534; border-radius: 9px; padding: 12px; margin-bottom: 12px; }
+  .disposal-result-card h5 { font-size: 11px; font-weight: 700; color: #4ade80; margin-bottom: 8px; }
+  .disposal-row { display: flex; justify-content: space-between; font-size: 11px; color: #cbd5e1; padding: 3px 0; border-bottom: 1px solid #1e293b; }
+  .disposal-row span:last-child { font-weight: 700; font-family: monospace; }
+  .disposal-row.gain span:last-child { color: #4ade80; }
+  .disposal-row.loss span:last-child { color: #f87171; }
+
+  /* ─── FINANCIAL STATEMENT IMPACT ─── */
+  .fs-section { margin-top: 16px; }
+  .fs-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .fs-card h5 { font-size: 11px; font-weight: 700; color: #a78bfa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .fs-card .grid-table td, .fs-card .grid-table th { font-size: 10px; padding: 5px 8px; }
+  .fs-note { font-size: 10px; color: #64748b; font-style: italic; padding: 8px 10px; background: #1e293b44; border-radius: 6px; margin-top: 8px; line-height: 1.6; }
+
+  /* ─── EXAMPLES TAB ─── */
+  .example-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .example-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .example-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+  .example-header h4 { font-size: 14px; font-weight: 700; color: #fff; }
+  .example-narrative { font-size: 12px; color: #94a3b8; line-height: 1.7; margin-bottom: 10px; }
+  .example-params { font-size: 11px; color: #64748b; background: var(--bg); padding: 6px 10px; border-radius: 6px; margin-bottom: 10px; font-family: monospace; }
+  .example-actions { display: flex; gap: 8px; }
+  .example-actions button { padding: 6px 14px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: #a5b4fc; transition: all .2s; }
+  .example-actions button:hover { border-color: var(--accent); }
+  .example-solution { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOP NAV ═══════════════ -->
+<nav class="top-nav">
+  <div class="brand">📉 DepreciCalc</div>
+  <button class="nav-tab active" onclick="showPage('learn')">📚 Learn: Methods &amp; Formulas</button>
+  <button class="nav-tab" onclick="showPage('play')">⚙️ Practice: Interactive Playground</button>
+  <div class="nav-right">
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="toggleMode()">Simple</button>
+      <button class="mode-btn" onclick="toggleMode()">Advanced</button>
+    </div>
+    <button class="teacher-btn" onclick="toggleTeacher()">🎓 Teacher Mode</button>
+    <button id="share-btn" class="teacher-btn" style="background:#334155" onclick="shareURL()">🔗 Share</button>
+  </div>
+</nav>
+
+<!-- ═══════════════ PAGE 1 — LEARN ═══════════════ -->
+<div id="page-learn" class="page active">
+  <div class="learn-container">
+
+    <!-- HERO -->
+    <div class="hero">
+      <h1>Understanding Depreciation Methods</h1>
+      <p>Master the theory, formulas, and decision rules — then practice in the interactive playground.</p>
+    </div>
+
+    <!-- ─── 1. DECISION FLOW DIAGRAM ─── -->
+    <div class="section-title"><span class="num">1</span> Decision Flow: Which Method to Use?</div>
+    <div class="flow-diagram">
+
+      <!-- Start node -->
+      <div class="flow-node flow-start">What type of asset?</div>
+      <div class="flow-arrow"></div>
+
+      <!-- Q1: Is usage measurable? -->
+      <div class="flow-node flow-question">Is usage measurable?</div>
+
+      <div class="flow-row" style="margin-top:4px;">
+        <!-- YES branch -->
+        <div class="flow-branch">
+          <div class="flow-arrow-label flow-label-yes">▼ YES</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node flow-result res-uop">Units of Production (UOP)</div>
+        </div>
+
+        <!-- NO branch continues -->
+        <div class="flow-branch">
+          <div class="flow-arrow-label flow-label-no">▼ NO</div>
+          <div class="flow-arrow"></div>
+
+          <!-- Q2: Equal annual charges? -->
+          <div class="flow-node flow-question">Equal annual charges?</div>
+
+          <div class="flow-row" style="margin-top:4px;">
+            <!-- YES → SLD -->
+            <div class="flow-branch">
+              <div class="flow-arrow-label flow-label-yes">▼ YES</div>
+              <div class="flow-arrow"></div>
+              <div class="flow-node flow-result res-sld">Straight-Line (SLD)</div>
+            </div>
+
+            <!-- NO continues -->
+            <div class="flow-branch">
+              <div class="flow-arrow-label flow-label-no">▼ NO</div>
+              <div class="flow-arrow"></div>
+
+              <!-- Q3: Loose tools / small assets? -->
+              <div class="flow-node flow-question">Loose tools / small assets?</div>
+
+              <div class="flow-row" style="margin-top:4px;">
+                <!-- YES → REV -->
+                <div class="flow-branch">
+                  <div class="flow-arrow-label flow-label-yes">▼ YES</div>
+                  <div class="flow-arrow"></div>
+                  <div class="flow-node flow-result res-rev">Revaluation (REV)</div>
+                </div>
+
+                <!-- NO continues -->
+                <div class="flow-branch">
+                  <div class="flow-arrow-label flow-label-no">▼ NO</div>
+                  <div class="flow-arrow"></div>
+
+                  <!-- Q4: Accelerated needed? -->
+                  <div class="flow-node flow-question">Accelerated needed?</div>
+
+                  <div class="flow-row" style="margin-top:4px;">
+                    <!-- YES → sub-branch -->
+                    <div class="flow-branch">
+                      <div class="flow-arrow-label flow-label-yes">▼ YES</div>
+                      <div class="flow-arrow"></div>
+
+                      <!-- Q5: Most aggressive? -->
+                      <div class="flow-node flow-question">Most aggressive?</div>
+
+                      <div class="flow-row" style="margin-top:4px;">
+                        <!-- YES → DDB -->
+                        <div class="flow-branch">
+                          <div class="flow-arrow-label flow-label-yes">▼ YES</div>
+                          <div class="flow-arrow"></div>
+                          <div class="flow-node flow-result res-ddb">Double Declining (DDB)</div>
+                        </div>
+
+                        <!-- NO → sub-branch -->
+                        <div class="flow-branch">
+                          <div class="flow-arrow-label flow-label-no">▼ NO</div>
+                          <div class="flow-arrow"></div>
+
+                          <!-- Q6: Fixed declining fraction preferred? -->
+                          <div class="flow-node flow-question">Fixed declining fraction preferred?</div>
+
+                          <div class="flow-row" style="margin-top:4px;">
+                            <!-- YES → SYD -->
+                            <div class="flow-branch">
+                              <div class="flow-arrow-label flow-label-yes">▼ YES</div>
+                              <div class="flow-arrow"></div>
+                              <div class="flow-node flow-result res-syd">Sum-of-Years' Digits (SYD)</div>
+                            </div>
+
+                            <!-- NO → RB -->
+                            <div class="flow-branch">
+                              <div class="flow-arrow-label flow-label-no">▼ NO</div>
+                              <div class="flow-arrow"></div>
+                              <div class="flow-node flow-result res-rb">Reducing Balance (RB)</div>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- NO to accelerated → Straight-Line is the default -->
+                    <div class="flow-branch">
+                      <div class="flow-arrow-label flow-label-no">▼ NO</div>
+                      <div class="flow-arrow"></div>
+                      <div class="flow-node flow-result res-sld">Straight-Line (SLD)</div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ─── 2. METHOD CARDS ─── -->
+    <div class="section-title"><span class="num">2</span> The Six Depreciation Methods</div>
+    <div class="methods-grid">
+
+      <!-- SLD -->
+      <div class="method-card">
+        <div class="method-card-header">
+          <div class="method-badge" style="background:#1e3a5f; color:#60a5fa;">SL</div>
+          <div class="method-card-name">Straight-Line</div>
+        </div>
+        <div class="method-card-abbr">SLD</div>
+        <div class="method-card-desc">The asset loses the same amount every year. Simple, predictable, most common.</div>
+        <div class="method-card-formula">Annual Depr = (Cost − Residual) ÷ Life</div>
+        <div class="adv-only" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-family:monospace;font-size:12px;color:#a5b4fc;">D = (C − S) / n</div>
+        <div class="method-card-tips">
+          <span class="tip-chip">💡 Subtract residual BEFORE dividing</span>
+          <span class="tip-chip">📌 Book value hits residual exactly at end</span>
+        </div>
+      </div>
+
+      <!-- RB -->
+      <div class="method-card">
+        <div class="method-card-header">
+          <div class="method-badge" style="background:#1e3a2f; color:#4ade80;">RB</div>
+          <div class="method-card-name">Reducing Balance</div>
+        </div>
+        <div class="method-card-abbr">RB</div>
+        <div class="method-card-desc">Fixed % on remaining book value each year. Higher charges early, lower later.</div>
+        <div class="method-card-formula">Depr = Rate% × Opening Book Value</div>
+        <div class="adv-only" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-family:monospace;font-size:12px;color:#a5b4fc;">D_t = r × BV_{t-1}</div>
+        <div class="method-card-tips">
+          <span class="tip-chip">💡 Formula alone never reaches residual — final year(s) may need adjustment</span>
+          <span class="tip-chip">📌 Rate = 1 − ⁿ√(Residual/Cost)</span>
+        </div>
+      </div>
+
+      <!-- DDB -->
+      <div class="method-card">
+        <div class="method-card-header">
+          <div class="method-badge" style="background:#3a1e1e; color:#f87171;">DD</div>
+          <div class="method-card-name">Double Declining Balance</div>
+        </div>
+        <div class="method-card-abbr">DDB</div>
+        <div class="method-card-desc">2× the straight-line rate on declining balance. Switches to SLD when optimal.</div>
+        <div class="method-card-formula">Rate = 2 ÷ Life<br>Depr = Rate × Book Value</div>
+        <div class="adv-only" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-family:monospace;font-size:12px;color:#a5b4fc;">r = 2/n, D_t = r × BV_t</div>
+        <div class="adv-only" style="display:none;margin-top:6px;font-size:10px;color:#f59e0b;background:#2d1a00;padding:6px 8px;border-radius:6px;line-height:1.5">
+  ⚠ <strong>OHADA Note:</strong> The SYSCOHADA "amortissement dégressif" uses coefficients: ×1.5 (life≤4), ×2.0 (life 5-6), ×2.5 (life≥7) applied to the SLD rate. DDB (2/n) matches only for life=5-6. For other lives, use the OHADA coefficient system.
+</div>
+        <div class="method-card-tips">
+          <span class="tip-chip">💡 Don't subtract residual from BV before applying rate</span>
+          <span class="tip-chip">📌 Switch-over year is key exam Q</span>
+        </div>
+      </div>
+
+      <!-- SYD -->
+      <div class="method-card">
+        <div class="method-card-header">
+          <div class="method-badge" style="background:#3a2a1e; color:#fb923c;">SY</div>
+          <div class="method-card-name">Sum-of-Years' Digits</div>
+        </div>
+        <div class="method-card-abbr">SYD</div>
+        <div class="method-card-desc">Fraction of remaining life × depreciable amount. Front-loaded charges.</div>
+        <div class="method-card-formula">Depr = (Rem.Life ÷ SYD) × (Cost − Residual)</div>
+        <div class="adv-only" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-family:monospace;font-size:12px;color:#a5b4fc;">D_t = [(n−t+1)/SYD] × (C−S)</div>
+        <div class="method-card-tips">
+          <span class="tip-chip">💡 SYD = n(n+1)/2</span>
+          <span class="tip-chip">📌 Fractions sum to exactly 1</span>
+        </div>
+      </div>
+
+      <!-- UOP -->
+      <div class="method-card">
+        <div class="method-card-header">
+          <div class="method-badge" style="background:#2a1e3a; color:#c084fc;">UP</div>
+          <div class="method-card-name">Units of Production</div>
+        </div>
+        <div class="method-card-abbr">UOP</div>
+        <div class="method-card-desc">Depreciation tied to actual output/usage. Varies each year.</div>
+        <div class="method-card-formula">Rate/unit = (Cost − Res) ÷ Total Units</div>
+        <div class="adv-only" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-family:monospace;font-size:12px;color:#a5b4fc;">D_t = [(C−S)/U] × u_t</div>
+        <div class="method-card-tips">
+          <span class="tip-chip">💡 Book value stops at residual</span>
+          <span class="tip-chip">📌 No fixed 'life' concept</span>
+        </div>
+      </div>
+
+      <!-- REV -->
+      <div class="method-card">
+        <div class="method-card-header">
+          <div class="method-badge" style="background:#1e3a3a; color:#34d399;">RV</div>
+          <div class="method-card-name">Revaluation</div>
+        </div>
+        <div class="method-card-abbr">REV</div>
+        <div class="method-card-desc">Asset revalued at year-end. Depreciation = opening − closing.</div>
+        <div class="method-card-formula">Depr = Opening + Additions − Closing</div>
+        <div class="adv-only" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-family:monospace;font-size:12px;color:#a5b4fc;">D_t = V_open + A_t − V_close</div>
+        <div class="method-card-tips">
+          <span class="tip-chip">💡 Add purchases first</span>
+          <span class="tip-chip">📌 No residual or life needed</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ─── 3. COMPARISON TABLE ─── -->
+    <div class="section-title"><span class="num">3</span> Quick Comparison</div>
+    <div class="table-wrap">
+      <table class="grid-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Equal?</th>
+            <th>Accelerated?</th>
+            <th>Needs Rate?</th>
+            <th>Time-based?</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>SLD</strong></td>
+            <td class="check-yes">✓ Yes</td>
+            <td class="check-no">✗</td>
+            <td class="check-no">✗</td>
+            <td class="check-yes">✓</td>
+            <td>Buildings, furniture</td>
+          </tr>
+          <tr>
+            <td><strong>RB</strong></td>
+            <td class="check-no">✗</td>
+            <td class="check-yes">✓ Yes</td>
+            <td class="check-yes">✓</td>
+            <td class="check-yes">✓</td>
+            <td>Tech, vehicles</td>
+          </tr>
+          <tr>
+            <td><strong>DDB</strong></td>
+            <td class="check-no">✗</td>
+            <td class="check-extra">✓✓</td>
+            <td class="check-extra">Auto</td>
+            <td class="check-yes">✓</td>
+            <td>Tax deferral, US GAAP</td>
+          </tr>
+          <tr>
+            <td><strong>SYD</strong></td>
+            <td class="check-no">✗</td>
+            <td class="check-yes">✓</td>
+            <td class="check-no">✗</td>
+            <td class="check-yes">✓</td>
+            <td>Exams, declining-benefit assets</td>
+          </tr>
+          <tr>
+            <td><strong>UOP</strong></td>
+            <td>Varies</td>
+            <td>—</td>
+            <td class="check-no">✗</td>
+            <td>Usage</td>
+            <td>Machinery, mines</td>
+          </tr>
+          <tr>
+            <td><strong>REV</strong></td>
+            <td>Varies</td>
+            <td>—</td>
+            <td class="check-no">✗</td>
+            <td class="check-no">✗</td>
+            <td>Loose tools, crockery</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ─── IMPAIRMENT vs DEPRECIATION ─── -->
+    <div style="margin-bottom:28px">
+      <p class="section-title">⚠ Important Distinction</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="method-card" style="border-color:#6366f1">
+          <div class="method-card-header">
+            <div class="method-badge" style="background:#1e1b4b;color:#a5b4fc">📉</div>
+            <div><div class="method-card-name">Depreciation (IAS 16)</div><div class="method-card-abbr" style="padding-left:0">Amortissement</div></div>
+          </div>
+          <div class="method-card-desc">Systematic allocation of depreciable amount over useful life. Planned, expected, and recorded each accounting period. Reflects the pattern of economic benefits consumed.</div>
+          <div class="method-card-tips">
+            <span class="tip-chip">📌 Routine — every year</span>
+            <span class="tip-chip">📌 Based on useful life</span>
+            <span class="tip-chip">📌 Cannot reverse (but estimates can be revised prospectively per IAS 8)</span>
+          </div>
+        </div>
+        <div class="method-card" style="border-color:#ef4444">
+          <div class="method-card-header">
+            <div class="method-badge" style="background:#3a1e1e;color:#f87171">⚡</div>
+            <div><div class="method-card-name">Impairment (IAS 36)</div><div class="method-card-abbr" style="padding-left:0">Dépréciation</div></div>
+          </div>
+          <div class="method-card-desc">Unexpected decline when recoverable amount falls below carrying amount. Event-driven (flood, obsolescence, market crash). Immediate write-down to recoverable amount.</div>
+          <div class="method-card-tips">
+            <span class="tip-chip">📌 Event-triggered</span>
+            <span class="tip-chip">📌 Immediate recognition</span>
+            <span class="tip-chip">📌 Can reverse (except goodwill)</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:10px;font-size:11px;color:#94a3b8;line-height:1.7">
+        <strong style="color:#fbbf24">Key exam point:</strong> After impairment, depreciation continues on the new (lower) carrying amount over the remaining useful life. Both IAS 16 and IAS 36 can apply to the same asset simultaneously. In OHADA/SYSCOHADA, impairment uses account <strong>6914</strong> (Dotations aux provisions pour dépréciation des immobilisations corporelles) credited to <strong>2914</strong>.
+      </div>
+    </div>
+
+    <!-- ─── CTA ─── -->
+    <div class="cta-wrap">
+      <button class="cta-btn" onclick="showPage('play')">⚙️ Open Interactive Playground →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE 2 — PLAYGROUND ═══════════════ -->
+<div id="page-play" class="page">
+  <div class="playground">
+    <!-- ── LEFT PANEL ── -->
+    <div class="left-panel">
+
+      <!-- Currency -->
+      <div class="ctrl-section">
+        <div class="input-group">
+          <div class="input-label">Currency <span class="unit">optional</span></div>
+          <select class="ctrl-input" id="inp-currency" onchange="onCurrencyChange(this.value)">
+          </select>
+        </div>
+      </div>
+
+      <!-- Asset Details -->
+      <div class="ctrl-section">
+        <h4 class="ctrl-title">Asset Details</h4>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Cost Price</label>
+          <input class="ctrl-input" id="inp-cost" type="number" value="100000" oninput="onInputChange()">
+          <div class="error-msg" id="err-cost"></div>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Residual Value</label>
+          <input class="ctrl-input" id="inp-res" type="number" value="10000" oninput="onInputChange()">
+          <div class="error-msg" id="err-res"></div>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Useful Life</label>
+          <input class="ctrl-input" id="inp-life" type="range" min="1" max="50" value="5" oninput="onInputChange()">
+          <span id="life-disp" style="font-size:11px;color:#94a3b8;">5 years</span>
+          <div class="error-msg" id="err-life"></div>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Depreciation Rate (%)
+            <span class="auto-badge" id="auto-badge" onclick="resetAutoRate()">Auto</span>
+          </label>
+          <input class="ctrl-input" id="inp-rate" type="number" value="20" oninput="onRateInput()">
+          <div class="error-msg" id="err-rate"></div>
+        </div>
+      </div>
+
+      <!-- Dates & Timing -->
+      <div class="ctrl-section">
+        <h4 class="ctrl-title">Dates &amp; Timing</h4>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Date Put Into Use</label>
+          <input class="ctrl-input" id="inp-date" type="date" value="2024-04-01" oninput="onInputChange()">
+          <div class="error-msg" id="err-date"></div>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">Financial Year-End</label>
+          <select class="ctrl-input" id="inp-ye" oninput="onInputChange()">
+            <option value="December">31 December</option>
+            <option value="March">31 March</option>
+            <option value="June">30 June</option>
+            <option value="September">30 September</option>
+          </select>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="inp-prorata" checked oninput="onInputChange()"> Pro-rata first year
+        </label>
+        <div style="font-size:9px;color:#64748b;margin-top:2px">Convention: month of acquisition counts as a full month (nearest-month method).</div>
+      </div>
+
+      <!-- Disposal / Cession -->
+      <div class="ctrl-section" id="disposal-section">
+        <h4 class="ctrl-title" style="cursor:pointer" onclick="toggleDisposal()">
+          Disposal / Cession <span id="disposal-toggle" style="float:right;font-size:10px">&#9654;</span>
+        </h4>
+        <div id="disposal-inputs" style="display:none">
+          <div class="ctrl-group">
+            <label class="ctrl-label">Disposal Date</label>
+            <input class="ctrl-input" id="inp-disposal-date" type="date" value="" oninput="onInputChange()">
+          </div>
+          <div class="ctrl-group">
+            <label class="ctrl-label">Sale Proceeds ($)</label>
+            <input class="ctrl-input" id="inp-proceeds" type="number" value="0" oninput="onInputChange()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Change in Estimate (IAS 8 / SYSCOHADA) -->
+      <div class="panel-section" id="estimate-section">
+        <div class="panel-section-title" style="cursor:pointer" onclick="toggleEstimateChange()">
+          🔄 Change in Estimate <span id="estimate-toggle" style="float:right">&#9654;</span>
+        </div>
+        <div id="estimate-inputs" style="display:none">
+          <div class="input-group">
+            <div class="input-label">Change from Year</div>
+            <input class="ctrl-input" id="inp-change-year" type="number" min="2" value="" placeholder="e.g. 3" oninput="onInputChange()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">New Useful Life <span class="unit">yrs total</span></div>
+            <input class="ctrl-input" id="inp-new-life" type="number" value="" placeholder="e.g. 8" oninput="onInputChange()">
+          </div>
+          <div class="input-group">
+            <div class="input-label">New Residual Value <span class="unit">$</span></div>
+            <input class="ctrl-input" id="inp-new-residual" type="number" value="" placeholder="Leave blank to keep current" oninput="onInputChange()">
+          </div>
+          <div style="font-size:10px;color:#64748b;margin-top:6px;line-height:1.5">
+            IAS 8: Changes in estimates are applied <strong>prospectively</strong> — no restatement of prior years. The remaining book value is spread over the revised remaining life.<br>
+            Note: IAS 8 also covers changes in accounting policy (e.g., switching from SLD to RB), which require retrospective application. This tool only handles estimate changes (life, residual).
+          </div>
+        </div>
+      </div>
+
+      <!-- UOP Inputs (hidden by default) -->
+      <div class="ctrl-section" id="uop-section" style="display:none;">
+        <h4 class="ctrl-title">Units-of-Production</h4>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Total Units</label>
+          <input class="ctrl-input" id="inp-total-units" type="number" value="50000" oninput="onInputChange()">
+        </div>
+        <div id="uop-rows"></div>
+      </div>
+
+      <!-- Revaluation Inputs (hidden by default) -->
+      <div class="ctrl-section" id="rev-section" style="display:none;">
+        <h4 class="ctrl-title">Revaluation</h4>
+        <div id="rev-rows"></div>
+      </div>
+
+      <!-- Methods to Display -->
+      <div class="ctrl-section">
+        <h4 class="ctrl-title">Methods to Display</h4>
+        <label class="method-check"><input type="checkbox" data-method="sld" checked onchange="onMethodToggle(this)"><span class="check-label">Straight-Line</span></label>
+        <label class="method-check"><input type="checkbox" data-method="rb" checked onchange="onMethodToggle(this)"><span class="check-label">Reducing Balance</span></label>
+        <label class="method-check"><input type="checkbox" data-method="ddb" onchange="onMethodToggle(this)"><span class="check-label">Double Declining</span></label>
+        <label class="method-check"><input type="checkbox" data-method="syd" onchange="onMethodToggle(this)"><span class="check-label">Sum-of-Years</span></label>
+        <label class="method-check"><input type="checkbox" data-method="uop" onchange="onMethodToggle(this)"><span class="check-label">Units-of-Production</span></label>
+        <label class="method-check"><input type="checkbox" data-method="rev" onchange="onMethodToggle(this)"><span class="check-label">Revaluation</span></label>
+      </div>
+
+    </div>
+
+    <!-- ── CENTER PANEL ── -->
+    <div class="center-panel">
+      <!-- Teacher scenario -->
+      <div class="scenario-box" id="scenario-box">
+        <h5>&#127891; Teacher Scenario</h5>
+        <textarea id="scenario-text" placeholder="Enter a problem for students..." rows="2" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:#e2e8f0;padding:8px;font-size:12px;resize:vertical;"></textarea>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+          <button id="hide-answer-btn" onclick="toggleHideAnswer()" style="padding:4px 12px;background:#0f766e;border:none;border-radius:6px;color:#fff;font-size:11px;cursor:pointer;">Hide Answer</button>
+          <span id="hide-answer-status" style="font-size:10px;color:#94a3b8;">Answers visible</span>
+        </div>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="method-tabs" id="method-tabs"></div>
+
+      <!-- Tab content -->
+      <div class="center-body" id="center-body">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="right-panel" id="right-panel">
+      <div class="right-panel-resize" id="right-resize"></div>
+      <div id="right-panel-content"><!-- Rendered dynamically by JS --></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+const CURRENCIES = [
+  { code: '', symbol: '', label: 'No currency symbol' },
+  { code: 'FCFA', symbol: 'FCFA ', label: 'FCFA (XAF/XOF)' },
+  { code: 'USD', symbol: '$', label: 'US Dollar ($)' },
+  { code: 'EUR', symbol: '€', label: 'Euro (€)' },
+  { code: 'GBP', symbol: '£', label: 'British Pound (£)' },
+  { code: 'NGN', symbol: '₦', label: 'Nigerian Naira (₦)' },
+  { code: 'KES', symbol: 'KSh ', label: 'Kenyan Shilling (KSh)' },
+  { code: 'ZAR', symbol: 'R', label: 'South African Rand (R)' },
+  { code: 'GHS', symbol: 'GH₵', label: 'Ghanaian Cedi (GH₵)' },
+  { code: 'MAD', symbol: 'MAD ', label: 'Moroccan Dirham (MAD)' },
+  { code: 'INR', symbol: '₹', label: 'Indian Rupee (₹)' },
+  { code: 'JPY', symbol: '¥', label: 'Japanese Yen (¥)' },
+  { code: 'CNY', symbol: '¥', label: 'Chinese Yuan (¥)' },
+  { code: 'BRL', symbol: 'R$', label: 'Brazilian Real (R$)' },
+  { code: 'CAD', symbol: 'CA$', label: 'Canadian Dollar (CA$)' },
+  { code: 'AUD', symbol: 'A$', label: 'Australian Dollar (A$)' },
+];
+
+const state = {
+  mode: 'simple',
+  teacherMode: false,
+  activePage: 'learn',
+  activeTab: 'sld',
+  currency: '',
+  inputs: {
+    cost: 100000, residual: 10000, life: 5, rate: 20,
+    rateIsManual: false,
+    purchaseDate: '2024-04-01', yearEnd: 'December', proRata: true,
+    totalUnits: 50000, unitsPerYear: [],
+    revalRows: [],
+    disposalDate: '', proceeds: 0,
+    changeYear: null, newLife: null, newResidual: null
+  },
+  activeMethods: { sld: true, rb: true, ddb: false, syd: false, uop: false, rev: false },
+  _jeYear: 0,
+  whif: {
+    method: 'sld', solveFor: 'life',
+    values: { cost: null, residual: null, annualDepr: null, life: null, rate: null, atYear: 1, bv: null, acc: null },
+    result: null
+  }
+};
+
+const YEAR_END_MONTHS = { December: 11, March: 2, June: 5, September: 8 };
+const METHOD_COLORS = { sld:'#6366f1', rb:'#22c55e', ddb:'#ef4444', syd:'#f59e0b', uop:'#a855f7', rev:'#14b8a6' };
+const METHOD_NAMES = { sld:'Straight-Line', rb:'Reducing Balance', ddb:'Double Declining', syd:'Sum-of-Years Digits', uop:'Units of Production', rev:'Revaluation' };
+
+function fmt(n) { return isNaN(n) || !isFinite(n) ? '—' : Math.round(n).toLocaleString('en-US'); }
+function curSym() { const c = CURRENCIES.find(c => c.code === state.currency); return c ? c.symbol : ''; }
+function fmtC(n) { return isNaN(n) || !isFinite(n) ? '—' : curSym() + Math.round(n).toLocaleString('en-US'); }
+function fmtDate(d) { return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+
+function showPage(p) {
+  state.activePage = p;
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + (p === 'learn' ? 'learn' : 'play')).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t, i) => t.classList.toggle('active', (p === 'learn' ? i === 0 : i === 1)));
+  if (p === 'play' && typeof buildAll === 'function') buildAll();
+}
+
+function toggleMode() {
+  state.mode = state.mode === 'simple' ? 'advanced' : 'simple';
+  document.querySelectorAll('.mode-btn').forEach((b, i) => b.classList.toggle('active', (state.mode === 'simple' ? i === 0 : i === 1)));
+  document.querySelectorAll('.adv-only').forEach(el => el.style.display = state.mode === 'advanced' ? '' : 'none');
+}
+
+function toggleTeacher() {
+  state.teacherMode = !state.teacherMode;
+  document.body.classList.toggle('teacher-active', state.teacherMode);
+  const btn = document.querySelector('.teacher-btn');
+  btn.style.background = state.teacherMode ? '#0f766e' : '#1e293b';
+  btn.textContent = state.teacherMode ? '🎓 Teacher Mode ON' : '🎓 Teacher Mode';
+}
+
+// ═══════════════════════════════════════════════════
+// DATE HELPERS
+// ═══════════════════════════════════════════════════
+
+function getPeriods(purchaseDateStr, numPeriods) {
+  const periods = [];
+  const start = new Date(purchaseDateStr + 'T00:00:00');
+  const yeMonth = YEAR_END_MONTHS[state.inputs.yearEnd] ?? 11;
+  // Year 1: purchase date to first financial year-end
+  let firstYE = new Date(start.getFullYear(), yeMonth + 1, 0); // last day of year-end month
+  if (firstYE <= start) {
+    firstYE = new Date(start.getFullYear() + 1, yeMonth + 1, 0);
+  }
+  periods.push({ start: new Date(start), end: new Date(firstYE) });
+  // Subsequent years: full accounting years
+  for (let y = 1; y < numPeriods; y++) {
+    const prevEnd = periods[y - 1].end;
+    const yrStart = new Date(prevEnd);
+    yrStart.setDate(yrStart.getDate() + 1);
+    const yrEnd = new Date(yrStart.getFullYear(), yeMonth + 1, 0);
+    if (yrEnd <= yrStart) {
+      // Year-end month already passed, go to next year
+      yrEnd.setFullYear(yrEnd.getFullYear() + 1);
+    }
+    periods.push({ start: yrStart, end: new Date(yrEnd.getFullYear(), yeMonth + 1, 0) });
+  }
+  return periods;
+}
+
+function proRataFraction(purchaseDateStr, yearEnd) {
+  const d = new Date(purchaseDateStr + 'T00:00:00');
+  const yeMonth = YEAR_END_MONTHS[yearEnd] ?? 11;
+  const startMonth = d.getMonth();
+  let months = yeMonth >= startMonth ? yeMonth - startMonth + 1 : 12 - startMonth + yeMonth + 1;
+  if (months <= 0 || months > 12) months = 12;
+  return months / 12;
+}
+
+// ═══════════════════════════════════════════════════
+// SIX CALCULATION ENGINES
+// ═══════════════════════════════════════════════════
+
+function calcSLD(cost, residual, life, purchaseDate, yearEnd, proRata) {
+  const depreciable = cost - residual;
+  const annualDepr = depreciable / life;
+  const periods = getPeriods(purchaseDate, life);
+  const fraction = proRata ? proRataFraction(purchaseDate, yearEnd) : 1;
+  const rows = [];
+  let bv = cost, acc = 0;
+  const baseRate = 100 / life;
+  for (let y = 1; y <= life; y++) {
+    const openBV = bv;
+    let depr = y === 1 ? annualDepr * fraction : annualDepr;
+    if (y === life) depr = Math.max(0, openBV - residual);
+    depr = Math.max(0, Math.min(depr, openBV - residual));
+    acc += depr; bv = openBV - depr;
+    rows.push({ year: y, periodStr: fmtDate(periods[y-1].start) + ' – ' + fmtDate(periods[y-1].end),
+      rate: baseRate.toFixed(1) + '%', openingBV: openBV, depr, accumulated: acc, closingBV: bv });
+  }
+  return rows;
+}
+
+function calcRB(cost, residual, life, rate, purchaseDate, yearEnd, proRata) {
+  const r = rate / 100;
+  const periods = getPeriods(purchaseDate, life);
+  const fraction = proRata ? proRataFraction(purchaseDate, yearEnd) : 1;
+  const rows = [];
+  let bv = cost, acc = 0;
+  for (let y = 1; y <= life; y++) {
+    const openBV = bv;
+    let depr = openBV * r;
+    if (y === 1 && proRata) depr *= fraction;
+    if (openBV - depr < residual) depr = Math.max(0, openBV - residual);
+    acc += depr; bv = openBV - depr;
+    rows.push({ year: y, periodStr: fmtDate(periods[y-1].start) + ' – ' + fmtDate(periods[y-1].end),
+      rate: rate.toFixed(1) + '%', openingBV: openBV, depr, accumulated: acc, closingBV: bv });
+  }
+  // Final-year catch-up: ensure BV reaches residual exactly
+  if (rows.length && rows[rows.length - 1].closingBV > residual + 0.01) {
+    const last = rows[rows.length - 1];
+    const adjustment = last.closingBV - residual;
+    last.depr += adjustment;
+    last.accumulated += adjustment;
+    last.closingBV = residual;
+  }
+  return rows;
+}
+
+function calcDDB(cost, residual, life, purchaseDate, yearEnd, proRata) {
+  const ddbRate = 2 / life;
+  const periods = getPeriods(purchaseDate, life);
+  const fraction = proRata ? proRataFraction(purchaseDate, yearEnd) : 1;
+  const rows = [];
+  let bv = cost, acc = 0, switched = false, switchYear = null;
+  for (let y = 1; y <= life; y++) {
+    const openBV = bv;
+    const remainingLife = life - y + 1;
+    const ddbCharge = ddbRate * openBV;
+    const sldCharge = remainingLife > 0 ? (openBV - residual) / remainingLife : openBV - residual;
+    if (!switched && (sldCharge > ddbCharge || openBV - ddbCharge < residual)) { switched = true; switchYear = y; }
+    let depr = switched ? Math.min(sldCharge, openBV - residual) : ddbCharge;
+    if (y === 1 && proRata) depr *= fraction;
+    depr = Math.max(0, Math.min(depr, openBV - residual));
+    acc += depr; bv = openBV - depr;
+    const effectiveRate = switched ? (openBV > 0 ? (depr / openBV * 100) : 0) : (ddbRate * 100);
+    rows.push({ year: y, periodStr: fmtDate(periods[y-1].start) + ' – ' + fmtDate(periods[y-1].end),
+      rate: effectiveRate.toFixed(1) + '%' + (y === switchYear ? ' ↩' : ''),
+      openingBV: openBV, depr, accumulated: acc, closingBV: bv, isSwitchYear: y === switchYear });
+  }
+  return rows;
+}
+
+function calcSYD(cost, residual, life, purchaseDate, yearEnd, proRata) {
+  const syd = life * (life + 1) / 2;
+  const depreciable = cost - residual;
+  const periods = getPeriods(purchaseDate, life);
+  const fraction = proRata ? proRataFraction(purchaseDate, yearEnd) : 1;
+  const rows = [];
+  let bv = cost, acc = 0;
+  // With pro-rata: Year 1 is partial, then re-spread remaining over Years 2..life
+  const yr1FullDepr = (life / syd) * depreciable;
+  const yr1Depr = proRata ? yr1FullDepr * fraction : yr1FullDepr;
+  const remainingAfterYr1 = depreciable - yr1Depr;
+  // Remaining SYD fractions for years 2..life, renormalized to sum to 1
+  const remainFracSum = proRata ? (1 - (life / syd) * fraction) : 0; // unused if !proRata
+  for (let y = 1; y <= life; y++) {
+    const openBV = bv;
+    const origFrac = (life - y + 1) / syd;
+    let depr;
+    if (y === 1) {
+      depr = yr1Depr;
+    } else if (proRata) {
+      // Re-spread: use original fractions for years 2..life, scaled so they sum to remainingAfterYr1
+      const tailSyd = syd - life; // sum of fractions for years 2..life (in original SYD terms) = (syd - life)/syd
+      const scaledFrac = tailSyd > 0 ? origFrac / (tailSyd / syd) : origFrac;
+      depr = scaledFrac * remainingAfterYr1;
+    } else {
+      depr = origFrac * depreciable;
+    }
+    depr = Math.max(0, Math.min(depr, openBV - residual));
+    acc += depr; bv = openBV - depr;
+    rows.push({ year: y, periodStr: fmtDate(periods[y-1].start) + ' – ' + fmtDate(periods[y-1].end),
+      rate: (origFrac * 100).toFixed(1) + '%', openingBV: openBV, depr, accumulated: acc, closingBV: bv });
+  }
+  return rows;
+}
+
+function calcUOP(cost, residual, unitsPerYear, totalUnits, purchaseDate) {
+  const ratePerUnit = totalUnits > 0 ? (cost - residual) / totalUnits : 0;
+  const life = unitsPerYear.length;
+  const periods = getPeriods(purchaseDate, life);
+  const rows = [];
+  let bv = cost, acc = 0;
+  for (let y = 1; y <= life; y++) {
+    const openBV = bv;
+    let depr = ratePerUnit * (unitsPerYear[y-1] || 0);
+    depr = Math.max(0, Math.min(depr, openBV - residual));
+    acc += depr; bv = openBV - depr;
+    rows.push({ year: y, periodStr: fmtDate(periods[y-1].start) + ' – ' + fmtDate(periods[y-1].end),
+      rate: totalUnits > 0 ? ((unitsPerYear[y-1] || 0) / totalUnits * 100).toFixed(1) + '%' : '—',
+      openingBV: openBV, depr, accumulated: acc, closingBV: bv });
+  }
+  return rows;
+}
+
+function calcREV(revalRows, purchaseDate) {
+  const life = revalRows.length;
+  const periods = getPeriods(purchaseDate, life);
+  const rows = [];
+  let acc = 0;
+  for (let y = 1; y <= life; y++) {
+    const r = revalRows[y-1];
+    const openBV = (r.opening || 0) + (r.additions || 0);
+    let depr = openBV - (r.closing || 0);
+    if (depr < 0) depr = 0;
+    acc += depr;
+    rows.push({ year: y, periodStr: fmtDate(periods[y-1].start) + ' – ' + fmtDate(periods[y-1].end),
+      rate: openBV > 0 ? (depr / openBV * 100).toFixed(1) + '%' : '—',
+      openingBV: openBV, depr, accumulated: acc, closingBV: r.closing || 0 });
+  }
+  return rows;
+}
+
+function getMethodRowsOriginal(method) {
+  const s = state.inputs;
+  switch(method) {
+    case 'sld': return calcSLD(s.cost, s.residual, s.life, s.purchaseDate, s.yearEnd, s.proRata);
+    case 'rb': return calcRB(s.cost, s.residual, s.life, s.rate, s.purchaseDate, s.yearEnd, s.proRata);
+    case 'ddb': return calcDDB(s.cost, s.residual, s.life, s.purchaseDate, s.yearEnd, s.proRata);
+    case 'syd': return calcSYD(s.cost, s.residual, s.life, s.purchaseDate, s.yearEnd, s.proRata);
+    case 'uop': return calcUOP(s.cost, s.residual, s.unitsPerYear, s.totalUnits, s.purchaseDate);
+    case 'rev': return calcREV(s.revalRows, s.purchaseDate);
+    default: return [];
+  }
+}
+
+function getMethodRows(method) {
+  // If change in estimate is active and applicable, use the wrapper
+  if (state.inputs.changeYear && state.inputs.newLife && method === 'sld') {
+    return calcWithEstimateChange(method);
+  }
+  return getMethodRowsOriginal(method);
+}
+
+// ═══════════════════════════════════════════════════
+// INPUT HANDLING
+// ═══════════════════════════════════════════════════
+
+function readInputs() {
+  state.inputs.cost = parseFloat(document.getElementById('inp-cost')?.value) || 0;
+  state.inputs.residual = parseFloat(document.getElementById('inp-res')?.value) || 0;
+  state.inputs.life = parseInt(document.getElementById('inp-life')?.value) || 5;
+  state.inputs.rate = parseFloat(document.getElementById('inp-rate')?.value) || 20;
+  state.inputs.purchaseDate = document.getElementById('inp-date')?.value || '2024-04-01';
+  state.inputs.yearEnd = document.getElementById('inp-ye')?.value || 'December';
+  state.inputs.proRata = document.getElementById('inp-prorata')?.checked ?? true;
+  state.inputs.totalUnits = parseFloat(document.getElementById('inp-total-units')?.value) || 50000;
+  state.inputs.disposalDate = document.getElementById('inp-disposal-date')?.value || '';
+  state.inputs.proceeds = parseFloat(document.getElementById('inp-proceeds')?.value) || 0;
+  // Change in Estimate fields
+  const changeYearVal = document.getElementById('inp-change-year')?.value;
+  state.inputs.changeYear = changeYearVal ? parseInt(changeYearVal) : null;
+  const newLifeVal = document.getElementById('inp-new-life')?.value;
+  state.inputs.newLife = newLifeVal ? parseInt(newLifeVal) : null;
+  const newResidualVal = document.getElementById('inp-new-residual')?.value;
+  state.inputs.newResidual = newResidualVal !== '' && newResidualVal !== undefined && newResidualVal !== null ? parseFloat(newResidualVal) : null;
+  // Read UOP rows
+  const uopInputs = document.querySelectorAll('#uop-rows input');
+  state.inputs.unitsPerYear = Array.from(uopInputs).map(i => parseFloat(i.value) || 0);
+  // Read REV rows
+  const revRows = document.querySelectorAll('.rev-row');
+  state.inputs.revalRows = Array.from(revRows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { opening: parseFloat(inputs[0]?.value) || 0, additions: parseFloat(inputs[1]?.value) || 0, closing: parseFloat(inputs[2]?.value) || 0 };
+  });
+  // Update life display
+  const lifeDisp = document.getElementById('life-disp');
+  if (lifeDisp) lifeDisp.textContent = state.inputs.life + ' years';
+}
+
+function validateInputs() {
+  let valid = true;
+  const costEl = document.getElementById('inp-cost');
+  const resEl = document.getElementById('inp-res');
+  const rateEl = document.getElementById('inp-rate');
+  // Clear errors
+  document.querySelectorAll('.ctrl-input').forEach(el => el.classList.remove('error'));
+  document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+  if (state.inputs.cost <= 0) { costEl?.classList.add('error'); showError(costEl, 'Cost must be > 0'); valid = false; }
+  if (state.inputs.residual >= state.inputs.cost) { resEl?.classList.add('error'); showError(resEl, 'Residual must be < Cost'); valid = false; }
+  if (state.inputs.residual < 0) { resEl?.classList.add('error'); showError(resEl, 'Residual must be ≥ 0'); valid = false; }
+  const needsRate = state.activeMethods.rb || state.activeMethods.ddb || state.activeTab === 'rb' || state.activeTab === 'ddb';
+  if (needsRate && (state.inputs.rate <= 0 || state.inputs.rate > 100)) { rateEl?.classList.add('error'); showError(rateEl, 'Rate: 0-100%'); valid = false; }
+  return valid;
+}
+
+function showError(el, msg) {
+  const errDiv = el?.parentElement?.querySelector('.error-msg');
+  if (errDiv) { errDiv.textContent = msg; errDiv.classList.add('show'); }
+}
+
+let _debounceTimer = null;
+function onInputChange() {
+  readInputs();
+  updateAutoRate();
+  if (!validateInputs()) return;
+  clearTimeout(_debounceTimer);
+  _debounceTimer = setTimeout(() => {
+    updateDynamicRows();
+    buildAll();
+  }, 80);
+}
+
+function updateAutoRate() {
+  if (!state.inputs.rateIsManual && state.inputs.cost > 0 && state.inputs.residual > 0 && state.inputs.residual < state.inputs.cost) {
+    const autoRate = (1 - Math.pow(state.inputs.residual / state.inputs.cost, 1 / state.inputs.life)) * 100;
+    state.inputs.rate = autoRate;
+    const rateEl = document.getElementById('inp-rate');
+    if (rateEl) rateEl.value = autoRate.toFixed(1);
+  }
+  const badge = document.getElementById('auto-badge');
+  if (badge) {
+    badge.textContent = state.inputs.rateIsManual ? 'Manual' : 'Auto';
+    badge.classList.toggle('manual', state.inputs.rateIsManual);
+  }
+  // A-5: Warn when residual=0 breaks RB auto-rate
+  const rateErrDiv = document.getElementById('err-rate');
+  if (rateErrDiv && state.inputs.residual === 0 && !state.inputs.rateIsManual) {
+    rateErrDiv.textContent = 'Residual = 0: RB auto-rate is undefined (would be 100%). Enter a manual rate.';
+    rateErrDiv.classList.add('show');
+  } else if (rateErrDiv && state.inputs.residual !== 0) {
+    // Only clear if the warning was ours (not from validateInputs)
+    if (rateErrDiv.textContent.startsWith('Residual = 0')) {
+      rateErrDiv.textContent = '';
+      rateErrDiv.classList.remove('show');
+    }
+  }
+}
+
+function onCurrencyChange(code) {
+  state.currency = code;
+  if (typeof buildAll === 'function') buildAll();
+}
+
+function onRateInput() {
+  state.inputs.rateIsManual = true;
+  onInputChange();
+}
+
+function resetAutoRate() {
+  state.inputs.rateIsManual = false;
+  onInputChange();
+}
+
+function onMethodToggle(el) {
+  const m = el.dataset.method;
+  state.activeMethods[m] = el.checked;
+  // Show/hide UOP and REV sections
+  const uopSec = document.getElementById('uop-section');
+  const revSec = document.getElementById('rev-section');
+  if (uopSec) uopSec.style.display = state.activeMethods.uop ? '' : 'none';
+  if (revSec) revSec.style.display = state.activeMethods.rev ? '' : 'none';
+  buildAll();
+}
+
+function updateDynamicRows() {
+  // UOP rows
+  const uopContainer = document.getElementById('uop-rows');
+  if (uopContainer) {
+    const life = state.inputs.life;
+    const perYear = Math.round(state.inputs.totalUnits / life);
+    let html = '';
+    for (let y = 1; y <= life; y++) {
+      const val = state.inputs.unitsPerYear[y-1] || perYear;
+      html += `<div class="uop-row"><label>Yr ${y}:</label><input class="ctrl-input" type="number" value="${val}" oninput="onInputChange()"></div>`;
+    }
+    uopContainer.innerHTML = html;
+    // UOP warning
+    const warn = document.getElementById('uop-warn');
+    if (warn) {
+      const sum = state.inputs.unitsPerYear.reduce((a, b) => a + b, 0);
+      warn.style.display = sum > state.inputs.totalUnits ? 'block' : 'none';
+    }
+  }
+  // REV rows
+  const revContainer = document.getElementById('rev-rows');
+  if (revContainer) {
+    const life = state.inputs.life;
+    let html = '';
+    for (let y = 1; y <= life; y++) {
+      const existing = state.inputs.revalRows[y-1] || {};
+      // Auto-chain: opening defaults to previous year's closing value
+      const prevClosing = y > 1 ? (state.inputs.revalRows[y-2]?.closing || Math.round(state.inputs.cost * Math.pow(0.85, y-1))) : null;
+      const openDef = y === 1 ? state.inputs.cost : prevClosing;
+      const closeDef = Math.round((existing.opening || openDef) * 0.85);
+      html += `<div class="rev-row"><label style="min-width:28px">Yr${y}</label>
+        <input class="ctrl-input" type="number" value="${existing.opening || openDef}" placeholder="Open" title="Opening Value" oninput="onInputChange()">
+        <input class="ctrl-input" type="number" value="${existing.additions || 0}" placeholder="Add" title="Additions" oninput="onInputChange()">
+        <input class="ctrl-input" type="number" value="${existing.closing || closeDef}" placeholder="Close" title="Closing Value" oninput="onInputChange()">
+      </div>`;
+    }
+    revContainer.innerHTML = html;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// TABLE RENDERING
+// ═══════════════════════════════════════════════════
+
+function renderTable(rows, title, method) {
+  const totalDepr = rows.reduce((s, r) => s + r.depr, 0);
+  const lastRow = rows[rows.length - 1];
+  const tableId = 'tbl-' + method + '-' + Math.random().toString(36).slice(2,6);
+  let html = `<div class="table-card">
+    <div class="table-card-header"><h4>${title}</h4>
+      <div style="display:flex;gap:5px;align-items:center">
+        <button class="copy-btn" onclick="copyTable('${tableId}')" title="Copy table to clipboard">📋 Copy</button>
+        <div class="export-btns"><button class="export-btn csv" onclick="exportCSV('${method}')">↓ CSV</button>
+          <button class="export-btn pdf" onclick="window.print()">↓ PDF</button></div></div></div>
+    <div style="overflow-x:auto"><table class="grid-table depr-table" id="${tableId}">
+    <thead><tr><th>Yr</th><th style="text-align:left">Period / Exercice</th><th>Rate / Taux</th><th style="text-align:right">Opening BV / VNC début ${curSym() ? '(' + curSym().trim() + ')' : ''}</th><th style="text-align:right">Depr / Dotation ${curSym() ? '(' + curSym().trim() + ')' : ''}</th><th style="text-align:right">Accumulated / Cumul ${curSym() ? '(' + curSym().trim() + ')' : ''}</th><th style="text-align:right">Closing BV / VNC fin ${curSym() ? '(' + curSym().trim() + ')' : ''}</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    const cls = r.isSwitchYear ? ' style="background:#2d1a0033"' : (r.isEstimateChange ? ' style="background:#4338ca22"' : '');
+    const estimateTag = r.isEstimateChange ? ' <span style="font-size:9px;color:#a5b4fc;font-weight:700" title="IAS 8: Change in estimate applied prospectively">🔄 IAS 8</span>' : '';
+    html += `<tr${cls}><td style="text-align:center">${r.year}${estimateTag}</td><td style="text-align:left;font-size:10px">${r.periodStr}</td><td style="text-align:center">${r.rate}</td>
+      <td style="text-align:right">${fmt(r.openingBV)}</td><td style="text-align:right">${fmt(r.depr)}</td>
+      <td style="text-align:right">${fmt(r.accumulated)}</td><td style="text-align:right">${fmt(r.closingBV)}</td></tr>`;
+  });
+  html += `<tr class="total-row"><td colspan="2" style="text-align:left">Total</td><td>—</td><td style="text-align:right">—</td>
+    <td style="text-align:right">${fmt(totalDepr)}</td><td style="text-align:right">${fmt(lastRow?.accumulated || 0)}</td>
+    <td style="text-align:right">${fmt(lastRow?.closingBV || 0)}</td></tr>`;
+  html += '</tbody></table></div></div>';
+  return html;
+}
+
+function exportCSV(method) {
+  const rows = getMethodRows(method);
+  let csv = 'Year,Period,Rate,Opening BV,Depreciation,Accumulated,Closing BV\n';
+  rows.forEach(r => { csv += `${r.year},"${r.periodStr}",${r.rate},${Math.round(r.openingBV)},${Math.round(r.depr)},${Math.round(r.accumulated)},${Math.round(r.closingBV)}\n`; });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `depreciation_${method}.csv`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════
+// CLIPBOARD COPY FUNCTIONS
+// ═══════════════════════════════════════════════════
+
+function flashCopied(btn, origText) {
+  const orig = origText || btn.textContent;
+  btn.textContent = '✓ Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+}
+
+function copyTable(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  // Build tab-separated text (pasteable into Excel/Sheets)
+  let text = '';
+  const headerCells = table.querySelectorAll('thead th');
+  text += Array.from(headerCells).map(th => th.textContent.trim()).join('\t') + '\n';
+  const bodyRows = table.querySelectorAll('tbody tr');
+  bodyRows.forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    text += Array.from(cells).map(td => td.textContent.replace(/🔄 IAS 8/g, '').trim()).join('\t') + '\n';
+  });
+  // Also build HTML for rich paste
+  const htmlStr = table.outerHTML;
+  const blob = new Blob([htmlStr], { type: 'text/html' });
+  const textBlob = new Blob([text], { type: 'text/plain' });
+  try {
+    navigator.clipboard.write([new ClipboardItem({ 'text/html': blob, 'text/plain': textBlob })]).then(() => {
+      const btn = table.closest('.table-card')?.querySelector('.copy-btn');
+      if (btn) flashCopied(btn, '📋 Copy');
+    });
+  } catch(e) {
+    // Fallback: plain text copy
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = table.closest('.table-card')?.querySelector('.copy-btn');
+      if (btn) flashCopied(btn, '📋 Copy');
+    });
+  }
+}
+
+function copyChart(btn) {
+  const card = btn.closest('.chart-card');
+  if (!card) return;
+  const svg = card.querySelector('svg');
+  if (svg) {
+    // Convert SVG to PNG via canvas
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * 2;
+      canvas.height = img.height * 2;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(2, 2);
+      // Dark background
+      ctx.fillStyle = '#1a1d2e';
+      ctx.fillRect(0, 0, img.width, img.height);
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(blob => {
+        try {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => flashCopied(btn, '📋'));
+        } catch(e) {
+          // Fallback: download
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'chart.png';
+          a.click();
+          flashCopied(btn, '📋');
+        }
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    };
+    img.src = url;
+  } else {
+    // No SVG — copy the card as HTML (for grouped bars etc)
+    const html = card.innerHTML;
+    navigator.clipboard.writeText(card.textContent).then(() => flashCopied(btn, '📋'));
+  }
+}
+
+function copySolution() {
+  const resultDiv = document.getElementById('whif-result-content');
+  if (!resultDiv) return;
+  // Build plain text version
+  let text = '=== SOLUTION ===\n';
+  const value = resultDiv.querySelector('[style*="font-size:28px"]');
+  const label = resultDiv.querySelector('[style*="color:#64748b"]');
+  if (value) text += value.textContent.trim() + '\n';
+  if (label) text += label.textContent.trim() + '\n\n';
+  // Workings
+  const workings = resultDiv.querySelector('.result-workings');
+  if (workings) {
+    text += 'WORKINGS:\n';
+    workings.querySelectorAll('div').forEach(d => { text += d.textContent.trim() + '\n'; });
+  }
+  // Schedule table
+  const table = resultDiv.querySelector('.grid-table');
+  if (table) {
+    text += '\nDEPRECIATION SCHEDULE:\n';
+    const headers = table.querySelectorAll('thead th');
+    text += Array.from(headers).map(th => th.textContent.trim()).join('\t') + '\n';
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      const cells = tr.querySelectorAll('td');
+      text += Array.from(cells).map(td => td.textContent.replace(/🔄 IAS 8/g, '').trim()).join('\t') + '\n';
+    });
+  }
+  // Also copy as HTML for rich paste
+  const htmlStr = resultDiv.innerHTML;
+  const htmlBlob = new Blob([htmlStr], { type: 'text/html' });
+  const textBlob = new Blob([text], { type: 'text/plain' });
+  try {
+    navigator.clipboard.write([new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob })]).then(() => {
+      const btn = resultDiv.querySelector('.copy-btn');
+      if (btn) flashCopied(btn, '📋 Copy Solution');
+    });
+  } catch(e) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = resultDiv.querySelector('.copy-btn');
+      if (btn) flashCopied(btn, '📋 Copy Solution');
+    });
+  }
+}
+
+function copyJournalEntry() {
+  const card = document.getElementById('je-card');
+  if (!card) return;
+  const table = card.querySelector('.journal-table');
+  const narration = card.querySelector('.je-narration');
+  let text = 'JOURNAL ENTRY\n';
+  text += '─'.repeat(50) + '\n';
+  if (table) {
+    table.querySelectorAll('tr').forEach(tr => {
+      const cells = tr.querySelectorAll('td');
+      const parts = Array.from(cells).map(td => td.textContent.trim()).filter(Boolean);
+      text += parts.join('\t') + '\n';
+    });
+  }
+  if (narration) text += '─'.repeat(50) + '\n' + narration.textContent.trim() + '\n';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = card.querySelector('.copy-btn-sm');
+    if (btn) flashCopied(btn, '📋');
+  });
+}
+
+function copyDisposalAnalysis() {
+  const card = document.querySelector('.disposal-result-card');
+  if (!card) return;
+  let text = 'DISPOSAL ANALYSIS — CESSION D\'IMMOBILISATION\n';
+  text += '═'.repeat(50) + '\n';
+  card.querySelectorAll('.disposal-row').forEach(row => {
+    const spans = row.querySelectorAll('span');
+    if (spans.length >= 2) text += spans[0].textContent.trim() + '\t' + spans[1].textContent.trim() + '\n';
+  });
+  card.querySelectorAll('.journal-table').forEach((table, i) => {
+    const narr = table.previousElementSibling;
+    if (narr) text += '\n' + narr.textContent.trim() + '\n';
+    text += '─'.repeat(40) + '\n';
+    table.querySelectorAll('tr').forEach(tr => {
+      const cells = tr.querySelectorAll('td');
+      text += Array.from(cells).map(td => td.textContent.trim()).filter(Boolean).join('\t') + '\n';
+    });
+  });
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = card.querySelector('.copy-btn-sm');
+    if (btn) flashCopied(btn, '📋');
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// CHART RENDERING
+// ═══════════════════════════════════════════════════
+
+function renderBarChart(rows) {
+  if (!rows.length) return '';
+  const chartId = 'bar-' + Math.random().toString(36).slice(2,6);
+  const maxDepr = Math.max(...rows.map(r => r.depr));
+  // Use percentage-based layout so bars fill the full card width
+  const n = rows.length;
+  const yAxisW = 44;
+  const topPad = 18, botPad = 16, labelH = 14;
+  const h = 180; // taller chart
+  const plotH = h - topPad - botPad - labelH;
+  // Calculate bar widths to fill available space
+  const plotW = 400; // viewBox width for bars area
+  const totalW = yAxisW + plotW;
+  const barW = Math.max(8, (plotW - 4) / n * 0.75);
+  const step = plotW / n;
+  let svg = '';
+  // Y-axis grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = topPad + (plotH / 4) * i;
+    const val = maxDepr * (1 - i / 4);
+    svg += `<line x1="${yAxisW}" y1="${y}" x2="${totalW}" y2="${y}" stroke="#1e293b" stroke-width="0.5"/>`;
+    svg += `<text x="${yAxisW - 4}" y="${y + 3}" text-anchor="end" fill="#64748b" font-size="7">${fmtC(val)}</text>`;
+  }
+  // Bars — fill the full width
+  rows.forEach((r, i) => {
+    const barH = maxDepr > 0 ? (r.depr / maxDepr) * plotH : 0;
+    const x = yAxisW + i * step + (step - barW) / 2;
+    const y = topPad + plotH - barH;
+    const color = METHOD_COLORS[state.activeTab] || '#6366f1';
+    svg += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="2" fill="${color}" opacity="${0.5 + i / rows.length * 0.5}"/>`;
+    // X-axis label
+    svg += `<text x="${x + barW / 2}" y="${h - 2}" text-anchor="middle" fill="#64748b" font-size="8">Y${r.year}</text>`;
+    // Data label always shown
+    const labelSize = n > 15 ? 6 : 7;
+    svg += '<text x="' + (x + barW / 2) + '" y="' + (y - 4) + '" text-anchor="middle" fill="' + color + '" font-size="' + labelSize + '" font-weight="600">$' + fmt(r.depr) + '</text>';
+  });
+  return `<div class="chart-card"><div class="chart-header"><h5>Annual Depreciation</h5><button class="copy-btn-sm" onclick="copyChart(this)" title="Copy chart as image">📋</button></div><svg viewBox="0 0 ${totalW} ${h}" width="100%" preserveAspectRatio="xMidYMid meet" id="${chartId}" style="overflow:visible;display:block">${svg}</svg></div>`;
+}
+
+function renderLineChart(rows, method) {
+  if (!rows.length) return '';
+  const cost = state.inputs.cost;
+  const res = state.inputs.residual;
+  const h = 110, w = 300, pad = 35;
+  const plotW = w - pad * 2, plotH = h - 30;
+  let svg = '';
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = 10 + (plotH / 4) * i;
+    svg += `<line x1="${pad}" y1="${y}" x2="${w - 10}" y2="${y}" stroke="#1e293b" stroke-width="0.5"/>`;
+    svg += `<text x="${pad - 4}" y="${y + 3}" text-anchor="end" fill="#64748b" font-size="7">${fmtC(cost - (cost - res) * i / 4)}</text>`;
+  }
+  // BV line
+  let pts = '';
+  rows.forEach((r, i) => {
+    const x = pad + (i / Math.max(rows.length - 1, 1)) * plotW;
+    const y = 10 + (1 - (r.closingBV - res) / Math.max(cost - res, 1)) * plotH;
+    pts += `${x},${y} `;
+  });
+  svg += `<polyline points="${pts}" fill="none" stroke="${METHOD_COLORS[method] || '#6366f1'}" stroke-width="2"/>`;
+  // Accumulated line (dashed)
+  const depreciable = cost - res;
+  let accPts = '';
+  rows.forEach((r, i) => {
+    const x = pad + (i / Math.max(rows.length - 1, 1)) * plotW;
+    const y = 10 + (1 - r.accumulated / Math.max(depreciable, 1)) * plotH;
+    accPts += `${x},${y} `;
+  });
+  svg += `<polyline points="${accPts}" fill="none" stroke="${'#f59e0b'}" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  // Data points
+  rows.forEach((r, i) => {
+    const x = pad + (i / Math.max(rows.length - 1, 1)) * plotW;
+    const y = 10 + (1 - (r.closingBV - res) / Math.max(cost - res, 1)) * plotH;
+    svg += `<circle cx="${x}" cy="${y}" r="3" fill="${METHOD_COLORS[method] || '#6366f1'}"><title>Year ${r.year}: BV ${fmtC(r.closingBV)} | Acc ${fmtC(r.accumulated)}</title></circle>`;
+  });
+  // X labels
+  rows.forEach((r, i) => {
+    const x = pad + (i / Math.max(rows.length - 1, 1)) * plotW;
+    svg += `<text x="${x}" y="${h}" text-anchor="middle" fill="#64748b" font-size="8">Y${r.year}</text>`;
+  });
+  // Overlay pills
+  let pills = '<div class="overlay-pills">';
+  pills += `<span style="font-size:9px;color:#64748b;margin-right:4px">Overlay:</span>`;
+  Object.keys(METHOD_NAMES).forEach(m => {
+    if (m !== method && state.activeMethods[m]) {
+      pills += `<span class="overlay-pill" style="border-color:${METHOD_COLORS[m]}40;color:${METHOD_COLORS[m]}" onclick="toggleOverlay(this,'${m}')">${METHOD_NAMES[m]}</span>`;
+    }
+  });
+  pills += '</div>';
+  // Legend
+  let legend = `<div style="font-size:9px;margin-top:4px;display:flex;gap:12px"><span style="color:${METHOD_COLORS[method]}">— Book Value</span><span style="color:#f59e0b">┅ Accumulated</span></div>`;
+  return `<div class="chart-card"><div class="chart-header"><h5>Book Value & Accumulated Over Time</h5><button class="copy-btn-sm" onclick="copyChart(this)" title="Copy chart as image">📋</button></div>${pills}<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">${svg}</svg>${legend}</div>`;
+}
+
+const activeOverlays = new Set();
+function toggleOverlay(el, method) {
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    activeOverlays.add(method);
+    el.style.background = METHOD_COLORS[method] + '22';
+    el.style.borderColor = METHOD_COLORS[method];
+  } else {
+    activeOverlays.delete(method);
+    el.style.background = '';
+    el.style.borderColor = METHOD_COLORS[method] + '40';
+  }
+  // Re-render the line chart SVG with overlay lines
+  const svgContainer = el.closest('.chart-card')?.querySelector('svg');
+  if (!svgContainer) return;
+  // Remove old overlays
+  svgContainer.querySelectorAll('.overlay-line').forEach(l => l.remove());
+  const cost = state.inputs.cost, res = state.inputs.residual;
+  const baseRows = getMethodRows(state.activeTab);
+  const pad = 35, plotW = 300 - pad * 2, plotH = 80;
+  activeOverlays.forEach(m => {
+    const rows = getMethodRows(m);
+    if (!rows.length) return;
+    let pts = '';
+    rows.forEach((r, i) => {
+      const x = pad + (i / Math.max(rows.length - 1, 1)) * plotW;
+      const y = 10 + (1 - (r.closingBV - res) / Math.max(cost - res, 1)) * plotH;
+      pts += `${x},${y} `;
+    });
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    line.setAttribute('points', pts);
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', METHOD_COLORS[m]);
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('stroke-dasharray', '6,3');
+    line.setAttribute('class', 'overlay-line');
+    svgContainer.appendChild(line);
+  });
+}
+
+function renderDonut(rows) {
+  if (!rows.length) return '';
+  const midYear = Math.max(1, Math.ceil(rows.length / 2));
+  const total = state.activeTab === 'rev' ? rows.reduce((s, r) => s + r.depr, 0) : (state.inputs.cost - state.inputs.residual);
+  const circumference = 2 * Math.PI * 40;
+  let html = `<div class="chart-card" style="text-align:center"><div class="chart-header" style="justify-content:center"><h5>Accumulated vs Remaining</h5><button class="copy-btn-sm" onclick="copyChart(this)" title="Copy chart as image">📋</button></div>
+    <div style="margin-bottom:6px"><label style="font-size:9px;color:#64748b">At Year: </label>
+    <input type="range" min="1" max="${rows.length}" value="${midYear}" style="width:80px;accent-color:var(--accent);vertical-align:middle"
+      oninput="updateDonut(this.value, ${rows.length})">
+    <span id="donut-year-label" style="font-size:11px;color:var(--accent);font-weight:700"> Yr ${midYear}</span></div>`;
+  const row = rows[midYear - 1];
+  const pct = total > 0 ? (row.accumulated / total * 100) : 0;
+  const dash = circumference * pct / 100;
+  html += `<svg viewBox="0 0 100 100" width="100" height="100" id="donut-svg">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="16"/>
+      <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent)" stroke-width="16" id="donut-arc"
+        stroke-dasharray="${dash} ${circumference}" stroke-dashoffset="${circumference/4}" transform="rotate(-90 50 50)"/>
+      <text x="50" y="48" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" id="donut-pct">${Math.round(pct)}%</text>
+      <text x="50" y="62" text-anchor="middle" fill="#64748b" font-size="8" id="donut-val">${fmtC(row.accumulated)}</text>
+    </svg>
+    <div style="font-size:9px;margin-top:4px"><span style="color:var(--accent)">■</span> Depreciated &nbsp;<span style="color:#1e293b;border:1px solid #334155;padding:0 2px">■</span> Remaining</div></div>`;
+  return html;
+}
+
+let _donutRows = [];
+function updateDonut(yr, maxYr) {
+  yr = parseInt(yr);
+  const rows = _donutRows.length ? _donutRows : getMethodRows(state.activeTab);
+  const row = rows[Math.min(yr, rows.length) - 1];
+  if (!row) return;
+  const total = state.activeTab === 'rev' ? rows.reduce((s, r) => s + r.depr, 0) : (state.inputs.cost - state.inputs.residual);
+  const pct = total > 0 ? (row.accumulated / total * 100) : 0;
+  const circumference = 2 * Math.PI * 40;
+  const dash = circumference * pct / 100;
+  const arc = document.getElementById('donut-arc');
+  const pctText = document.getElementById('donut-pct');
+  const valText = document.getElementById('donut-val');
+  const label = document.getElementById('donut-year-label');
+  if (arc) arc.setAttribute('stroke-dasharray', `${dash} ${circumference}`);
+  if (pctText) pctText.textContent = Math.round(pct) + '%';
+  if (valText) valText.textContent = fmtC(row.accumulated);
+  if (label) label.textContent = ' Yr ' + yr;
+}
+
+let _allMethodRows = {};
+function renderGroupedBars() {
+  const methods = Object.keys(state.activeMethods).filter(m => state.activeMethods[m]);
+  if (!methods.length) return '';
+  // Cache all method rows for the year slider
+  _allMethodRows = {};
+  let maxLife = 0;
+  methods.forEach(m => { _allMethodRows[m] = getMethodRows(m); maxLife = Math.max(maxLife, _allMethodRows[m].length); });
+  const defaultYear = 1;
+  const charges = {};
+  methods.forEach(m => { charges[m] = _allMethodRows[m][0]?.depr || 0; });
+  const maxC = Math.max(...Object.values(charges), 1);
+  // Build SVG bars that fill the space properly
+  const barWidth = Math.max(28, Math.min(60, 280 / methods.length));
+  const gap = 8;
+  const svgW = methods.length * (barWidth + gap);
+  const svgH = 120;
+  const topPad = 18, botPad = 16;
+  const plotH = svgH - topPad - botPad;
+  let svg = '';
+  methods.forEach((m, i) => {
+    const x = i * (barWidth + gap);
+    const h = maxC > 0 ? (charges[m] / maxC) * plotH : 0;
+    const y = topPad + plotH - h;
+    svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${h}" rx="3" fill="${METHOD_COLORS[m]}"/>`;
+    svg += `<text x="${x + barWidth/2}" y="${y - 4}" text-anchor="middle" fill="${METHOD_COLORS[m]}" font-size="9" font-weight="700">${fmtC(charges[m])}</text>`;
+    svg += `<text x="${x + barWidth/2}" y="${svgH - 2}" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">${m.toUpperCase()}</text>`;
+  });
+  let html = `<div class="chart-card" id="grouped-bars-card">
+    <div class="chart-header"><h5>Method Charges Comparison</h5><button class="copy-btn-sm" onclick="copyChart(this)" title="Copy chart as image">📋</button></div>
+    <div style="margin-bottom:6px"><label style="font-size:9px;color:#64748b">At Year: </label>
+      <input type="range" min="1" max="${maxLife}" value="${defaultYear}" style="width:100px;accent-color:var(--accent);vertical-align:middle"
+        oninput="updateGroupedBars(this.value)">
+      <span id="gb-year-label" style="font-size:11px;color:var(--accent);font-weight:700"> Yr 1</span>
+    </div>
+    <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" height="${svgH}" id="grouped-bars-svg" style="overflow:visible">${svg}</svg>
+  </div>`;
+  return html;
+}
+
+function updateGroupedBars(yr) {
+  yr = parseInt(yr);
+  const methods = Object.keys(_allMethodRows).filter(m => _allMethodRows[m]?.length);
+  if (!methods.length) return;
+  const charges = {};
+  methods.forEach(m => { charges[m] = _allMethodRows[m][Math.min(yr, _allMethodRows[m].length) - 1]?.depr || 0; });
+  const maxC = Math.max(...Object.values(charges), 1);
+  const barWidth = Math.max(28, Math.min(60, 280 / methods.length));
+  const gap = 8;
+  const svgW = methods.length * (barWidth + gap);
+  const svgH = 120;
+  const topPad = 18, botPad = 16;
+  const plotH = svgH - topPad - botPad;
+  let svg = '';
+  methods.forEach((m, i) => {
+    const x = i * (barWidth + gap);
+    const h = maxC > 0 ? (charges[m] / maxC) * plotH : 0;
+    const y = topPad + plotH - h;
+    svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${h}" rx="3" fill="${METHOD_COLORS[m]}"/>`;
+    svg += `<text x="${x + barWidth/2}" y="${y - 4}" text-anchor="middle" fill="${METHOD_COLORS[m]}" font-size="9" font-weight="700">${fmtC(charges[m])}</text>`;
+    svg += `<text x="${x + barWidth/2}" y="${svgH - 2}" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">${m.toUpperCase()}</text>`;
+  });
+  const svgEl = document.getElementById('grouped-bars-svg');
+  if (svgEl) { svgEl.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`); svgEl.innerHTML = svg; }
+  const label = document.getElementById('gb-year-label');
+  if (label) label.textContent = ' Yr ' + yr;
+}
+
+// ═══════════════════════════════════════════════════
+// TAB RENDERING
+// ═══════════════════════════════════════════════════
+
+function renderTabs() {
+  const tabBar = document.getElementById('method-tabs');
+  if (!tabBar) return;
+  let html = '';
+  const order = ['sld','rb','ddb','syd','uop','rev'];
+  order.forEach(m => {
+    if (state.activeMethods[m]) {
+      html += `<button class="method-tab ${state.activeTab === m ? 'active' : ''}" onclick="setTab('${m}')">${METHOD_NAMES[m]}</button>`;
+    }
+  });
+  html += `<button class="method-tab compare ${state.activeTab === 'compare' ? 'active' : ''}" onclick="setTab('compare')">⚖ Compare All</button>`;
+  html += `<button class="method-tab whif ${state.activeTab === 'whif' ? 'active' : ''}" onclick="setTab('whif')">🔮 What-If</button>`;
+  html += `<button class="method-tab ${state.activeTab === 'examples' ? 'active' : ''}" style="background:#1e293b;color:#a5b4fc;border:1px solid #4338ca" onclick="setTab('examples')">📖 Examples</button>`;
+  tabBar.innerHTML = html;
+}
+
+function setTab(tab) {
+  state.activeTab = tab;
+  renderTabs();
+  renderCenterContent();
+  renderRightPanel();
+}
+
+function renderCenterContent() {
+  const body = document.getElementById('center-body');
+  if (!body) return;
+  if (state.activeTab === 'compare') {
+    body.innerHTML = renderCompareTab();
+  } else if (state.activeTab === 'whif') {
+    body.innerHTML = renderWhifTab();
+  } else if (state.activeTab === 'examples') {
+    body.innerHTML = renderExamplesTab();
+    return;
+  } else {
+    const rows = getMethodRows(state.activeTab);
+    // Warn if change in estimate is set but method is not SLD
+    let html = '';
+    if (state.inputs.changeYear && state.inputs.newLife && state.activeTab !== 'sld' && state.activeTab !== 'compare' && state.activeTab !== 'whif' && state.activeTab !== 'examples') {
+      html += '<div style="background:#2d1a00;border:1px solid #78350f;border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:#fcd34d;line-height:1.5">⚠ <strong>Change in estimate is currently only applied to Straight-Line method.</strong> The schedule below uses the original parameters. Switch to SLD tab to see the revised schedule.</div>';
+    }
+    html += renderTable(rows, METHOD_NAMES[state.activeTab] + ' Schedule', state.activeTab);
+    html += '<div class="charts-row">' + renderBarChart(rows, state.activeTab) + renderLineChart(rows, state.activeTab) + '</div>';
+    _donutRows = rows; // Store for donut slider
+    html += '<div class="charts-row">' + renderDonut(rows) + renderGroupedBars() + '</div>';
+    body.innerHTML = html;
+  }
+}
+
+function renderCompareTab() {
+  const methods = Object.keys(state.activeMethods).filter(m => state.activeMethods[m]);
+  const allRows = {};
+  let maxLife = 0;
+  methods.forEach(m => { allRows[m] = getMethodRows(m); maxLife = Math.max(maxLife, allRows[m].length); });
+  const cmpId = 'cmp-' + Math.random().toString(36).slice(2,6);
+  let html = '<div class="table-card"><div class="table-card-header"><h4>All Methods — Side by Side</h4><button class="copy-btn" onclick="copyTable(\'' + cmpId + '\')" title="Copy table">📋 Copy</button></div><div style="overflow-x:auto"><table class="grid-table" id="' + cmpId + '">';
+  html += '<thead><tr><th>Yr</th><th style="text-align:left">Period</th>';
+  methods.forEach(m => { html += `<th style="text-align:right;color:${METHOD_COLORS[m]}">${m.toUpperCase()} ($)</th>`; });
+  html += '</tr></thead><tbody>';
+  for (let y = 0; y < maxLife; y++) {
+    const periodStr = allRows[methods[0]]?.[y]?.periodStr || '';
+    html += `<tr><td style="text-align:center">${y+1}</td><td style="text-align:left;font-size:10px">${periodStr}</td>`;
+    methods.forEach(m => { html += `<td style="text-align:right">${fmtC(allRows[m]?.[y]?.depr || 0)}</td>`; });
+    html += '</tr>';
+  }
+  // Total row
+  html += '<tr class="total-row"><td colspan="2" style="text-align:left">Total</td>';
+  methods.forEach(m => { const total = allRows[m]?.reduce((s, r) => s + r.depr, 0) || 0; html += `<td style="text-align:right">${fmtC(total)}</td>`; });
+  html += '</tr></tbody></table></div></div>';
+
+  // ─── Financial Statement Impact ───
+  html += '<div class="fs-section">';
+
+  // 3a. Compte de Resultat (Income Statement)
+  html += '<div class="fs-card"><h5>Compte de R&eacute;sultat (Income Statement Extract)</h5>';
+  html += '<div style="overflow-x:auto"><table class="grid-table"><thead><tr><th>Year</th>';
+  methods.forEach(m => { html += `<th style="text-align:right;color:${METHOD_COLORS[m]}">Depr. ${m.toUpperCase()}</th>`; });
+  html += '<th style="text-align:right">Revenue</th>';
+  methods.forEach(m => { html += `<th style="text-align:right;color:${METHOD_COLORS[m]}">Profit Impact ${m.toUpperCase()}</th>`; });
+  html += '</tr></thead><tbody>';
+  for (let y = 0; y < maxLife; y++) {
+    html += `<tr><td style="text-align:center">${y + 1}</td>`;
+    methods.forEach(m => { html += `<td style="text-align:right">${fmtC(allRows[m]?.[y]?.depr || 0)}</td>`; });
+    html += '<td style="text-align:center;color:#64748b">&mdash;</td>';
+    methods.forEach(m => {
+      const depr = allRows[m]?.[y]?.depr || 0;
+      html += `<td style="text-align:right;color:#f87171">(${fmtC(depr)})</td>`;
+    });
+    html += '</tr>';
+  }
+  html += '</tbody></table></div></div>';
+
+  // 3b. Bilan (Balance Sheet)
+  const cost = state.inputs.cost;
+  html += '<div class="fs-card"><h5>Bilan (Balance Sheet Extract)</h5>';
+  html += '<div style="overflow-x:auto"><table class="grid-table"><thead><tr><th>Year</th>';
+  methods.forEach(m => {
+    html += `<th style="text-align:right;color:${METHOD_COLORS[m]}">Immo. Co&ucirc;t (${m.toUpperCase()})</th>`;
+    html += `<th style="text-align:right;color:${METHOD_COLORS[m]}">Amort. Cum. (${m.toUpperCase()})</th>`;
+    html += `<th style="text-align:right;color:${METHOD_COLORS[m]}">VNC (${m.toUpperCase()})</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  for (let y = 0; y < maxLife; y++) {
+    html += `<tr><td style="text-align:center">${y + 1}</td>`;
+    methods.forEach(m => {
+      const row = allRows[m]?.[y];
+      html += `<td style="text-align:right">${fmtC(cost)}</td>`;
+      html += `<td style="text-align:right">(${fmtC(row?.accumulated || 0)})</td>`;
+      html += `<td style="text-align:right;font-weight:700">${fmtC(row?.closingBV || 0)}</td>`;
+    });
+    html += '</tr>';
+  }
+  html += '</tbody></table></div></div>';
+
+  // 3c. Cash Flow Note
+  html += `<div class="fs-card"><h5>Cash Flow Note (IAS 7)</h5>
+    <div class="fs-note">Depreciation is a non-cash expense (IAS 7.28). Cash impact: <strong>$0 each year</strong>. Cash was paid at acquisition: <strong>${fmtC(cost)}</strong>. Under SYSCOHADA, amortissements are added back in the Tableau de Financement (Emplois-Ressources).</div></div>`;
+
+  html += '</div>'; // close fs-section
+
+  return html;
+}
+
+// ═══════════════════════════════════════════════════
+// WHAT-IF ANALYSIS
+// ═══════════════════════════════════════════════════
+
+function renderWhifTab() {
+  const w = state.whif;
+  // Method selector
+  let html = '<div class="whif-panel"><div class="whif-header"><div><div style="font-size:14px;font-weight:800;color:#fbbf24">🔮 What-If Analysis & Reverse Solver</div><div style="font-size:11px;color:#92400e;margin-top:3px">Fill in what you know, lock those values, leave ONE unlocked — we solve for it.</div></div></div>';
+  html += '<div style="padding:18px">';
+  // Method pills
+  html += '<div class="whif-method-row"><span class="whif-method-label">Method:</span>';
+  ['sld','rb','ddb','syd','uop'].forEach(m => {
+    html += `<button class="whif-method-btn ${w.method === m ? 'active' : ''}" onclick="setWhifMethod('${m}')">${METHOD_NAMES[m]}</button>`;
+  });
+  html += '</div>';
+  // Presets
+  html += '<div style="font-size:10px;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Quick Scenarios</div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
+  html += '<button class="preset-btn" onclick="loadPreset(\'find-life\')">Find: Useful Life</button>';
+  html += '<button class="preset-btn" onclick="loadPreset(\'find-cost\')">Find: Original Cost</button>';
+  html += '<button class="preset-btn" onclick="loadPreset(\'find-rate\')">Find: Depreciation Rate</button>';
+  html += '<button class="preset-btn" onclick="loadPreset(\'find-res\')">Find: Residual Value</button>';
+  html += '<button class="preset-btn" onclick="loadPreset(\'find-depr\')">Find: Annual Depreciation</button>';
+  html += '</div>';
+  // Variable cards
+  const cards = [
+    { id: 'cost', label: 'Cost Price', unit: '$ — original purchase price' },
+    { id: 'residual', label: 'Residual Value', unit: '$ — expected scrap value' },
+    { id: 'annualDepr', label: state.whif.method === 'syd' ? 'Year 1 Depreciation' : 'Annual Depreciation', unit: state.whif.method === 'syd' ? '$ — Year 1 charge only (SYD varies)' : '$ — charge per year' },
+    { id: 'life', label: 'Useful Life', unit: 'years' },
+    { id: 'rate', label: 'Rate %', unit: '% — for RB/DDB' },
+    { id: 'atYear', label: 'At Year N', unit: 'year number (always locked)', fixed: true },
+    { id: 'bv', label: 'Book Value @ Yr N', unit: '$ — BV at specified year' },
+    { id: 'acc', label: 'Accumulated Depr', unit: '$ — total charged so far', noSolve: true }
+  ];
+  html += '<div class="whif-vars">';
+  cards.forEach(c => {
+    const isSolving = w.solveFor === c.id && !c.fixed && !c.noSolve;
+    const cls = c.fixed ? 'known' : (isSolving ? 'solving' : 'known');
+    const lockIcon = c.fixed ? '🔒' : (isSolving ? '🔓' : '🔒');
+    const val = w.values[c.id];
+    const displayVal = isSolving ? '' : (val !== null && val !== undefined ? val : '');
+    const lockClick = c.fixed || c.noSolve ? '' : `onclick="toggleWhifLock('${c.id}')"`;
+    html += `<div class="var-card ${cls}" id="vc-${c.id}">
+      <div class="var-card-label">${c.label} <span style="cursor:${c.fixed?'default':'pointer'}" ${lockClick}>${lockIcon}</span></div>
+      <input class="var-input" id="wv-${c.id}" type="number" value="${displayVal}" placeholder="${isSolving ? '?' : ''}"
+        ${isSolving ? 'style="color:var(--amber)"' : ''} oninput="onWhifInput('${c.id}', this.value)">
+      <div style="font-size:9px;color:#64748b;margin-top:4px">${c.unit}</div></div>`;
+  });
+  html += '</div>';
+  // Solve button
+  html += '<button class="solve-btn" onclick="runSolve()">🔮 Solve Now</button>';
+  // Result (initially hidden)
+  html += '<div id="whif-result" style="display:none"></div>';
+  html += '</div></div>';
+  return html;
+}
+
+function setWhifMethod(m) {
+  state.whif.method = m;
+  renderCenterContent();
+}
+
+function toggleWhifLock(id) {
+  state.whif.solveFor = id;
+  state.whif.values[id] = null;
+  renderCenterContent();
+}
+
+function onWhifInput(id, val) {
+  state.whif.values[id] = val !== '' ? parseFloat(val) : null;
+}
+
+function loadPreset(preset) {
+  const presets = {
+    'find-life': { method:'sld', solveFor:'life', vals: { cost:120000, residual:20000, annualDepr:20000, life:null, rate:20, atYear:2, bv:80000, acc:40000 }},
+    'find-cost': { method:'sld', solveFor:'cost', vals: { cost:null, residual:15000, annualDepr:17000, life:5, rate:20, atYear:3, bv:null, acc:51000 }},
+    'find-rate': { method:'rb', solveFor:'rate', vals: { cost:50000, residual:15820, annualDepr:null, life:4, rate:null, atYear:2, bv:28125, acc:null }},
+    'find-res': { method:'sld', solveFor:'residual', vals: { cost:80000, residual:null, annualDepr:12000, life:5, rate:20, atYear:4, bv:32000, acc:48000 }},
+    'find-depr': { method:'sld', solveFor:'annualDepr', vals: { cost:100000, residual:10000, annualDepr:null, life:5, rate:20, atYear:1, bv:null, acc:null }}
+  };
+  const p = presets[preset];
+  if (!p) return;
+  state.whif.method = p.method;
+  state.whif.solveFor = p.solveFor;
+  state.whif.values = { ...p.vals };
+  renderCenterContent();
+}
+
+// ═══════════════════════════════════════════════════
+// SOLVERS
+// ═══════════════════════════════════════════════════
+
+const SOLVERS = {
+  sld: {
+    life: v => { const life = (v.cost - v.residual) / v.annualDepr; return { result: life.toFixed(1) + ' years', num: life, label: 'Useful Life — Straight-Line',
+      steps: ['SLD: Annual Depr = (Cost − Residual) ÷ Life', 'Rearrange: Life = (Cost − Residual) ÷ Annual Depr',
+        `= (${fmtC(v.cost)} − ${fmtC(v.residual)}) ÷ ${fmtC(v.annualDepr)}`, `= ${fmtC(v.cost-v.residual)} ÷ ${fmtC(v.annualDepr)} = ${life.toFixed(1)} years ✓`]}; },
+    cost: v => { const c = v.annualDepr * v.life + v.residual; return { result: fmtC(c), num: c, label: 'Cost — Straight-Line',
+      steps: ['Cost = (Annual Depr × Life) + Residual', `= (${fmtC(v.annualDepr)} × ${v.life}) + ${fmtC(v.residual)}`, `= ${fmtC(c)} ✓`]}; },
+    residual: v => { const r = v.cost - v.annualDepr * v.life; return { result: fmtC(r), num: r, label: 'Residual — Straight-Line',
+      steps: ['Residual = Cost − (Annual Depr × Life)', `= ${fmtC(v.cost)} − (${fmtC(v.annualDepr)} × ${v.life})`, `= ${fmtC(r)} ✓`]}; },
+    annualDepr: v => { const d = (v.cost - v.residual) / v.life; return { result: fmtC(d) + '/yr', num: d, label: 'Annual Depreciation — Straight-Line',
+      steps: ['Annual Depr = (Cost − Residual) ÷ Life', `= (${fmtC(v.cost)} − ${fmtC(v.residual)}) ÷ ${v.life}`, `= ${fmtC(d)}/year ✓`]}; },
+    bv: v => {
+      const d = (v.cost - v.residual) / v.life;
+      const fraction = state.inputs.proRata ? proRataFraction(state.inputs.purchaseDate, state.inputs.yearEnd) : 1;
+      const yr1Depr = d * fraction;
+      let bv;
+      if (v.atYear === 1) { bv = v.cost - yr1Depr; }
+      else { bv = v.cost - yr1Depr - d * (v.atYear - 1); }
+      return { result: fmtC(bv), num: bv, label: 'BV at Year ' + v.atYear + ' — SLD',
+        steps: ['Annual Depr = $' + fmt(d), 'Year 1 (pro-rata): $' + fmt(yr1Depr),
+          'BV at Year ' + v.atYear + ' = Cost − Yr1 − (' + (v.atYear-1) + ' × $' + fmt(d) + ')',
+          '= $' + fmt(bv) + ' ✓']};
+    },
+    rate: v => { const r = 100/v.life; return { result: r.toFixed(2)+'%', num: r, label: 'Rate — SLD (derived from life)',
+      steps: ['Rate = 100 ÷ Life', `= 100 ÷ ${v.life} = ${r.toFixed(2)}%`]}; }
+  },
+  rb: {
+    life: v => { const l = Math.log(v.residual/v.cost)/Math.log(1-v.rate/100); return { result: l.toFixed(1)+' years', num: l, label: 'Life — Reducing Balance',
+      steps: ['Life = log(Residual/Cost) ÷ log(1−Rate)', `= log(${v.residual}/${v.cost}) ÷ log(${(1-v.rate/100).toFixed(4)})`, `= ${l.toFixed(1)} years ✓`]}; },
+    cost: v => { const c = v.residual/Math.pow(1-v.rate/100,v.life); return { result: fmtC(c), num: c, label: 'Cost — Reducing Balance',
+      steps: ['Cost = Residual ÷ (1−Rate)^Life', `= ${fmtC(v.residual)} ÷ (${(1-v.rate/100).toFixed(4)})^${v.life}`, `= ${fmtC(c)} ✓`]}; },
+    residual: v => { const r = v.cost*Math.pow(1-v.rate/100,v.life); return { result: fmtC(r), num: r, label: 'Residual — Reducing Balance',
+      steps: ['Residual = Cost × (1−Rate)^Life', `= ${fmtC(v.cost)} × (1−${v.rate}%)^${v.life}`, `= ${fmtC(r)} ✓`]}; },
+    rate: v => { const r = (1-Math.pow(v.bv/v.cost,1/v.atYear))*100; return { result: r.toFixed(2)+'%', num: r, label: 'Rate — Reducing Balance',
+      steps: ['Rate = 1 − (BV/Cost)^(1/N)', `= 1 − (${fmtC(v.bv)}/${fmtC(v.cost)})^(1/${v.atYear})`, `= ${r.toFixed(2)}% ✓`]}; },
+    annualDepr: v => { const d = (v.rate/100)*v.cost; return { result: fmtC(d)+' (Yr1)', num: d, label: 'Year 1 Depr — Reducing Balance',
+      steps: ['Year 1 Depr = Rate × Cost', `= ${v.rate}% × ${fmtC(v.cost)}`, `= ${fmtC(d)} ✓`]}; },
+    bv: v => { const bv = v.cost*Math.pow(1-v.rate/100,v.atYear); return { result: fmtC(bv), num: bv, label: `BV at Year ${v.atYear} — RB`,
+      steps: ['BV = Cost × (1−Rate)^N', `= ${fmtC(v.cost)} × (1−${v.rate}%)^${v.atYear}`, `= ${fmtC(bv)} ✓`]}; }
+  },
+  ddb: {
+    annualDepr: v => { const d = (2/v.life)*v.cost; return { result: fmtC(d)+' (Yr1)', num: d, label: 'Year 1 Depr — DDB',
+      steps: ['DDB Year 1 = (2÷Life) × Cost', `= (2÷${v.life}) × ${fmtC(v.cost)}`, `= ${fmtC(d)} ✓`]}; },
+    bv: v => { const rows = calcDDB(v.cost, v.residual||0, v.life, state.inputs.purchaseDate, state.inputs.yearEnd, false);
+      const bv = rows[Math.min(v.atYear,rows.length)-1]?.closingBV||0;
+      return { result: fmtC(bv), num: bv, label: `BV at Year ${v.atYear} — DDB`,
+        steps: ['Run DDB schedule:', ...rows.slice(0,v.atYear).map((r,i) => `Yr${i+1}: ${fmtC(r.openingBV)} → depr ${fmtC(r.depr)} → BV ${fmtC(r.closingBV)}`), `BV = ${fmtC(bv)} ✓`]}; },
+    life: v => { let lo=1,hi=50,best=5; for(let i=0;i<20;i++){ const mid=Math.round((lo+hi)/2); const rows=calcDDB(v.cost,v.residual||0,mid,state.inputs.purchaseDate,state.inputs.yearEnd,false);
+        const testBV=rows[Math.min(v.atYear,mid)-1]?.closingBV||v.residual; if(Math.abs(testBV-(v.bv||0))<1){best=mid;break;} if(testBV>(v.bv||0))hi=mid-1;else lo=mid+1; best=mid; }
+      return { result: best+' years', num: best, label: 'Life — DDB (binary search)', steps: [`Target BV at Yr ${v.atYear} = ${fmtC(v.bv)}`, 'Binary search over 1–50 years', `Found: Life = ${best} years ✓`]}; },
+    cost: v => { let lo=1,hi=10000000,best=100000; for(let i=0;i<25;i++){ const mid=(lo+hi)/2; const rows=calcDDB(mid,v.residual||0,v.life,state.inputs.purchaseDate,state.inputs.yearEnd,false);
+        const testBV=rows[Math.min(v.atYear,v.life)-1]?.closingBV||0; if(Math.abs(testBV-(v.bv||0))<1){best=mid;break;} if(testBV<(v.bv||0))lo=mid;else hi=mid; best=mid; }
+      return { result: fmtC(best), num: best, label: 'Cost — DDB (binary search)', steps: [`Target BV at Yr ${v.atYear} = ${fmtC(v.bv)}`, 'Binary search $1–$10M (25 iterations)', `Found: Cost = ${fmtC(best)} ✓`]}; }
+  },
+  syd: {
+    annualDepr: v => { const syd=v.life*(v.life+1)/2; const d=(v.life/syd)*(v.cost-v.residual); return { result: fmtC(d)+' (Yr1)', num: d, label: 'Year 1 Depr — SYD',
+      steps: [`SYD = ${v.life}×(${v.life}+1)÷2 = ${syd}`, `Yr1 fraction = ${v.life}/${syd}`, `Depr = (${v.life}/${syd}) × (${fmtC(v.cost)}−${fmtC(v.residual)}) = ${fmtC(d)} ✓`]}; },
+    life: v => { const dep=v.cost-v.residual; const life=Math.round(2*dep/v.annualDepr - 1);
+      return { result: life+' years', num: life, label: 'Life — SYD', steps: ['SYD Year 1: D₁ = 2×(C−S)/(n+1)', 'Rearrange: n+1 = 2×(C−S)/D₁', `n = 2×${fmtC(dep)}÷${fmtC(v.annualDepr)} − 1`, `= ${(2*dep/v.annualDepr).toFixed(1)} − 1 = ${life} years ✓`]}; },
+    cost: v => { const syd=v.life*(v.life+1)/2; const c=v.annualDepr*syd/v.life+v.residual; return { result: fmtC(c), num: c, label: 'Cost — SYD',
+      steps: [`SYD = ${syd}`, `Cost = (D₁×SYD÷Life)+Res = (${fmtC(v.annualDepr)}×${syd}÷${v.life})+${fmtC(v.residual)}`, `= ${fmtC(c)} ✓`]}; },
+    residual: v => { const syd=v.life*(v.life+1)/2; const r=v.cost-v.annualDepr*syd/v.life; return { result: fmtC(r), num: r, label: 'Residual — SYD',
+      steps: [`Residual = Cost − (D₁×SYD÷Life)`, `= ${fmtC(v.cost)} − (${fmtC(v.annualDepr)}×${syd}÷${v.life})`, `= ${fmtC(r)} ✓`]}; },
+    bv: v => { const syd=v.life*(v.life+1)/2; const dep=v.cost-v.residual; const N=v.atYear; const sumFrac=(N*(2*v.life-N+1))/(2*syd); const bv=v.cost-dep*sumFrac;
+      return { result: fmtC(bv), num: bv, label: `BV at Year ${N} — SYD`, steps: [`Σfractions(1..${N}) = [${N}×(2×${v.life}−${N}+1)]÷(2×${syd}) = ${sumFrac.toFixed(4)}`, `BV = ${fmtC(v.cost)} − ${fmtC(dep)} × ${sumFrac.toFixed(4)} = ${fmtC(bv)} ✓`]}; }
+  },
+  uop: {
+    annualDepr: v => { const units = state.inputs.unitsPerYear[0]||v.life||1; const rpu=(v.cost-v.residual)/(v.totalUnits||50000); const d=rpu*units;
+      return { result: fmtC(d)+' (Yr1)', num: d, label: 'Year 1 Depr — UOP', steps: [`Rate/unit = (${fmtC(v.cost)}−${fmtC(v.residual)})÷${fmt(v.totalUnits||50000)}`, `Yr1 = rate × ${fmt(units)} units = ${fmtC(d)} ✓`]}; },
+    cost: v => { const rpu=v.annualDepr/(state.inputs.unitsPerYear[0]||1); const c=rpu*(v.totalUnits||50000)+v.residual; return { result: fmtC(c), num: c, label: 'Cost — UOP',
+      steps: ['Cost = Rate/unit × Total Units + Residual', `= ${fmtC(c)} ✓`]}; }
+  },
+  rev: {} // Not applicable
+};
+
+function runSolve() {
+  const w = state.whif;
+  const v = w.values;
+  const m = w.method;
+  const sf = w.solveFor;
+  const resultDiv = document.getElementById('whif-result');
+  if (!resultDiv) return;
+
+  // Check REV
+  if (m === 'rev') {
+    resultDiv.innerHTML = '<div class="callout" style="margin-top:16px"><div class="callout-title">Not Available</div>Revaluation method does not support reverse solving. Switch to another method.</div>';
+    resultDiv.style.display = 'block';
+    return;
+  }
+
+  const solver = SOLVERS[m]?.[sf];
+  if (!solver) {
+    resultDiv.innerHTML = `<div class="callout" style="margin-top:16px"><div class="callout-title">Cannot Solve</div>The variable "${sf}" cannot be solved for the ${METHOD_NAMES[m]} method. Try a different variable or method.</div>`;
+    resultDiv.style.display = 'block';
+    return;
+  }
+
+  // Add totalUnits to values for UOP
+  v.totalUnits = state.inputs.totalUnits;
+
+  try {
+    const res = solver(v);
+    // Update the solved input
+    const solvedInput = document.getElementById('wv-' + sf);
+    if (solvedInput) solvedInput.value = typeof res.num === 'number' ? (Number.isInteger(res.num) ? res.num : res.num.toFixed(2)) : res.num;
+    w.values[sf] = res.num;
+
+    // Build result HTML
+    let html = `<div class="whif-result" id="whif-result-content">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.06em">✅ Solution Found</div>
+        <button class="copy-btn" onclick="copySolution()" title="Copy solution to clipboard">📋 Copy Solution</button>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:#4ade80;margin-bottom:6px">${res.result}</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:10px">${res.label}</div>
+      <div class="result-workings">${res.steps.map((s,i) => `<div>${i+1}. ${s}</div>`).join('')}</div>`;
+
+    // Build schedule from solved values
+    const schedCost = v.cost || state.inputs.cost;
+    const schedRes = v.residual ?? state.inputs.residual;
+    const schedLife = Math.round(v.life || state.inputs.life);
+    const schedRate = v.rate || state.inputs.rate;
+    let schedRows;
+    switch(m) {
+      case 'sld': schedRows = calcSLD(schedCost, schedRes, schedLife, state.inputs.purchaseDate, state.inputs.yearEnd, false); break;
+      case 'rb': schedRows = calcRB(schedCost, schedRes, schedLife, schedRate, state.inputs.purchaseDate, state.inputs.yearEnd, false); break;
+      case 'ddb': schedRows = calcDDB(schedCost, schedRes, schedLife, state.inputs.purchaseDate, state.inputs.yearEnd, false); break;
+      case 'syd': schedRows = calcSYD(schedCost, schedRes, schedLife, state.inputs.purchaseDate, state.inputs.yearEnd, false); break;
+      case 'uop': schedRows = calcUOP(schedCost, schedRes, state.inputs.unitsPerYear, state.inputs.totalUnits, state.inputs.purchaseDate); break;
+      default: schedRows = [];
+    }
+
+    if (schedRows.length) {
+      html += '<div style="margin-top:18px;border-top:1px solid #166534;padding-top:14px">';
+      html += '<div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:10px">Full Depreciation Schedule</div>';
+      html += renderTable(schedRows, METHOD_NAMES[m] + ' (from solved values)', m);
+      html += '</div>';
+    }
+
+    html += '</div>';
+    resultDiv.innerHTML = html;
+    resultDiv.style.display = 'block';
+  } catch (e) {
+    resultDiv.innerHTML = `<div class="callout" style="margin-top:16px"><div class="callout-title">Error</div>Could not solve: ${e.message}. Check that all known values are filled in correctly.</div>`;
+    resultDiv.style.display = 'block';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// DISPOSAL / CESSION
+// ═══════════════════════════════════════════════════
+
+function toggleDisposal() {
+  const inputs = document.getElementById('disposal-inputs');
+  const toggle = document.getElementById('disposal-toggle');
+  if (!inputs) return;
+  const isHidden = inputs.style.display === 'none';
+  inputs.style.display = isHidden ? '' : 'none';
+  if (toggle) toggle.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+}
+
+function computeDisposal(method) {
+  const s = state.inputs;
+  if (!s.disposalDate) return null;
+  const purchaseDate = new Date(s.purchaseDate + 'T00:00:00');
+  const disposalDate = new Date(s.disposalDate + 'T00:00:00');
+  if (disposalDate <= purchaseDate) return null;
+
+  const rows = getMethodRows(method);
+  if (!rows.length) return null;
+
+  // Calculate time difference
+  const diffMs = disposalDate - purchaseDate;
+  const totalMonths = (disposalDate.getFullYear() - purchaseDate.getFullYear()) * 12
+    + (disposalDate.getMonth() - purchaseDate.getMonth())
+    + (disposalDate.getDate() >= purchaseDate.getDate() ? 0 : -1);
+  const fullYears = Math.floor(totalMonths / 12);
+  const remainingMonths = totalMonths % 12;
+
+  // Determine how many full years of depreciation have been recorded
+  // and compute pro-rata for the disposal year
+  let accumulatedBeforeDisposalYear = 0;
+  let completedYears = Math.min(fullYears, rows.length);
+  for (let i = 0; i < completedYears; i++) {
+    accumulatedBeforeDisposalYear += rows[i].depr;
+  }
+
+  // Pro-rata depreciation for the disposal year (partial year)
+  let finalDepr = 0;
+  if (remainingMonths > 0 && completedYears < rows.length) {
+    const fullYearDepr = rows[completedYears].depr;
+    finalDepr = fullYearDepr * (remainingMonths / 12);
+  }
+
+  const totalAccumulated = accumulatedBeforeDisposalYear + finalDepr;
+  const carryingAmount = s.cost - totalAccumulated;
+  const gainLoss = s.proceeds - carryingAmount;
+
+  return {
+    disposalDate: fmtDate(disposalDate),
+    yearsInUse: fullYears + ' year' + (fullYears !== 1 ? 's' : '') + (remainingMonths > 0 ? ', ' + remainingMonths + ' month' + (remainingMonths !== 1 ? 's' : '') : ''),
+    fullYears,
+    remainingMonths,
+    accumulatedBeforeDisposalYear,
+    finalDepr,
+    totalAccumulated,
+    carryingAmount,
+    proceeds: s.proceeds,
+    gainLoss,
+    isGain: gainLoss >= 0,
+    cost: s.cost
+  };
+}
+
+function renderFullJournalLedger(method, rows) {
+  if (!rows || !rows.length) return '';
+  const s = state.inputs;
+  const methodName = METHOD_NAMES[method] || method;
+  const purchaseDate = fmtDate(new Date(s.purchaseDate + 'T00:00:00'));
+  const hasEstimateChange = s.changeYear && s.newLife && method === 'sld';
+  const disposal = s.disposalDate ? computeDisposal(method) : null;
+
+  let html = `<div class="journal-entry-card" id="je-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h5 style="margin-bottom:0">📒 Complete Journal Ledger</h5>
+      <button class="copy-btn-sm" onclick="copyJournalEntry()" title="Copy all journal entries">📋</button>
+    </div>`;
+
+  let entryNum = 1;
+
+  // ── ENTRY: Acquisition ──
+  html += `<div class="je-section-label">Entry ${entryNum} — Acquisition (${purchaseDate})</div>
+    <table class="journal-table">
+      <tr class="je-debit"><td>2xxx</td><td>Property, Plant & Equipment (at cost)</td><td class="je-amount">${fmtC(s.cost)}</td><td></td></tr>
+      <tr class="je-credit"><td></td><td style="padding-left:24px">521 Bank / 4851 Fournisseurs d'immobilisations</td><td></td><td class="je-amount">${fmtC(s.cost)}</td></tr>
+    </table>
+    <div class="je-narration">Being purchase of fixed asset. / <em>Acquisition d'immobilisation corporelle, amortissement ${methodName} sur ${s.life} ans.</em></div>`;
+  entryNum++;
+
+  // ── ENTRIES: Annual Depreciation ──
+  rows.forEach((r, i) => {
+    // Check if this year is after disposal
+    if (disposal && i >= disposal.fullYears + (disposal.remainingMonths > 0 ? 1 : 0)) return;
+
+    const isChangeYear = hasEstimateChange && r.isEstimateChange;
+    const label = isChangeYear
+      ? `Entry ${entryNum} — Year ${r.year} Depreciation (revised estimate — IAS 8)`
+      : `Entry ${entryNum} — Year ${r.year} Depreciation (${r.periodStr})`;
+
+    // If disposal year with partial depreciation, show only final partial
+    if (disposal && disposal.remainingMonths > 0 && i === disposal.fullYears) {
+      html += `<div class="je-section-label">${label} — pro-rata to disposal (${disposal.remainingMonths}/12)</div>
+        <table class="journal-table">
+          <tr class="je-debit"><td>6813</td><td>Depreciation Expense</td><td class="je-amount">${fmtC(disposal.finalDepr)}</td><td></td></tr>
+          <tr class="je-credit"><td></td><td style="padding-left:24px">28xx Accumulated Depreciation</td><td></td><td class="je-amount">${fmtC(disposal.finalDepr)}</td></tr>
+        </table>
+        <div class="je-narration">Being depreciation for partial year ${r.year} to disposal date. / <em>Dotation aux amortissements de l'exercice (prorata), ${methodName}.</em></div>`;
+    } else {
+      html += `<div class="je-section-label"${isChangeYear ? ' style="color:#a5b4fc"' : ''}>${label}</div>
+        <table class="journal-table">
+          <tr class="je-debit"><td>6813</td><td>Depreciation Expense</td><td class="je-amount">${fmtC(r.depr)}</td><td></td></tr>
+          <tr class="je-credit"><td></td><td style="padding-left:24px">28xx Accumulated Depreciation</td><td></td><td class="je-amount">${fmtC(r.depr)}</td></tr>
+        </table>
+        <div class="je-narration">Being depreciation for Year ${r.year}. / <em>Dotation aux amortissements de l'exercice, ${methodName}.</em>${r.year === 1 && s.proRata ? ' (Pro-rata: ' + Math.round(proRataFraction(s.purchaseDate, s.yearEnd) * 12) + '/12 months)' : ''}${isChangeYear ? ' IAS 8: Remaining BV spread over revised remaining life.' : ''}</div>`;
+    }
+    entryNum++;
+  });
+
+  // ── ENTRY: Change in Estimate note (if applicable) ──
+  if (hasEstimateChange) {
+    html += `<div class="je-section-label" style="color:#a5b4fc;border-color:#4338ca">📝 Note — Change in Accounting Estimate (IAS 8)</div>
+      <div class="je-narration" style="border-top:none;padding-top:0;line-height:1.6">
+        At Year ${s.changeYear}, useful life revised from ${s.life} to ${s.newLife} years${s.newResidual !== null && s.newResidual !== undefined ? ', residual revised to $' + fmt(s.newResidual) : ''}.
+        Applied <strong>prospectively</strong> — no restatement of prior years. Remaining book value at Year ${s.changeYear} spread over revised remaining life (${s.newLife - s.changeYear + 1} years).
+        No journal entry required for the change itself — only future depreciation charges are affected.
+      </div>`;
+  }
+
+  // ── ENTRIES: Disposal ──
+  if (disposal) {
+    html += `<div class="je-section-label" style="color:#4ade80;border-color:#166534">Entry ${entryNum} — Disposal / Sale (${disposal.disposalDate})</div>`;
+
+    // Summary
+    html += `<div style="font-size:10px;color:#94a3b8;margin:6px 0;line-height:1.6">
+      Carrying Amount (VNC): ${fmtC(disposal.carryingAmount)} | Proceeds: ${fmtC(disposal.proceeds)} |
+      <span style="color:${disposal.isGain ? '#4ade80' : '#f87171'};font-weight:700">${disposal.isGain ? 'Gain' : 'Loss'}: ${fmtC(Math.abs(disposal.gainLoss))}</span>
+    </div>`;
+
+    // Record the sale proceeds
+    html += `<div class="je-narration" style="border-top:none;padding-top:0">${entryNum}a — Record sale proceeds. / <em>Constatation du prix de cession de l'immobilisation.</em></div>
+      <table class="journal-table">
+        <tr class="je-debit"><td>521</td><td>Bank / Receivable</td><td class="je-amount">${fmtC(disposal.proceeds)}</td><td></td></tr>
+        <tr class="je-credit"><td></td><td style="padding-left:24px">822 Income from Disposal of Fixed Assets</td><td></td><td class="je-amount">${fmtC(disposal.proceeds)}</td></tr>
+      </table>`;
+
+    // Remove asset and accumulated depreciation
+    html += `<div class="je-narration" style="margin-top:6px">${entryNum}b — Remove asset from books. / <em>Sortie de l'immobilisation du patrimoine.</em></div>
+      <table class="journal-table">
+        <tr class="je-debit"><td>812</td><td>Carrying Amount of Disposed Assets</td><td class="je-amount">${fmtC(disposal.carryingAmount)}</td><td></td></tr>
+        <tr class="je-debit"><td>28xx</td><td>Accumulated Depreciation</td><td class="je-amount">${fmtC(disposal.totalAccumulated)}</td><td></td></tr>
+        <tr class="je-credit"><td></td><td style="padding-left:24px">2xxx Property, Plant & Equipment (at cost)</td><td></td><td class="je-amount">${fmtC(disposal.cost)}</td></tr>
+      </table>`;
+
+    html += `<div class="je-narration" style="margin-top:6px">
+      Net effect: ${disposal.isGain ? 'Gain (822 − 812)' : 'Loss (812 − 822)'} = ${fmtC(Math.abs(disposal.gainLoss))} recognized in ${disposal.isGain ? 'income' : 'expenses'}.
+      <br>Verification: VNC (${fmtC(disposal.carryingAmount)}) + Acc. Depr (${fmtC(disposal.totalAccumulated)}) = Cost (${fmtC(disposal.cost)}) ✓
+    </div>`;
+  }
+
+  html += '</div>';
+  html += `<div style="background:#1e293b;border-radius:6px;padding:8px;margin-bottom:10px;font-size:10px;color:#64748b;line-height:1.6">
+  <strong style="color:#94a3b8">SYSCOHADA Account Guide:</strong><br>
+  • Buildings (Bâtiments): 231 / 2831<br>
+  • Equipment (Matériel): 241 / 2841<br>
+  • Vehicles (Transport): 245 / 2845<br>
+  • IT Equipment (Informatique): 2441 / 2844<br>
+  • Furniture (Mobilier): 244 / 2844<br>
+  Replace 2xxx/28xx above with the specific accounts for your asset type.
+</div>`;
+  return html;
+}
+
+function onJournalYearChange(val) {
+  state._jeYear = parseInt(val) || 0;
+  renderRightPanel();
+}
+
+// ═══════════════════════════════════════════════════
+// RIGHT PANEL
+// ═══════════════════════════════════════════════════
+
+function renderRightPanel() {
+  const panel = document.getElementById('right-panel-content') || document.getElementById('right-panel');
+  if (!panel) return;
+  const m = state.activeTab;
+  if (m === 'compare' || m === 'whif' || m === 'examples') {
+    panel.innerHTML = '<div class="explain-card"><h5>Select a Method Tab</h5><p>Choose a specific depreciation method tab to see formulas, worked examples, and tips here.</p></div>';
+    return;
+  }
+  const s = state.inputs;
+  const depreciable = s.cost - s.residual;
+  const annualSLD = depreciable / s.life;
+  const fraction = s.proRata ? proRataFraction(s.purchaseDate, s.yearEnd) : 1;
+  const months = Math.round(fraction * 12);
+
+  const content = {
+    sld: {
+      title: 'Straight-Line Depreciation',
+      desc: 'The asset loses the same amount every year. Simple, predictable, and the most common method.',
+      steps: [
+        { label: 'Step 1 — Depreciable Amount', val: `${fmtC(s.cost)} − ${fmtC(s.residual)} = ${fmtC(depreciable)}` },
+        { label: 'Step 2 — Annual Charge', val: `${fmtC(depreciable)} ÷ ${s.life} = ${fmtC(annualSLD)}/yr` },
+        ...(s.proRata ? [{ label: 'Step 3 — Pro-rata Year 1', val: `${fmtC(annualSLD)} × ${months}/12 = ${fmtC(annualSLD * fraction)}` }] : [])
+      ],
+      mistake: "Forgetting to subtract residual before dividing. It's (Cost MINUS Residual) ÷ Life.",
+      whenToUse: 'Buildings, furniture, patents, leasehold improvements, any asset with consistent wear.',
+      advNote: 'IAS 16: Straight-line is the default method under IFRS when the pattern of benefits cannot be determined.'
+    },
+    rb: {
+      title: 'Reducing Balance',
+      desc: 'A fixed percentage applied to the remaining book value. Higher charges early when the asset is most productive.',
+      steps: [
+        { label: 'Rate', val: `${s.rate.toFixed?.(1) ?? s.rate}% ${!s.rateIsManual ? '(auto-calculated)' : '(manual)'}` },
+        { label: 'Year 1 Charge', val: `${s.rate}% × ${fmtC(s.cost)} = ${fmtC(s.cost * s.rate / 100)}` },
+        ...(s.proRata ? [{ label: 'Pro-rata Year 1', val: `${fmtC(s.cost * s.rate / 100)} × ${months}/12 = ${fmtC(s.cost * s.rate / 100 * fraction)}` }] : [])
+      ],
+      mistake: 'Using Cost instead of Opening Book Value after Year 1. Always multiply rate by PREVIOUS closing BV.',
+      whenToUse: 'Technology, vehicles, equipment that loses value rapidly in early years.',
+      advNote: 'Auto-rate derivation: r = 1 − (S/C)^(1/n). The rate that causes BV to exactly reach residual at end of life.'
+    },
+    ddb: {
+      title: 'Double Declining Balance',
+      desc: 'Uses twice the straight-line rate. The most aggressive standard method. Switches to SLD when optimal.',
+      steps: [
+        { label: 'DDB Rate', val: `2 ÷ ${s.life} = ${(200/s.life).toFixed(1)}%` },
+        { label: 'Year 1 Charge', val: `${(200/s.life).toFixed(1)}% × ${fmtC(s.cost)} = ${fmtC(s.cost * 2 / s.life)}` },
+        { label: 'Switch Logic', val: 'Switch to SLD when SLD charge > DDB charge or BV would drop below residual' }
+      ],
+      mistake: 'Not switching to SLD at the right time. Compare both charges every year.',
+      whenToUse: 'Tax deferral strategies, US GAAP reporting, assets with rapid early obsolescence.',
+      advNote: 'Switch-over year: Compare (BV−S)/remaining vs (2/n)×BV each year. Switch when SLD exceeds DDB.<br><br>⚠ <strong>OHADA Note:</strong> The SYSCOHADA "amortissement dégressif" uses coefficients: ×1.5 (life≤4), ×2.0 (life 5-6), ×2.5 (life≥7) applied to the SLD rate. DDB (2/n) matches only for life=5-6. For other lives, use the OHADA coefficient system.'
+    },
+    syd: {
+      title: 'Sum-of-Years Digits',
+      desc: 'Assigns a declining fraction each year. Front-loaded but less aggressive than DDB.',
+      steps: [
+        { label: 'SYD', val: `${s.life} × (${s.life}+1) ÷ 2 = ${s.life*(s.life+1)/2}` },
+        { label: 'Year 1 Fraction', val: `${s.life} ÷ ${s.life*(s.life+1)/2} = ${(s.life/(s.life*(s.life+1)/2)).toFixed(4)}` },
+        { label: 'Year 1 Charge', val: `${(s.life/(s.life*(s.life+1)/2)).toFixed(4)} × ${fmtC(depreciable)} = ${fmtC(s.life/(s.life*(s.life+1)/2) * depreciable)}` }
+      ],
+      mistake: 'Computing SYD as just n instead of n(n+1)/2. The denominator is the sum of ALL years.',
+      whenToUse: 'Exam questions, leases, assets where benefit declines predictably.',
+      advNote: 'SYD = n(n+1)/2. Cumulative fraction after k years: [k(2n−k+1)]/(2×SYD).'
+    },
+    uop: {
+      title: 'Units of Production',
+      desc: 'Depreciation tied to actual output. Fair matching of expense to revenue.',
+      steps: [
+        { label: 'Rate per Unit', val: `(${fmtC(s.cost)} − ${fmtC(s.residual)}) ÷ ${fmt(s.totalUnits)} = $${((s.cost-s.residual)/s.totalUnits).toFixed(4)}/unit` },
+        { label: 'Varies by Year', val: 'Charge = Rate × Actual units used that year' }
+      ],
+      mistake: 'Forgetting that total depreciation is capped at (Cost − Residual). Stop at residual value.',
+      whenToUse: 'Machinery, mines, vehicles where usage varies significantly year to year.',
+      advNote: 'Matches expense to revenue better than time-based methods. Not available under all tax codes.'
+    },
+    rev: {
+      title: 'Revaluation Method',
+      desc: 'Asset counted/revalued at year-end. Depreciation is the difference between opening and closing values.',
+      steps: [
+        { label: 'Formula', val: 'Depr = Opening Value + Additions − Closing Value' },
+        { label: 'Note', val: 'No fixed rate, life, or residual concept needed' }
+      ],
+      mistake: 'Forgetting to add new purchases to opening value before computing the charge.',
+      whenToUse: 'Loose tools, crockery, livestock, small items not individually tracked.',
+      advNote: 'Common for assets that cannot be individually identified. IFRS allows this for biological assets.<br><br>Under IAS 16.39 and SYSCOHADA, revaluation increases (surplus) are credited to equity (account 105 — Écart de réévaluation), not to income. Only decreases are charged to profit. This tool only handles decreases.'
+    }
+  };
+
+  const c = content[m];
+  if (!c) { panel.innerHTML = ''; return; }
+
+  // Full journal ledger: acquisition → depreciation → estimate change → disposal
+  const rows = getMethodRows(m);
+  let html = renderFullJournalLedger(m, rows);
+
+  html += `<div class="explain-card"><h5>${c.title}</h5><p>${c.desc}</p></div>`;
+  html += '<div class="explain-card"><h5>Worked Example</h5>';
+  c.steps.forEach(s => {
+    html += `<div class="formula-step"><div class="formula-step-label">${s.label}</div><div class="formula-step-val">${s.val}</div></div>`;
+  });
+  html += '</div>';
+  html += `<div class="callout"><div class="callout-title">Common Mistake</div>${c.mistake}</div>`;
+  html += `<div class="explain-card" style="margin-top:10px"><h5>When to Use</h5><p>${c.whenToUse}</p></div>`;
+  if (state.mode === 'advanced' && c.advNote) {
+    html += `<div class="adv-only explain-card" style="margin-top:10px;border:1px solid var(--accent);"><h5>Advanced Note</h5><p>${c.advNote}</p></div>`;
+  }
+  panel.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// WORKED EXAMPLES
+// ═══════════════════════════════════════════════════
+
+const WORKED_EXAMPLES = [
+  { title: 'SLD — Office Furniture', narrative: 'Entreprise SAHEL ach\u00e8te du mobilier de bureau pour 5,000,000 FCFA le 1er juillet 2024. Dur\u00e9e de vie utile: 10 ans. Valeur r\u00e9siduelle: 500,000 FCFA. Exercice clos le 31 d\u00e9cembre. Calculer l\'amortissement pour les 3 premi\u00e8res ann\u00e9es.',
+    params: { cost: 5000000, residual: 500000, life: 10, method: 'sld', purchaseDate: '2024-07-01', yearEnd: 'December', proRata: true }},
+  { title: 'SLD — IT Equipment', narrative: 'La soci\u00e9t\u00e9 TECH-AFRIQUE acquiert du mat\u00e9riel informatique pour 3,600,000 FCFA le 1er janvier 2024. Amortissement lin\u00e9aire sur 4 ans. Valeur r\u00e9siduelle nulle. Exercice: 1er janvier au 31 d\u00e9cembre.',
+    params: { cost: 3600000, residual: 0, life: 4, method: 'sld', purchaseDate: '2024-01-01', yearEnd: 'December', proRata: false }},
+  { title: 'Reducing Balance — Vehicle', narrative: 'Transport CONGO ach\u00e8te un camion pour 25,000,000 FCFA le 1er avril 2024. Taux d\'amortissement d\u00e9gressif: 25%. Valeur r\u00e9siduelle estim\u00e9e: 2,000,000 FCFA. Exercice: janvier-d\u00e9cembre.',
+    params: { cost: 25000000, residual: 2000000, life: 8, method: 'rb', purchaseDate: '2024-04-01', yearEnd: 'December', proRata: true }},
+  { title: 'DDB — Manufacturing Machine', narrative: 'Industrie CIMENT acquiert une machine de production pour 80,000,000 FCFA le 1er janvier 2024. Dur\u00e9e de vie: 5 ans. Valeur r\u00e9siduelle: 5,000,000 FCFA. M\u00e9thode d\u00e9gressive acc\u00e9l\u00e9r\u00e9e (DDB).',
+    params: { cost: 80000000, residual: 5000000, life: 5, method: 'ddb', purchaseDate: '2024-01-01', yearEnd: 'December', proRata: false }},
+  { title: 'SYD — Specialized Equipment', narrative: 'Laboratoire PHARMA ach\u00e8te un \u00e9quipement sp\u00e9cialis\u00e9 pour 12,000,000 FCFA le 1er octobre 2024. Dur\u00e9e de vie: 6 ans. Valeur r\u00e9siduelle: 1,200,000 FCFA. M\u00e9thode de la somme des chiffres d\'ann\u00e9es.',
+    params: { cost: 12000000, residual: 1200000, life: 6, method: 'syd', purchaseDate: '2024-10-01', yearEnd: 'December', proRata: true }},
+  { title: 'UOP — Mining Equipment', narrative: 'Mines du SUD exploite un gisement avec un \u00e9quipement co\u00fbtant 50,000,000 FCFA. R\u00e9serves totales estim\u00e9es: 200,000 tonnes. Extraction annuelle: Yr1=45,000t, Yr2=50,000t, Yr3=40,000t, Yr4=35,000t, Yr5=30,000t. R\u00e9siduel: 5,000,000 FCFA.',
+    params: { cost: 50000000, residual: 5000000, life: 5, method: 'uop', purchaseDate: '2024-01-01', yearEnd: 'December', proRata: false, totalUnits: 200000, unitsPerYear: [45000, 50000, 40000, 35000, 30000] }},
+  { title: 'Disposal — Selling Before End of Life', narrative: 'Entreprise SAHEL (from Example 1) decides to sell the office furniture on 30 September 2027 for 3,200,000 FCFA. Calculate the gain or loss on disposal.',
+    params: { cost: 5000000, residual: 500000, life: 10, method: 'sld', purchaseDate: '2024-07-01', yearEnd: 'December', proRata: true, disposalDate: '2027-09-30', proceeds: 3200000 }},
+  { title: 'Method Comparison — Which is Best?', narrative: 'Comparez l\'amortissement d\'une immobilisation de 20,000,000 FCFA (r\u00e9siduel 2,000,000, dur\u00e9e 5 ans) selon les m\u00e9thodes lin\u00e9aire, d\u00e9gressive, et SYD. Quelle m\u00e9thode produit la plus forte charge en Ann\u00e9e 1?',
+    params: { cost: 20000000, residual: 2000000, life: 5, method: 'compare', purchaseDate: '2024-01-01', yearEnd: 'December', proRata: false }}
+];
+
+function renderExamplesTab() {
+  let html = '<div style="max-width:800px;margin:0 auto">';
+  html += '<div style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:4px">📖 Worked Examples</div>';
+  html += '<div style="font-size:12px;color:#64748b;margin-bottom:18px">Pre-built scenarios with step-by-step solutions. Load them into the playground or reveal the answer below.</div>';
+  WORKED_EXAMPLES.forEach((ex, i) => {
+    const p = ex.params;
+    const methodLabel = p.method === 'compare' ? 'Compare' : (METHOD_NAMES[p.method] || p.method.toUpperCase());
+    html += `<div class="example-card">
+      <div class="example-header"><span class="example-num">${i + 1}</span><h4>${ex.title}</h4></div>
+      <p class="example-narrative">${ex.narrative}</p>
+      <div class="example-params">Cost: ${fmt(p.cost)} | Life: ${p.life} yrs | Residual: ${fmt(p.residual)} | Method: ${methodLabel}</div>
+      <div class="example-actions">
+        <button onclick="loadExample(${i})">📊 Load &amp; Solve</button>
+        <button onclick="toggleSolution(${i})">👁 Show Solution</button>
+      </div>
+      <div id="example-solution-${i}" style="display:none" class="example-solution"></div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function loadExample(i) {
+  const ex = WORKED_EXAMPLES[i];
+  if (!ex) return;
+  const p = ex.params;
+  state.inputs.cost = p.cost;
+  state.inputs.residual = p.residual;
+  state.inputs.life = p.life;
+  state.inputs.purchaseDate = p.purchaseDate;
+  state.inputs.yearEnd = p.yearEnd;
+  state.inputs.proRata = p.proRata;
+  if (p.totalUnits !== undefined) state.inputs.totalUnits = p.totalUnits;
+  if (p.unitsPerYear !== undefined) state.inputs.unitsPerYear = [...p.unitsPerYear];
+  if (p.disposalDate !== undefined) {
+    state.inputs.disposalDate = p.disposalDate;
+    state.inputs.proceeds = p.proceeds || 0;
+    // Show disposal section
+    const dispInputs = document.getElementById('disposal-inputs');
+    const dispToggle = document.getElementById('disposal-toggle');
+    if (dispInputs) dispInputs.style.display = '';
+    if (dispToggle) dispToggle.innerHTML = '&#9660;';
+  } else {
+    state.inputs.disposalDate = '';
+    state.inputs.proceeds = 0;
+  }
+  // Handle rate: for RB we set manual rate
+  if (p.method === 'rb') {
+    state.inputs.rateIsManual = true;
+    state.inputs.rate = 25; // 25% from the vehicle example
+  } else {
+    state.inputs.rateIsManual = false;
+  }
+  // Activate the method
+  const targetTab = p.method;
+  if (targetTab === 'compare') {
+    // Enable SLD, RB, SYD for comparison
+    state.activeMethods.sld = true;
+    state.activeMethods.rb = true;
+    state.activeMethods.syd = true;
+  } else if (METHOD_NAMES[targetTab]) {
+    state.activeMethods[targetTab] = true;
+  }
+  if (targetTab === 'uop') {
+    state.activeMethods.uop = true;
+    const uopSec = document.getElementById('uop-section');
+    if (uopSec) uopSec.style.display = '';
+  }
+  // Sync checkboxes
+  document.querySelectorAll('[data-method]').forEach(cb => {
+    cb.checked = !!state.activeMethods[cb.dataset.method];
+  });
+  // Show/hide sections
+  const uopSec = document.getElementById('uop-section');
+  const revSec = document.getElementById('rev-section');
+  if (uopSec) uopSec.style.display = state.activeMethods.uop ? '' : 'none';
+  if (revSec) revSec.style.display = state.activeMethods.rev ? '' : 'none';
+  // Sync DOM inputs
+  syncInputsToDOM();
+  // Build and switch tab
+  state.activeTab = targetTab;
+  buildAll();
+}
+
+function toggleSolution(i) {
+  const div = document.getElementById('example-solution-' + i);
+  if (!div) return;
+  if (div.style.display === 'none') {
+    div.style.display = '';
+    // Lazily render solution
+    if (!div.dataset.rendered) {
+      const ex = WORKED_EXAMPLES[i];
+      const p = ex.params;
+      let html = '';
+      if (p.method === 'compare') {
+        // Show SLD, RB (auto rate), SYD side by side
+        const autoRate = (1 - Math.pow(p.residual / p.cost, 1 / p.life)) * 100;
+        const sldRows = calcSLD(p.cost, p.residual, p.life, p.purchaseDate, p.yearEnd, p.proRata);
+        const rbRows = calcRB(p.cost, p.residual, p.life, autoRate, p.purchaseDate, p.yearEnd, p.proRata);
+        const sydRows = calcSYD(p.cost, p.residual, p.life, p.purchaseDate, p.yearEnd, p.proRata);
+        html += renderTable(sldRows, 'Straight-Line Schedule', 'sld');
+        html += renderTable(rbRows, 'Reducing Balance Schedule (Rate: ' + autoRate.toFixed(1) + '%)', 'rb');
+        html += renderTable(sydRows, 'Sum-of-Years Digits Schedule', 'syd');
+        html += '<div style="background:#052e16;border:1px solid #166534;border-radius:8px;padding:10px;font-size:12px;color:#86efac;margin-top:8px">';
+        html += '<strong>Answer:</strong> Year 1 charges: SLD $' + fmt(sldRows[0].depr) + ' | RB $' + fmt(rbRows[0].depr) + ' | SYD $' + fmt(sydRows[0].depr);
+        const maxMethod = sldRows[0].depr >= rbRows[0].depr && sldRows[0].depr >= sydRows[0].depr ? 'SLD' :
+                          rbRows[0].depr >= sydRows[0].depr ? 'RB' : 'SYD';
+        html += '. <strong>' + maxMethod + '</strong> produces the highest Year 1 charge.</div>';
+      } else if (p.disposalDate) {
+        // Disposal scenario
+        const rows = calcSLD(p.cost, p.residual, p.life, p.purchaseDate, p.yearEnd, p.proRata);
+        html += renderTable(rows, METHOD_NAMES[p.method] + ' Schedule', p.method);
+        // Calculate disposal
+        const tempState = { ...state.inputs };
+        state.inputs.cost = p.cost; state.inputs.residual = p.residual; state.inputs.life = p.life;
+        state.inputs.purchaseDate = p.purchaseDate; state.inputs.yearEnd = p.yearEnd; state.inputs.proRata = p.proRata;
+        state.inputs.disposalDate = p.disposalDate; state.inputs.proceeds = p.proceeds;
+        const disposal = computeDisposal(p.method);
+        Object.assign(state.inputs, tempState);
+        if (disposal) {
+          html += '<div style="background:#052e16;border:1px solid #166534;border-radius:8px;padding:10px;font-size:12px;color:#86efac;margin-top:8px">';
+          html += '<strong>Disposal Analysis:</strong><br>Carrying Amount (VNC): $' + fmt(disposal.carryingAmount);
+          html += '<br>Sale Proceeds: $' + fmt(disposal.proceeds);
+          html += '<br>' + (disposal.isGain ? 'Gain (Plus-value)' : 'Loss (Moins-value)') + ': $' + fmt(Math.abs(disposal.gainLoss)) + '</div>';
+        }
+      } else {
+        // Normal method
+        let rows;
+        switch(p.method) {
+          case 'sld': rows = calcSLD(p.cost, p.residual, p.life, p.purchaseDate, p.yearEnd, p.proRata); break;
+          case 'rb': rows = calcRB(p.cost, p.residual, p.life, 25, p.purchaseDate, p.yearEnd, p.proRata); break;
+          case 'ddb': rows = calcDDB(p.cost, p.residual, p.life, p.purchaseDate, p.yearEnd, p.proRata); break;
+          case 'syd': rows = calcSYD(p.cost, p.residual, p.life, p.purchaseDate, p.yearEnd, p.proRata); break;
+          case 'uop': rows = calcUOP(p.cost, p.residual, p.unitsPerYear || [], p.totalUnits || 0, p.purchaseDate); break;
+          default: rows = [];
+        }
+        if (rows.length) html += renderTable(rows, METHOD_NAMES[p.method] + ' Schedule', p.method);
+      }
+      div.innerHTML = html;
+      div.dataset.rendered = 'true';
+    }
+  } else {
+    div.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SYNC INPUTS TO DOM
+// ═══════════════════════════════════════════════════
+
+function syncInputsToDOM() {
+  const s = state.inputs;
+  const costEl = document.getElementById('inp-cost'); if (costEl) costEl.value = s.cost;
+  const resEl = document.getElementById('inp-res'); if (resEl) resEl.value = s.residual;
+  const lifeEl = document.getElementById('inp-life'); if (lifeEl) lifeEl.value = s.life;
+  const rateEl = document.getElementById('inp-rate'); if (rateEl) rateEl.value = typeof s.rate === 'number' ? s.rate.toFixed?.(1) ?? s.rate : s.rate;
+  const dateEl = document.getElementById('inp-date'); if (dateEl) dateEl.value = s.purchaseDate;
+  const yeEl = document.getElementById('inp-ye'); if (yeEl) yeEl.value = s.yearEnd;
+  const prEl = document.getElementById('inp-prorata'); if (prEl) prEl.checked = s.proRata;
+  const lifeDisp = document.getElementById('life-disp'); if (lifeDisp) lifeDisp.textContent = s.life + ' years';
+  const dispDateEl = document.getElementById('inp-disposal-date'); if (dispDateEl) dispDateEl.value = s.disposalDate || '';
+  const proceedsEl = document.getElementById('inp-proceeds'); if (proceedsEl) proceedsEl.value = s.proceeds || 0;
+  const totalUnitsEl = document.getElementById('inp-total-units'); if (totalUnitsEl) totalUnitsEl.value = s.totalUnits;
+  const changeYearEl = document.getElementById('inp-change-year'); if (changeYearEl) changeYearEl.value = s.changeYear || '';
+  const newLifeEl = document.getElementById('inp-new-life'); if (newLifeEl) newLifeEl.value = s.newLife || '';
+  const newResidualEl = document.getElementById('inp-new-residual'); if (newResidualEl) newResidualEl.value = s.newResidual !== null && s.newResidual !== undefined ? s.newResidual : '';
+  updateAutoRate();
+}
+
+// ═══════════════════════════════════════════════════
+// CHANGE IN ESTIMATE (IAS 8)
+// ═══════════════════════════════════════════════════
+
+function toggleEstimateChange() {
+  const inputs = document.getElementById('estimate-inputs');
+  const toggle = document.getElementById('estimate-toggle');
+  if (!inputs) return;
+  const isHidden = inputs.style.display === 'none';
+  inputs.style.display = isHidden ? '' : 'none';
+  if (toggle) toggle.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+}
+
+function calcWithEstimateChange(method) {
+  const s = state.inputs;
+  if (!s.changeYear || !s.newLife || s.changeYear < 2) {
+    return getMethodRowsOriginal(method);
+  }
+  // Currently only supported for SLD
+  if (method !== 'sld') return getMethodRowsOriginal(method);
+
+  const changeYear = s.changeYear;
+  const newTotalLife = s.newLife;
+  const newResidual = s.newResidual !== null && s.newResidual !== undefined ? s.newResidual : s.residual;
+
+  // Phase 1: calculate normally up to changeYear-1
+  const originalRows = calcSLD(s.cost, s.residual, s.life, s.purchaseDate, s.yearEnd, s.proRata);
+
+  // Take rows before the change
+  const beforeRows = originalRows.slice(0, changeYear - 1);
+  const lastBeforeRow = beforeRows[beforeRows.length - 1];
+  if (!lastBeforeRow) return originalRows;
+
+  const bvAtChange = lastBeforeRow.closingBV;
+  const remainingLife = newTotalLife - (changeYear - 1);
+  if (remainingLife <= 0) return originalRows;
+
+  const newDepreciable = bvAtChange - newResidual;
+  const newAnnualDepr = newDepreciable / remainingLife;
+  const newRate = (newTotalLife > 0 ? 100 / newTotalLife : 0);
+
+  // Phase 2: revised schedule from changeYear onwards
+  const totalYears = (changeYear - 1) + remainingLife;
+  const periods = getPeriods(s.purchaseDate, totalYears);
+  let bv = bvAtChange;
+  let acc = lastBeforeRow.accumulated;
+
+  const allRows = [...beforeRows];
+  for (let y = changeYear; y <= totalYears; y++) {
+    const openBV = bv;
+    let depr = newAnnualDepr;
+    if (y === totalYears) depr = Math.max(0, openBV - newResidual);
+    depr = Math.max(0, Math.min(depr, openBV - newResidual));
+    acc += depr;
+    bv = openBV - depr;
+    allRows.push({
+      year: y,
+      periodStr: periods[y-1] ? fmtDate(periods[y-1].start) + ' \u2013 ' + fmtDate(periods[y-1].end) : '',
+      rate: newRate.toFixed(1) + '%',
+      openingBV: openBV,
+      depr: depr,
+      accumulated: acc,
+      closingBV: bv,
+      isEstimateChange: y === changeYear
+    });
+  }
+  return allRows;
+}
+
+// ═══════════════════════════════════════════════════
+// URL SHARING
+// ═══════════════════════════════════════════════════
+
+function shareURL() {
+  const s = state.inputs;
+  const params = new URLSearchParams({
+    cost: s.cost, residual: s.residual, life: s.life, rate: s.rate,
+    date: s.purchaseDate, ye: s.yearEnd, prorata: s.proRata, method: state.activeTab
+  });
+  const url = window.location.origin + window.location.pathname + '?' + params.toString();
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('share-btn');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '🔗 Share', 2000); }
+  }).catch(() => {
+    // Fallback for non-HTTPS contexts
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    const btn = document.getElementById('share-btn');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '🔗 Share', 2000); }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// TEACHER MODE HELPERS
+// ═══════════════════════════════════════════════════
+
+let hideAnswers = false;
+function toggleHideAnswer() {
+  hideAnswers = !hideAnswers;
+  const btn = document.getElementById('hide-answer-btn');
+  const status = document.getElementById('hide-answer-status');
+  if (btn) btn.textContent = hideAnswers ? 'Reveal Answer' : 'Hide Answer';
+  if (status) status.textContent = hideAnswers ? 'Answers hidden from students' : 'Answers visible';
+  // Hide/show result in What-If
+  const res = document.getElementById('whif-result');
+  if (res) res.style.display = hideAnswers ? 'none' : (state.whif.result ? 'block' : 'none');
+}
+
+// ═══════════════════════════════════════════════════
+// MASTER BUILD
+// ═══════════════════════════════════════════════════
+
+function buildAll() {
+  readInputs();
+  if (!validateInputs()) return;
+  updateDynamicRows();
+  renderTabs();
+  renderCenterContent();
+  renderRightPanel();
+}
+
+// ═══════════════════════════════════════════════════
+// INITIALIZE
+// ═══════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════
+// RIGHT PANEL RESIZE
+// ═══════════════════════════════════════════════════
+(function() {
+  let isDragging = false;
+  document.addEventListener('mousedown', e => {
+    if (e.target.id === 'right-resize' || e.target.closest('#right-resize')) {
+      isDragging = true;
+      e.target.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    }
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const panel = document.getElementById('right-panel');
+    if (!panel) return;
+    const newWidth = window.innerWidth - e.clientX;
+    const clamped = Math.max(180, Math.min(600, newWidth));
+    panel.style.width = clamped + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      const handle = document.getElementById('right-resize');
+      if (handle) handle.classList.remove('dragging');
+    }
+  });
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.adv-only').forEach(el => el.style.display = 'none');
+  // Hide conditional sections initially
+  const uopSec = document.getElementById('uop-section');
+  const revSec = document.getElementById('rev-section');
+  if (uopSec) uopSec.style.display = 'none';
+  if (revSec) revSec.style.display = 'none';
+  // Populate currency dropdown
+  const currSelect = document.getElementById('inp-currency');
+  if (currSelect) {
+    CURRENCIES.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.code; opt.textContent = c.label;
+      currSelect.appendChild(opt);
+    });
+    currSelect.value = state.currency || '';
+  }
+  // Initial auto-rate
+  updateAutoRate();
+  // Build playground if visible
+  updateDynamicRows();
+
+  // E-3: Load saved state from localStorage
+  try {
+    const savedCurrency = localStorage.getItem('depreciCalc_currency');
+    if (savedCurrency !== null) { state.currency = savedCurrency; const cs = document.getElementById('inp-currency'); if (cs) cs.value = savedCurrency; }
+    const saved = localStorage.getItem('depreciCalc_inputs');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      Object.assign(state.inputs, parsed);
+      // Sync DOM
+      const costEl = document.getElementById('inp-cost'); if (costEl) costEl.value = state.inputs.cost;
+      const resEl = document.getElementById('inp-res'); if (resEl) resEl.value = state.inputs.residual;
+      const lifeEl = document.getElementById('inp-life'); if (lifeEl) lifeEl.value = state.inputs.life;
+      const rateEl = document.getElementById('inp-rate'); if (rateEl) rateEl.value = state.inputs.rate;
+      const dateEl = document.getElementById('inp-date'); if (dateEl) dateEl.value = state.inputs.purchaseDate;
+      const yeEl = document.getElementById('inp-ye'); if (yeEl) yeEl.value = state.inputs.yearEnd;
+      const prEl = document.getElementById('inp-prorata'); if (prEl) prEl.checked = state.inputs.proRata;
+      const lifeDisp = document.getElementById('life-disp'); if (lifeDisp) lifeDisp.textContent = state.inputs.life + ' years';
+      const dispDateEl = document.getElementById('inp-disposal-date'); if (dispDateEl && state.inputs.disposalDate) dispDateEl.value = state.inputs.disposalDate;
+      const proceedsEl = document.getElementById('inp-proceeds'); if (proceedsEl) proceedsEl.value = state.inputs.proceeds;
+    }
+  } catch(e) { /* ignore corrupt localStorage */ }
+
+  // URL parameter loading (overrides localStorage)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('cost')) {
+    const paramMap = { cost: 'cost', residual: 'residual', life: 'life', rate: 'rate',
+      date: 'purchaseDate', ye: 'yearEnd', prorata: 'proRata', method: null };
+    Object.entries(paramMap).forEach(([param, field]) => {
+      if (urlParams.has(param) && field) {
+        const val = urlParams.get(param);
+        if (field === 'proRata') state.inputs[field] = val === 'true';
+        else if (['cost','residual','life','rate'].includes(field)) state.inputs[field] = parseFloat(val);
+        else state.inputs[field] = val;
+      }
+    });
+    if (urlParams.has('method')) {
+      const m = urlParams.get('method');
+      if (METHOD_NAMES[m]) { state.activeTab = m; state.activeMethods[m] = true; }
+      else if (m === 'compare') state.activeTab = 'compare';
+      else if (m === 'whif') state.activeTab = 'whif';
+      else if (m === 'examples') state.activeTab = 'examples';
+    }
+    // Sync DOM inputs
+    syncInputsToDOM();
+    // Switch to playground page
+    showPage('play');
+  }
+
+  // E-3: Save state to localStorage on page unload
+  window.addEventListener('beforeunload', () => {
+    try { localStorage.setItem('depreciCalc_inputs', JSON.stringify(state.inputs)); localStorage.setItem('depreciCalc_currency', state.currency); } catch(e) {}
+  });
+});
+</script>
+</body>
+</html>
