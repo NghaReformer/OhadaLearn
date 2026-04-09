@@ -1,6 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 
-function detectLanguage(acceptLanguage: string | null): 'en' | 'fr' {
+export function detectLanguage(acceptLanguage: string | null): 'en' | 'fr' {
 	if (!acceptLanguage) return 'en';
 	const parts = acceptLanguage.split(',').map((p) => p.trim().split(';')[0].toLowerCase());
 	for (const part of parts) {
@@ -10,7 +10,7 @@ function detectLanguage(acceptLanguage: string | null): 'en' | 'fr' {
 	return 'en';
 }
 
-function getLegacyRedirect(pathname: string): string | null {
+export function getLegacyRedirect(pathname: string): string | null {
 	if (pathname === '/playgrounds' || pathname.startsWith('/playgrounds/')) {
 		return `/en${pathname}`;
 	}

@@ -1,24 +1,5 @@
 import { describe, it, expect } from 'vitest';
-
-function detectLanguage(acceptLanguage: string | null): 'en' | 'fr' {
-	if (!acceptLanguage) return 'en';
-	const parts = acceptLanguage.split(',').map((p) => p.trim().split(';')[0].toLowerCase());
-	for (const part of parts) {
-		if (part === 'fr' || part.startsWith('fr-')) return 'fr';
-		if (part === 'en' || part.startsWith('en-')) return 'en';
-	}
-	return 'en';
-}
-
-function getLegacyRedirect(pathname: string): string | null {
-	if (pathname === '/playgrounds' || pathname.startsWith('/playgrounds/')) {
-		return `/en${pathname}`;
-	}
-	if (pathname === '/privacy') {
-		return `/en${pathname}`;
-	}
-	return null;
-}
+import { detectLanguage, getLegacyRedirect } from '../../src/hooks.server';
 
 describe('detectLanguage', () => {
 	it('returns fr for French Accept-Language', () => {
