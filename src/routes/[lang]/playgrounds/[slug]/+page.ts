@@ -1,9 +1,17 @@
 import { error } from '@sveltejs/kit';
 import { playgrounds } from '$lib/data/playgrounds';
+import { isRegistered } from '$lib/playgrounds/_registry';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = ({ params }) => {
+// Ensure journal-entry module registers itself (side-effect import)
+import '$lib/playgrounds/journal-entry/index';
+
+export const load: PageLoad = ({ params, data }) => {
 	const pg = playgrounds.find((p) => p.slug === params.slug);
 	if (!pg) throw error(404, 'Playground not found');
-	return { pg };
+	return {
+		...data,
+		pg,
+		isNativeModule: isRegistered(params.slug),
+	};
 };

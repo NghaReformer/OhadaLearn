@@ -80,22 +80,34 @@
 		</div>
 	</header>
 
-	<div class="iframe-container">
-		{#if !iframeLoaded}
-			<div class="iframe-loading">
-				<div class="spinner"></div>
-				<span>{$t('playgrounds.loading')}</span>
-			</div>
-		{/if}
-		<iframe
-			bind:this={iframeEl}
-			src={pg.staticFile}
-			title={$t(pg.titleKey)}
-			sandbox="allow-scripts allow-same-origin allow-popups"
-			class:loaded={iframeLoaded}
-			onload={onIframeLoad}
-		></iframe>
-	</div>
+	{#if data.isNativeModule}
+		<div class="native-container">
+			{#await import('$lib/playgrounds/journal-entry/Playground.svelte') then module}
+				<module.default
+					learnSections={data.learnSections}
+					scenarios={data.scenarios}
+					exercises={data.exercises}
+				/>
+			{/await}
+		</div>
+	{:else}
+		<div class="iframe-container">
+			{#if !iframeLoaded}
+				<div class="iframe-loading">
+					<div class="spinner"></div>
+					<span>{$t('playgrounds.loading')}</span>
+				</div>
+			{/if}
+			<iframe
+				bind:this={iframeEl}
+				src={pg.staticFile}
+				title={$t(pg.titleKey)}
+				sandbox="allow-scripts allow-same-origin allow-popups"
+				class:loaded={iframeLoaded}
+				onload={onIframeLoad}
+			></iframe>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -200,6 +212,13 @@
 		color: var(--text-primary);
 		border-color: var(--accent);
 		background: var(--panel-hover);
+	}
+
+	/* ---- Native Svelte module container ---- */
+	.native-container {
+		flex: 1;
+		overflow-y: auto;
+		min-height: 0;
 	}
 
 	/* ---- Iframe container ---- */
