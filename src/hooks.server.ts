@@ -31,7 +31,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// Root redirect: / → /en/ or /fr/ based on Accept-Language
 	if (pathname === '/') {
 		const lang = detectLanguage(event.request.headers.get('accept-language'));
-		throw redirect(302, `/${lang}/`);
+		throw redirect(302, `/${lang}`);
 	}
 
 	// Legacy URL redirects (Phase 1 URLs without lang prefix)
