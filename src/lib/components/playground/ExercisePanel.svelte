@@ -13,7 +13,7 @@
 		avance: { label: 'Avancé', color: 'var(--error)', glow: 'var(--amber-glow)' },
 	};
 
-	let grouped = $derived(() => {
+	let grouped = $derived.by(() => {
 		const groups = new Map<ExerciseDifficulty, ExerciseTemplateFile[]>();
 		for (const d of difficultyOrder) {
 			const items = exercises.filter((ex) => ex.difficulty === d);
@@ -33,7 +33,7 @@
 {:else}
 	<div class="exercise-groups">
 		{#each difficultyOrder as difficulty (difficulty)}
-			{@const items = grouped().get(difficulty)}
+			{@const items = grouped.get(difficulty)}
 			{#if items && items.length > 0}
 				<section class="difficulty-group">
 					<h3 class="difficulty-heading">

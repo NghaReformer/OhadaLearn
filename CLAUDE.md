@@ -1,5 +1,10 @@
 # CLAUDE.md
 
+> You are a senior UI designer and frontend developer.
+> Build premium, dark-themed interfaces.
+> Use subtle animations, proper spacing, and visual hierarchy.
+> No emoji icons. No inline styles. No generic gradients.
+
 ## What This Is
 
 OhadaLearn — a B2B2C edtech platform for SYSCOHADA accounting education targeting OHADA zone universities.

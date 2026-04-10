@@ -54,6 +54,29 @@ function parseArgs(): Config {
 	};
 }
 
+function validateInputs(config: Config): void {
+	if (!/^[a-z0-9][a-z0-9-]*$/.test(config.slug)) {
+		console.error(`Invalid slug: "${config.slug}" — must be lowercase alphanumeric with hyphens`);
+		process.exit(1);
+	}
+	for (const s of config.standards) {
+		if (!/^[a-z0-9-]+$/.test(s)) {
+			console.error(`Invalid standard: "${s}" — must be lowercase alphanumeric with hyphens`);
+			process.exit(1);
+		}
+	}
+	for (const s of config.sharedResources) {
+		if (!/^[a-z0-9-]+$/.test(s)) {
+			console.error(`Invalid shared resource: "${s}" — must be lowercase alphanumeric with hyphens`);
+			process.exit(1);
+		}
+	}
+}
+
+function escapeQuotes(s: string): string {
+	return s.replace(/'/g, "\\'");
+}
+
 function toClassName(slug: string): string {
 	return slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('');
 }
@@ -72,6 +95,7 @@ function replaceTokens(content: string, config: Config): string {
 
 function main(): void {
 	const config = parseArgs();
+	validateInputs(config);
 	const pgDir = path.join(SRC_ROOT, config.slug);
 
 	if (fs.existsSync(pgDir)) {
@@ -114,8 +138,10 @@ function main(): void {
 	const enContent = fs.readFileSync(enPath, 'utf-8');
 	const frContent = fs.readFileSync(frPath, 'utf-8');
 
-	const enKeys = `\t'pg.${config.slug}.title': '${config.title}',\n\t'pg.${config.slug}.desc': '${config.title} playground.',\n`;
-	const frKeys = `\t'pg.${config.slug}.title': '${config.titleFr}',\n\t'pg.${config.slug}.desc': 'Calculateur de ${config.titleFr.toLowerCase()}.',\n`;
+	const safeTitle = escapeQuotes(config.title);
+	const safeTitleFr = escapeQuotes(config.titleFr);
+	const enKeys = `\t'pg.${config.slug}.title': '${safeTitle}',\n\t'pg.${config.slug}.desc': '${safeTitle} playground.',\n`;
+	const frKeys = `\t'pg.${config.slug}.title': '${safeTitleFr}',\n\t'pg.${config.slug}.desc': 'Calculateur de ${safeTitleFr.toLowerCase()}.',\n`;
 
 	// Insert keys before the closing `};` — handles optional trailing whitespace/newline
 	fs.writeFileSync(enPath, enContent.replace(/};\s*$/, `${enKeys}};\n`));

@@ -56,7 +56,7 @@
     },
     "solutionLogic": {
       "type": "object",
-      "required": ["solverFunction"],
+      "required": ["solverFunction", "answerType"],
       "properties": {
         "solverFunction": { "type": "string" },
         "answerType": { "enum": ["numeric", "journal-entry", "account-classification", "multi-select"], "default": "numeric" },

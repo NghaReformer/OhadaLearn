@@ -7,8 +7,25 @@ import type { ExerciseDifficulty } from '$lib/contracts/playground';
 
 const CONTENT_ROOT = path.resolve('content');
 
+const SAFE_SLUG = /^[a-z0-9][a-z0-9-]*$/;
+
+function validateSlug(slug: string): void {
+	if (!SAFE_SLUG.test(slug)) {
+		throw new Error(`Invalid content slug: "${slug}"`);
+	}
+}
+
+function safePath(...segments: string[]): string {
+	const resolved = path.resolve(CONTENT_ROOT, ...segments);
+	if (!resolved.startsWith(CONTENT_ROOT + path.sep) && resolved !== CONTENT_ROOT) {
+		throw new Error(`Path traversal detected: ${segments.join('/')}`);
+	}
+	return resolved;
+}
+
 export async function loadLearnSections(slug: string, locale: Locale): Promise<LearnSection[]> {
-	const dir = path.join(CONTENT_ROOT, slug, 'learn', locale);
+	validateSlug(slug);
+	const dir = safePath(slug, 'learn', locale);
 	if (!fs.existsSync(dir)) return [];
 
 	const files = fs.readdirSync(dir)
@@ -31,7 +48,8 @@ export async function loadLearnSections(slug: string, locale: Locale): Promise<L
 }
 
 export async function loadScenarios(slug: string): Promise<Scenario[]> {
-	const dir = path.join(CONTENT_ROOT, slug, 'scenarios');
+	validateSlug(slug);
+	const dir = safePath(slug, 'scenarios');
 	if (!fs.existsSync(dir)) return [];
 
 	const files = fs.readdirSync(dir)
@@ -48,7 +66,8 @@ export async function loadExercises(
 	slug: string,
 	difficulty?: ExerciseDifficulty,
 ): Promise<ExerciseTemplateFile[]> {
-	const baseDir = path.join(CONTENT_ROOT, slug, 'exercises');
+	validateSlug(slug);
+	const baseDir = safePath(slug, 'exercises');
 	if (!fs.existsSync(baseDir)) return [];
 
 	const difficulties: ExerciseDifficulty[] = difficulty

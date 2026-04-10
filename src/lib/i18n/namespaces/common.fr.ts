@@ -24,6 +24,7 @@ export const commonFr: TranslationMap = {
 	'shell.standard': 'Norme',
 	'shell.share': 'Partager',
 	'shell.copied': 'Copié !',
+	'shell.exercises': 'Exercices',
 	'shell.exercises.coming': 'Bientôt',
 	'shell.exercises.coming_desc': 'Les exercices pour ce sujet sont en cours de développement.',
 };

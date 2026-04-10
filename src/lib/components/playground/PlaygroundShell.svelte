@@ -80,7 +80,7 @@
 			const fromUrl: Record<string, unknown> = {};
 			for (const key of shareableKeys) {
 				const val = urlParams.get(key);
-				if (val !== null) {
+				if (val !== null && val !== '') {
 					// Attempt numeric coercion; keep as string if not a number
 					const num = Number(val);
 					fromUrl[key] = isNaN(num) ? val : num;

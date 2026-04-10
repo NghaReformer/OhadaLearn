@@ -24,8 +24,8 @@ const katexSchema = {
 	],
 	attributes: {
 		...defaultSchema.attributes,
-		'*': [...(defaultSchema.attributes?.['*'] || []), 'className', 'style'],
-		span: [...(defaultSchema.attributes?.['span'] || []), 'aria-hidden'],
+		'*': [...(defaultSchema.attributes?.['*'] || []), 'className'],
+		span: [...(defaultSchema.attributes?.['span'] || []), 'aria-hidden', 'style'],
 		math: ['xmlns'],
 		annotation: ['encoding'],
 	},

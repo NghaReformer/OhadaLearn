@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 # Testing
 playwright-report/
 test-results/
+.env*.local
+.serena/
