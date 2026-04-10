@@ -1,0 +1,15 @@
+{
+  "slug": "customer-collection",
+  "titleKey": "je.scenario.customerCollection.title",
+  "descKey": "je.scenario.customerCollection.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-04-15",
+      "description": "Customer payment on account",
+      "lines": [
+        { "accountKey": "bank", "debit": 3575000, "credit": "" },
+        { "accountKey": "accountsReceivable", "debit": "", "credit": 3575000 }
+      ]
+    }
+  }
+}

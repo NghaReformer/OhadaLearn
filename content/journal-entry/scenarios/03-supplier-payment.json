@@ -1,0 +1,15 @@
+{
+  "slug": "supplier-payment",
+  "titleKey": "je.scenario.supplierPayment.title",
+  "descKey": "je.scenario.supplierPayment.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-04-10",
+      "description": "Payment to supplier for outstanding invoice",
+      "lines": [
+        { "accountKey": "accountsPayable", "debit": 1431000, "credit": "" },
+        { "accountKey": "bank", "debit": "", "credit": 1431000 }
+      ]
+    }
+  }
+}

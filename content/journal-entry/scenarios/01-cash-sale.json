@@ -1,0 +1,16 @@
+{
+  "slug": "cash-sale",
+  "titleKey": "je.scenario.cashSale.title",
+  "descKey": "je.scenario.cashSale.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-03-15",
+      "description": "Cash sale of merchandise with VAT",
+      "lines": [
+        { "accountKey": "bank", "debit": 2981250, "credit": "" },
+        { "accountKey": "salesMerchandise", "debit": "", "credit": 2500000 },
+        { "accountKey": "vatCollected", "debit": "", "credit": 481250 }
+      ]
+    }
+  }
+}

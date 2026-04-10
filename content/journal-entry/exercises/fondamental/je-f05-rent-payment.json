@@ -1,0 +1,20 @@
+{
+  "id": "je-f05-rent-payment",
+  "playgroundSlug": "journal-entry",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "je.exercise.f05.prompt",
+    "parameters": [
+      { "name": "rentAmount", "type": "currency", "min": 200000, "max": 2000000, "step": 50000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "rentPayment",
+    "answerType": "journal-entry",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "je.exercise.f05.correct",
+    "incorrect": "je.exercise.f05.incorrect"
+  }
+}

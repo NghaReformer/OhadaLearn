@@ -1,0 +1,15 @@
+{
+  "slug": "rent-payment",
+  "titleKey": "je.scenario.rentPayment.title",
+  "descKey": "je.scenario.rentPayment.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-03-01",
+      "description": "Monthly office rent payment",
+      "lines": [
+        { "accountKey": "rentExpense", "debit": 750000, "credit": "" },
+        { "accountKey": "bank", "debit": "", "credit": 750000 }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "equipment-purchase",
+  "titleKey": "je.scenario.equipmentPurchase.title",
+  "descKey": "je.scenario.equipmentPurchase.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-02-12",
+      "description": "Purchase of equipment on credit",
+      "lines": [
+        { "accountKey": "equipment", "debit": 8500000, "credit": "" },
+        { "accountKey": "vatDeductible", "debit": 1636250, "credit": "" },
+        { "accountKey": "accountsPayable", "debit": "", "credit": 10136250 }
+      ]
+    }
+  }
+}

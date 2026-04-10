@@ -1,0 +1,20 @@
+{
+  "id": "je-f02-credit-purchase",
+  "playgroundSlug": "journal-entry",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "je.exercise.f02.prompt",
+    "parameters": [
+      { "name": "purchaseAmount", "type": "currency", "min": 300000, "max": 4000000, "step": 100000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "creditPurchase",
+    "answerType": "journal-entry",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "je.exercise.f02.correct",
+    "incorrect": "je.exercise.f02.incorrect"
+  }
+}

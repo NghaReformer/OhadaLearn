@@ -1,0 +1,16 @@
+{
+  "slug": "credit-purchase",
+  "titleKey": "je.scenario.creditPurchase.title",
+  "descKey": "je.scenario.creditPurchase.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-03-18",
+      "description": "Credit purchase of merchandise with VAT",
+      "lines": [
+        { "accountKey": "purchasesMerchandise", "debit": 1200000, "credit": "" },
+        { "accountKey": "vatDeductible", "debit": 231000, "credit": "" },
+        { "accountKey": "accountsPayable", "debit": "", "credit": 1431000 }
+      ]
+    }
+  }
+}

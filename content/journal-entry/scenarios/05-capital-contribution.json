@@ -1,0 +1,15 @@
+{
+  "slug": "capital-contribution",
+  "titleKey": "je.scenario.capitalContribution.title",
+  "descKey": "je.scenario.capitalContribution.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-01-05",
+      "description": "Owner invests cash into the business",
+      "lines": [
+        { "accountKey": "bank", "debit": 25000000, "credit": "" },
+        { "accountKey": "shareCapital", "debit": "", "credit": 25000000 }
+      ]
+    }
+  }
+}

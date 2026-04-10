@@ -1,0 +1,15 @@
+{
+  "slug": "depreciation",
+  "titleKey": "je.scenario.depreciation.title",
+  "descKey": "je.scenario.depreciation.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-03-31",
+      "description": "Monthly depreciation of equipment",
+      "lines": [
+        { "accountKey": "depreciationExpense", "debit": 350000, "credit": "" },
+        { "accountKey": "accDeprEquipment", "debit": "", "credit": 350000 }
+      ]
+    }
+  }
+}

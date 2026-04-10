@@ -1,0 +1,15 @@
+{
+  "slug": "salary-expense",
+  "titleKey": "je.scenario.salaryExpense.title",
+  "descKey": "je.scenario.salaryExpense.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-03-31",
+      "description": "Monthly payroll — salaries due to employees",
+      "lines": [
+        { "accountKey": "salaryExpense", "debit": 4500000, "credit": "" },
+        { "accountKey": "employeesPayable", "debit": "", "credit": 4500000 }
+      ]
+    }
+  }
+}

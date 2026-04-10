@@ -1,0 +1,16 @@
+{
+  "slug": "credit-sale",
+  "titleKey": "je.scenario.creditSale.title",
+  "descKey": "je.scenario.creditSale.desc",
+  "presetValues": {
+    "draft": {
+      "date": "2024-03-20",
+      "description": "Credit sale of merchandise with VAT",
+      "lines": [
+        { "accountKey": "accountsReceivable", "debit": 5962500, "credit": "" },
+        { "accountKey": "salesMerchandise", "debit": "", "credit": 5000000 },
+        { "accountKey": "vatCollected", "debit": "", "credit": 962500 }
+      ]
+    }
+  }
+}

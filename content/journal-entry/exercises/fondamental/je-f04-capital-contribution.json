@@ -1,0 +1,20 @@
+{
+  "id": "je-f04-capital-contribution",
+  "playgroundSlug": "journal-entry",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "je.exercise.f04.prompt",
+    "parameters": [
+      { "name": "capitalAmount", "type": "currency", "min": 5000000, "max": 50000000, "step": 5000000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "capitalContribution",
+    "answerType": "journal-entry",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "je.exercise.f04.correct",
+    "incorrect": "je.exercise.f04.incorrect"
+  }
+}
