@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 
+	let lang = $derived(page.params.lang || 'en');
 	let year = new Date().getFullYear();
 	let copyright = $derived($t('footer.copyright').replace('{year}', String(year)));
 </script>
@@ -13,9 +15,9 @@
 		</div>
 
 		<div class="footer-links">
-			<a href="/playgrounds">{$t('footer.links.playgrounds')}</a>
-			<a href="/waitlist">{$t('footer.links.waitlist')}</a>
-			<a href="/privacy">Privacy</a>
+			<a href={`/${lang}/playgrounds`}>{$t('footer.links.playgrounds')}</a>
+			<a href={`/${lang}/#waitlist`}>{$t('footer.links.waitlist')}</a>
+			<a href={`/${lang}/privacy`}>{$t('footer.links.privacy')}</a>
 		</div>
 
 		<p class="footer-copy">{copyright}</p>

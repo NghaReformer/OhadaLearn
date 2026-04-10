@@ -10,7 +10,7 @@
 		if (targetLang === currentLocale) return;
 		const currentPath = page.url.pathname;
 		const newPath = currentPath.replace(/^\/[a-z]{2}(\/|$)/, `/${targetLang}$1`);
-		goto(newPath);
+		goto(newPath + page.url.search + page.url.hash);
 	}
 </script>
 

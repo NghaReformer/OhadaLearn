@@ -18,7 +18,7 @@
 		if (!iframeEl?.contentWindow || !iframeLoaded) return;
 		iframeEl.contentWindow.postMessage(
 			{ type: 'ohadalearn:settings', locale: $locale$, currency: $currency$ },
-			'*'
+			window.location.origin
 		);
 	}
 

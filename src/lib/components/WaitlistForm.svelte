@@ -10,6 +10,7 @@
 	let email = $state('');
 	let institution = $state('');
 	let role = $state('');
+	let website = $state(''); // honeypot — hidden field to trap bots
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
@@ -22,12 +23,12 @@
 			const res = await fetch('/api/waitlist', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, email, institution: institution || undefined, role }),
+				body: JSON.stringify({ name, email, institution: institution || undefined, role, website: website || undefined }),
 			});
 
 			if (!res.ok) {
 				const data = await res.json().catch(() => null);
-				errorMessage = data?.message ?? '';
+				errorMessage = data?.error ?? '';
 				formState = 'error';
 				return;
 			}
@@ -50,6 +51,11 @@
 			<p>{$t('waitlist.success')}</p>
 		</div>
 	{:else}
+		<!-- Honeypot field — hidden from humans, filled by bots -->
+		<div style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;" aria-hidden="true">
+			<input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
+		</div>
+
 		<div class="field">
 			<label for="waitlist-name" class="label">{$t('waitlist.name.placeholder')}</label>
 			<input

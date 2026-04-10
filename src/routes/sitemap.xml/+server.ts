@@ -9,6 +9,7 @@ export const GET: RequestHandler = () => {
 		'/',
 		'/playgrounds',
 		...playgrounds.map((pg) => `/playgrounds/${pg.slug}`),
+		'/privacy',
 	];
 
 	const urls = paths.flatMap((path) =>

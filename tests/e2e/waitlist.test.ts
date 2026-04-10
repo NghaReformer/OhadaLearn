@@ -33,6 +33,6 @@ test.describe('Waitlist form', () => {
     await form.locator('select').selectOption('student');
     await form.locator('button[type="submit"]').click();
 
-    await expect(page.locator('.waitlist-success')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('.success-msg')).toBeVisible({ timeout: 5000 });
   });
 });

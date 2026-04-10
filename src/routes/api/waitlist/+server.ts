@@ -9,6 +9,14 @@ const RATE_LIMIT_MAX = 5; // max 5 submissions per minute per IP
 
 function isRateLimited(ip: string): boolean {
 	const now = Date.now();
+
+	// Prevent unbounded growth: sweep expired entries when map exceeds threshold
+	if (rateLimitMap.size > 10_000) {
+		for (const [key, val] of rateLimitMap) {
+			if (now > val.resetAt) rateLimitMap.delete(key);
+		}
+	}
+
 	const entry = rateLimitMap.get(ip);
 	if (!entry || now > entry.resetAt) {
 		rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });

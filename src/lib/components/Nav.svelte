@@ -42,7 +42,7 @@
 				{#if !hideLanguageToggle}
 					<LanguageToggle />
 				{/if}
-				<a href="#waitlist" class="cta-btn" onclick={closeMobile}>{$t('nav.waitlist')}</a>
+				<a href={`/${lang}/#waitlist`} class="cta-btn" onclick={closeMobile}>{$t('nav.waitlist')}</a>
 			</div>
 		</div>
 	</div>
