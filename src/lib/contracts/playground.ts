@@ -66,6 +66,8 @@ export interface PlaygroundModule {
 	manifest: PlaygroundManifest;
 	translations: TranslationNamespace;
 	exerciseTypes: ExerciseTypeDef[];
-	loadPlaygroundComponent: () => Promise<{ default: Component }>;
-	loadLearnComponent: () => Promise<{ default: Component }>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	loadPlaygroundComponent: () => Promise<{ default: Component<any> }>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	loadLearnComponent: () => Promise<{ default: Component<any> }>;
 }

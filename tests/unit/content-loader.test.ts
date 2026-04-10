@@ -2,7 +2,7 @@ import { describe, it, expect, afterAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-const TEST_SLUG = '__test_pg__';
+const TEST_SLUG = 'test-pg-tmp';
 const CONTENT_ROOT = path.resolve('content');
 const TEST_DIR = path.join(CONTENT_ROOT, TEST_SLUG);
 

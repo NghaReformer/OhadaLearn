@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-const TEST_SLUG = '__test_scaffold__';
+const TEST_SLUG = 'test-scaffold-tmp';
 const PG_DIR = path.resolve(`src/lib/playgrounds/${TEST_SLUG}`);
 const CONTENT_DIR = path.resolve(`content/${TEST_SLUG}`);
 
