@@ -17,4 +17,13 @@ export const commonEn: TranslationMap = {
 	'footer.links.playgrounds': 'Playgrounds',
 	'footer.links.waitlist': 'Join Waitlist',
 	'footer.links.privacy': 'Privacy',
+	'shell.tab.learn': 'Learn',
+	'shell.tab.playground': 'Playground',
+	'shell.tab.scenarios': 'Scenarios',
+	'shell.currency': 'Currency',
+	'shell.standard': 'Standard',
+	'shell.share': 'Share',
+	'shell.copied': 'Copied!',
+	'shell.exercises.coming': 'Coming Soon',
+	'shell.exercises.coming_desc': 'Exercises for this topic are being developed.',
 };
