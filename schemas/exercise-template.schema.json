@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "playgroundSlug", "difficulty", "template", "solutionLogic", "feedbackTemplates"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "playgroundSlug": { "type": "string" },
+    "difficulty": { "enum": ["fondamental", "intermediaire", "avance"] },
+    "template": {
+      "type": "object",
+      "required": ["promptKey", "parameters"],
+      "properties": {
+        "promptKey": { "type": "string" },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["name", "type", "min", "max"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "enum": ["integer", "decimal", "currency", "rate", "periods"] },
+                  "min": { "type": "number" },
+                  "max": { "type": "number" },
+                  "step": { "type": "number" }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "required": ["name", "type", "accountClasses"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "const": "account-set" },
+                  "accountClasses": { "type": "array", "items": { "type": "integer" } },
+                  "count": { "type": "integer" }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "required": ["name", "type", "minLines", "maxLines"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "const": "journal-lines" },
+                  "minLines": { "type": "integer" },
+                  "maxLines": { "type": "integer" }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    "solutionLogic": {
+      "type": "object",
+      "required": ["solverFunction"],
+      "properties": {
+        "solverFunction": { "type": "string" },
+        "answerType": { "enum": ["numeric", "journal-entry", "account-classification", "multi-select"], "default": "numeric" },
+        "tolerance": { "type": "number" },
+        "toleranceType": { "enum": ["absolute", "relative"], "default": "absolute" },
+        "partialCredit": { "type": "boolean", "default": false }
+      }
+    },
+    "feedbackTemplates": {
+      "type": "object",
+      "required": ["correct", "incorrect"],
+      "properties": {
+        "correct": { "type": "string" },
+        "incorrect": { "type": "string" }
+      }
+    }
+  }
+}
