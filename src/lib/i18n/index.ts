@@ -59,7 +59,10 @@ import { landingEn } from './namespaces/landing.en';
 import { landingFr } from './namespaces/landing.fr';
 import { playgroundsEn } from './namespaces/playgrounds.en';
 import { playgroundsFr } from './namespaces/playgrounds.fr';
+import { journalEntryEn } from './namespaces/journal-entry.en';
+import { journalEntryFr } from './namespaces/journal-entry.fr';
 
 registerNamespace('common', { en: commonEn, fr: commonFr });
 registerNamespace('landing', { en: landingEn, fr: landingFr });
 registerNamespace('playgrounds', { en: playgroundsEn, fr: playgroundsFr });
+registerNamespace('journal-entry', { en: journalEntryEn, fr: journalEntryFr });
