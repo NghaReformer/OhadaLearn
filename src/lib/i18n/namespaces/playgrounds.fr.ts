@@ -18,4 +18,6 @@ export const playgroundsFr: TranslationMap = {
 	'playgrounds.loading': 'Chargement du playground…',
 	'playgrounds.fullscreen': 'Plein écran',
 	'playgrounds.exit_fullscreen': 'Quitter le plein écran',
+	'pg.journal-entry.title': 'Écritures Comptables',
+	'pg.journal-entry.desc': 'Calculateur de écritures comptables.',
 };

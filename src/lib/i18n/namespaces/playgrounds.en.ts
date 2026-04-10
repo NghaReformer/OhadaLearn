@@ -18,4 +18,6 @@ export const playgroundsEn: TranslationMap = {
 	'playgrounds.loading': 'Loading playground…',
 	'playgrounds.fullscreen': 'Fullscreen',
 	'playgrounds.exit_fullscreen': 'Exit Fullscreen',
+	'pg.journal-entry.title': 'Journal Entries',
+	'pg.journal-entry.desc': 'Journal Entries playground.',
 };
