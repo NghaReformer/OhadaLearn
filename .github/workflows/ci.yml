@@ -30,6 +30,9 @@ jobs:
       - name: Unit tests
         run: npx vitest run
 
+      - name: Exercise validation
+        run: npx tsx scripts/validate-exercises.ts
+
       - name: Production build
         run: npm run build
 
