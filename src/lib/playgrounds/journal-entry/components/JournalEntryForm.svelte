@@ -258,10 +258,17 @@
 	}
 
 	/* ---- Lines table ---- */
+	/*
+	 * NOTE: no `overflow: hidden` here. Account picker dropdowns are
+	 * position:absolute inside `.account-picker` and must be allowed to
+	 * escape this container, otherwise the dropdown for the last row gets
+	 * clipped to 0px and users cannot select accounts. Rounded corners are
+	 * preserved by radiusing the header and last row explicitly.
+	 */
 	.lines-table {
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-md);
-		overflow: hidden;
+		position: relative;
 	}
 
 	.lines-header {
@@ -271,6 +278,8 @@
 		padding: 0.5rem 0.625rem;
 		background: var(--bg-subtle);
 		border-bottom: 1px solid var(--border-subtle);
+		border-top-left-radius: var(--radius-md);
+		border-top-right-radius: var(--radius-md);
 		font-family: var(--font-body);
 		font-size: 0.6875rem;
 		font-weight: 700;
@@ -299,6 +308,8 @@
 
 	.line-row:last-child {
 		border-bottom: none;
+		border-bottom-left-radius: var(--radius-md);
+		border-bottom-right-radius: var(--radius-md);
 	}
 
 	.amount-input {
