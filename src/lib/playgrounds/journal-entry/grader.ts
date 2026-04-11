@@ -87,13 +87,16 @@ export function gradeJournalEntry(
 		});
 	}
 
-	// Score: correct = full points, partial = half, extra/missing = 0
+	// Score: correct = full points, partial = half, extra/missing = 0.
+	// Extra lines expand the denominator so over-posting cannot still earn 100%.
 	const totalLines = modelLines.length;
 	const correctCount = results.filter((r) => r.status === 'correct').length;
 	const partialCount = results.filter((r) => r.status === 'partial').length;
+	const extraCount = results.filter((r) => r.status === 'extra').length;
+	const scoreDenominator = totalLines + extraCount;
 	const score =
-		totalLines > 0
-			? Math.round(((correctCount + partialCount * 0.5) / totalLines) * 100)
+		scoreDenominator > 0
+			? Math.round(((correctCount + partialCount * 0.5) / scoreDenominator) * 100)
 			: 0;
 
 	return {

@@ -12,6 +12,7 @@
 	import PlaygroundScenarios from './PlaygroundScenarios.svelte';
 	import ExercisePanel from './ExercisePanel.svelte';
 	import ShareButton from './ShareButton.svelte';
+	import { serializeShareValue, deserializeShareValue } from './share-state';
 
 	type Tab = 'learn' | 'playground' | 'scenarios';
 
@@ -60,7 +61,7 @@
 		const state = $pgState;
 		for (const key of shareableKeys) {
 			if (key in state) {
-				params.set(key, String(state[key]));
+				params.set(key, serializeShareValue(state[key]));
 			}
 		}
 		const base = page.url.origin + page.url.pathname;
@@ -81,9 +82,7 @@
 			for (const key of shareableKeys) {
 				const val = urlParams.get(key);
 				if (val !== null && val !== '') {
-					// Attempt numeric coercion; keep as string if not a number
-					const num = Number(val);
-					fromUrl[key] = isNaN(num) ? val : num;
+					fromUrl[key] = deserializeShareValue(val);
 				}
 			}
 			if (Object.keys(fromUrl).length > 0) {

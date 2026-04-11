@@ -53,7 +53,7 @@ describe('gradeJournalEntry', () => {
 			{ accountKey: 'vatCollected', debit: 0, credit: 1000 },
 		];
 		const result = gradeJournalEntry(student, model, 'ohada', 'en');
-		expect(result.score).toBe(100); // extra lines don't reduce score
+		expect(result.score).toBeLessThan(100);
 		expect(result.lineResults.filter((r) => r.status === 'extra')).toHaveLength(1);
 	});
 

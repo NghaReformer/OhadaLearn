@@ -3,20 +3,39 @@
 	import { manifest } from './manifest';
 	import { JournalEntryEngine } from './engine';
 	import { accountingStandard$ } from '$lib/stores/preferences';
-	import { getAccount } from '$lib/shared/chart-of-accounts';
+	import { locale, t } from '$lib/i18n';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
-	import type { JournalEntryPlaygroundState, DraftEntry } from './types';
+	import type {
+		JournalEntryPlaygroundState,
+		DraftEntry,
+		JournalLine,
+		PipelineStage
+	} from './types';
 	import type { LearnSection, Scenario, ExerciseTemplateFile } from '$lib/content/types';
+	import {
+		buildExerciseFeedback,
+		randomizeExerciseParameters,
+		renderExercisePrompt
+	} from './exercises';
 
 	import JournalEntryForm from './components/JournalEntryForm.svelte';
 	import EntryHistory from './components/EntryHistory.svelte';
 	import TAccountView from './components/TAccountView.svelte';
+	import AccountingStagePanel from './components/AccountingStagePanel.svelte';
+	import ExerciseWorkspace from './components/ExerciseWorkspace.svelte';
+
+	type ExerciseFeedbackState = {
+		score: number;
+		isCorrect: boolean;
+		messageKey: string;
+		lineFeedback: Array<{ status: 'correct' | 'partial' | 'extra' | 'missing'; explanation: string }>;
+	} | null;
 
 	let {
 		learnSections = [],
 		scenarios = [],
-		exercises = [],
+		exercises = []
 	}: {
 		learnSections?: LearnSection[];
 		scenarios?: Scenario[];
@@ -29,73 +48,164 @@
 		syscohada: 'ohada',
 		ifrs: 'ifrs',
 		'french-pcg': 'pcg',
-		'us-gaap': 'usgaap',
+		'us-gaap': 'usgaap'
 	};
 
-	const freshDraft: DraftEntry = {
-		date: new Date().toISOString().slice(0, 10),
-		description: '',
-		lines: [
-			{ accountKey: '', debit: '', credit: '' },
-			{ accountKey: '', debit: '', credit: '' },
-		],
-	};
+	const shareableKeys = [
+		'entries',
+		'draft',
+		'selectedAccount',
+		'selectedEntryId',
+		'selectedStage',
+		'selectedExerciseId',
+		'exerciseParams'
+	];
+
+	function createFreshDraft(description = ''): DraftEntry {
+		return {
+			date: new Date().toISOString().slice(0, 10),
+			description,
+			lines: [
+				{ accountKey: '', debit: '', credit: '' },
+				{ accountKey: '', debit: '', credit: '' }
+			]
+		};
+	}
+
+	function normalizeDraftLines(lines: DraftEntry['lines']): JournalLine[] {
+		return lines
+			.filter((line) => line.accountKey && (line.debit !== '' || line.credit !== ''))
+			.map((line) => ({
+				accountKey: line.accountKey,
+				debit: typeof line.debit === 'number' ? line.debit : 0,
+				credit: typeof line.credit === 'number' ? line.credit : 0
+			}));
+	}
 
 	const stateDefaults: Record<string, unknown> = {
 		entries: [],
-		draft: { ...freshDraft, lines: freshDraft.lines.map((l) => ({ ...l })) },
+		draft: createFreshDraft(),
 		selectedAccount: null,
 		selectedEntryId: null,
+		selectedStage: 'ledger' satisfies PipelineStage,
+		selectedExerciseId: null,
+		exerciseParams: null
 	};
 
 	let framework: AccountingFramework = $derived(standardToFramework[$accountingStandard$]);
+	let currentLocale = $derived($locale);
+	let translate = $derived($t);
+	let exerciseFeedback = $state<ExerciseFeedbackState>(null);
 </script>
 
 <PlaygroundShell
 	{manifest}
-	storeKey="journal-entry_v1"
+	storeKey="journal-entry_v2"
 	{stateDefaults}
 	{learnSections}
 	{scenarios}
-	{exercises}
+	shareableKeys={shareableKeys}
 >
 	{#snippet playground(state, updateState)}
 		{@const typedState = state as unknown as JournalEntryPlaygroundState}
-		{@const draft = (typedState.draft ?? freshDraft) as DraftEntry}
+		{@const draft = (typedState.draft ?? createFreshDraft()) as DraftEntry}
 		{@const entries = typedState.entries ?? []}
 		{@const validation = engine.validate(draft, framework)}
-		{@const ledger = engine.buildLedger(entries)}
-		{@const selectedEntry = entries.find((e) => e.id === typedState.selectedEntryId)}
+		{@const ledger = engine.buildLedger(entries, framework)}
+		{@const ledgerAccounts = [...ledger.values()].sort((a, b) =>
+			a.account.frameworkCode.localeCompare(b.account.frameworkCode, undefined, { numeric: true })
+		)}
+		{@const trialBalance = engine.buildTrialBalance(ledger)}
+		{@const trialBalanceCheck = engine.verifyTrialBalance(trialBalance)}
+		{@const incomeStatement = engine.buildIncomeStatement(trialBalance, framework)}
+		{@const balanceSheet = engine.buildBalanceSheet(trialBalance, incomeStatement.netIncome)}
+		{@const cashFlow = engine.buildCashFlow(entries, framework)}
+		{@const selectedStage = typedState.selectedStage ?? 'ledger'}
+		{@const selectedEntry = entries.find((entry) => entry.id === typedState.selectedEntryId)}
+		{@const selectedAccountKeys = selectedEntry?.lines.map((line) => line.accountKey) ?? []}
+		{@const entryImpact = engine.analyzeEntryImpact(selectedEntry, framework)}
 		{@const tAccountKey = typedState.selectedAccount ?? selectedEntry?.lines[0]?.accountKey ?? null}
 		{@const tAccountData = tAccountKey ? engine.getTAccount(ledger, tAccountKey) : null}
-		{@const tAccountName = tAccountKey
-			? (() => {
-					const acc = getAccount(tAccountKey, framework);
-					return acc ? `${acc.frameworkCode} — ${acc.frameworkNameEn}` : tAccountKey;
-				})()
-			: ''}
+		{@const selectedExercise = exercises.find(
+			(exercise) => exercise.id === typedState.selectedExerciseId
+		)}
+		{@const exercisePrompt =
+			selectedExercise && typedState.exerciseParams
+				? renderExercisePrompt(
+						translate(selectedExercise.template.promptKey),
+						typedState.exerciseParams,
+						currentLocale
+					)
+				: ''}
 
 		<div class="je-layout">
-			<div class="je-main">
+			<div class="je-workspace">
+				{#if exercises.length > 0}
+					<ExerciseWorkspace
+						{exercises}
+						selectedExerciseId={typedState.selectedExerciseId}
+						prompt={exercisePrompt}
+						feedback={exerciseFeedback}
+						onSelectExercise={(exerciseId) => {
+							const exercise = exercises.find((item) => item.id === exerciseId);
+							if (!exercise) return;
+
+							exerciseFeedback = null;
+							updateState({
+								selectedExerciseId: exerciseId,
+								exerciseParams: randomizeExerciseParameters(exercise),
+								draft: createFreshDraft(translate(exercise.template.promptKey)),
+								selectedEntryId: null
+							});
+						}}
+						onRandomize={() => {
+							if (!selectedExercise) return;
+
+							exerciseFeedback = null;
+							updateState({
+								exerciseParams: randomizeExerciseParameters(selectedExercise),
+								draft: createFreshDraft(translate(selectedExercise.template.promptKey)),
+								selectedEntryId: null
+							});
+						}}
+						onCheck={() => {
+							if (!selectedExercise || !typedState.exerciseParams) return;
+
+							const result = buildExerciseFeedback(
+								normalizeDraftLines(draft.lines),
+								selectedExercise,
+								typedState.exerciseParams,
+								framework,
+								currentLocale
+							);
+
+							exerciseFeedback = {
+								score: result.score,
+								isCorrect: result.isCorrect,
+								messageKey: result.messageKey,
+								lineFeedback: result.lineFeedback
+							};
+						}}
+					/>
+				{/if}
+
 				<JournalEntryForm
 					{draft}
-					onUpdate={(updated) => updateState({ draft: updated })}
+					onUpdate={(updated) => {
+						exerciseFeedback = null;
+						updateState({ draft: updated });
+					}}
 					onPost={() => {
-						if (validation.valid) {
-							const entry = engine.postDraft(draft);
-							updateState({
-								entries: [...entries, entry],
-								draft: {
-									date: new Date().toISOString().slice(0, 10),
-									description: '',
-									lines: [
-										{ accountKey: '', debit: '', credit: '' },
-										{ accountKey: '', debit: '', credit: '' },
-									],
-								},
-								selectedEntryId: entry.id,
-							});
-						}
+						if (!validation.valid) return;
+
+						const entry = engine.postDraft(draft);
+						exerciseFeedback = null;
+						updateState({
+							entries: [...entries, entry],
+							draft: createFreshDraft(),
+							selectedEntryId: entry.id,
+							selectedStage: 'ledger'
+						});
 					}}
 					{validation}
 				/>
@@ -103,18 +213,55 @@
 				<EntryHistory
 					{entries}
 					selectedEntryId={typedState.selectedEntryId}
-					onSelect={(id) => updateState({ selectedEntryId: id })}
+					onSelect={(id) =>
+						updateState({
+							selectedEntryId: id,
+							selectedStage: selectedStage
+						})}
+					onSelectAccount={(accountKey) => updateState({ selectedAccount: accountKey })}
 					onDelete={(id) => {
 						updateState({
-							entries: entries.filter((e) => e.id !== id),
-							selectedEntryId: typedState.selectedEntryId === id ? null : typedState.selectedEntryId,
+							entries: entries.filter((entry) => entry.id !== id),
+							selectedEntryId:
+								typedState.selectedEntryId === id ? null : typedState.selectedEntryId
 						});
 					}}
 				/>
 			</div>
 
-			<div class="je-sidebar">
-				<TAccountView data={tAccountData} accountName={tAccountName} />
+			<div class="je-analysis">
+				<AccountingStagePanel
+					stage={selectedStage}
+					counts={{
+						ledger: ledgerAccounts.length,
+						trialBalance: trialBalance.length,
+						incomeStatement: incomeStatement.revenues.length + incomeStatement.expenses.length,
+						balanceSheet:
+							balanceSheet.currentAssets.length +
+							balanceSheet.nonCurrentAssets.length +
+							balanceSheet.currentLiabilities.length +
+							balanceSheet.nonCurrentLiabilities.length +
+							balanceSheet.equity.length,
+						cashFlow:
+							cashFlow.operating.length +
+							cashFlow.investing.length +
+							cashFlow.financing.length
+					}}
+					{ledgerAccounts}
+					{trialBalance}
+					{trialBalanceCheck}
+					{incomeStatement}
+					{balanceSheet}
+					{cashFlow}
+					selectedAccount={typedState.selectedAccount}
+					{selectedEntry}
+					{selectedAccountKeys}
+					{entryImpact}
+					onSelectStage={(stage) => updateState({ selectedStage: stage })}
+					onSelectAccount={(accountKey) => updateState({ selectedAccount: accountKey })}
+				/>
+
+				<TAccountView data={tAccountData} />
 			</div>
 		</div>
 	{/snippet}
@@ -123,32 +270,23 @@
 <style>
 	.je-layout {
 		display: grid;
-		grid-template-columns: 1fr 380px;
+		grid-template-columns: minmax(360px, 420px) 1fr;
 		gap: 1.5rem;
 		padding: 1.5rem;
 		min-height: 0;
 	}
 
-	.je-main {
+	.je-workspace,
+	.je-analysis {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: 1rem;
 		min-width: 0;
 	}
 
-	.je-sidebar {
-		position: sticky;
-		top: 1.5rem;
-		align-self: start;
-	}
-
-	@media (max-width: 1024px) {
+	@media (max-width: 1180px) {
 		.je-layout {
 			grid-template-columns: 1fr;
-		}
-
-		.je-sidebar {
-			position: static;
 		}
 	}
 </style>

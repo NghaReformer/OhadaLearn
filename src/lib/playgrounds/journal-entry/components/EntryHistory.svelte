@@ -14,11 +14,13 @@
 		selectedEntryId,
 		onSelect,
 		onDelete,
+		onSelectAccount = () => {},
 	}: {
 		entries: JournalEntry[];
 		selectedEntryId: string | null;
 		onSelect: (id: string) => void;
 		onDelete: (id: string) => void;
+		onSelectAccount?: (accountKey: string) => void;
 	} = $props();
 
 	const standardToFramework: Record<AccountingStandard, AccountingFramework> = {
@@ -111,7 +113,18 @@
 								<tbody>
 									{#each entry.lines as line}
 										<tr>
-											<td class="line-account">{getAccountDisplay(line.accountKey)}</td>
+											<td class="line-account">
+												<button
+													class="account-link"
+													type="button"
+													onclick={(event) => {
+														event.stopPropagation();
+														onSelectAccount(line.accountKey);
+													}}
+												>
+													{getAccountDisplay(line.accountKey)}
+												</button>
+											</td>
 											<td class="col-right mono">{line.debit > 0 ? fmtCurrency(line.debit, currency) : ''}</td>
 											<td class="col-right mono">{line.credit > 0 ? fmtCurrency(line.credit, currency) : ''}</td>
 										</tr>
@@ -229,6 +242,20 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.account-link {
+		border: none;
+		background: none;
+		padding: 0;
+		color: var(--text-secondary);
+		cursor: pointer;
+		font: inherit;
+		text-align: left;
+	}
+
+	.account-link:hover {
+		color: var(--accent);
 	}
 
 	.entry-total {

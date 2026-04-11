@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
+	import { locale } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
 	import type { TAccountData } from '../types';
 
 	let {
-		data,
-		accountName,
+		data
 	}: {
 		data: TAccountData | null;
-		accountName: string;
 	} = $props();
 
 	let currency = $derived($currency$);
+	let currentLocale = $derived($locale);
 
 	let balanceSide = $derived.by(() => {
 		if (!data) return 'debit';
@@ -21,9 +21,11 @@
 
 	let balanceAbs = $derived(data ? Math.abs(data.balance) : 0);
 
-	let maxRows = $derived.by(() => {
-		if (!data) return 0;
-		return Math.max(data.debits.length, data.credits.length);
+	let accountName = $derived.by(() => {
+		if (!data) return '';
+		return currentLocale === 'fr'
+			? `${data.account.frameworkCode} — ${data.account.frameworkNameFr}`
+			: `${data.account.frameworkCode} — ${data.account.frameworkNameEn}`;
 	});
 </script>
 
@@ -64,7 +66,7 @@
 					{#each data.debits as entry}
 						<div class="taccount-entry">
 							<span class="entry-desc" title={entry.description}>{entry.description}</span>
-							<span class="entry-amount debit-amount">{fmtCurrency(entry.amount, currency)}</span>
+							<span class="entry-amount debit-amount">{fmtCurrency(entry.debit, currency)}</span>
 						</div>
 					{/each}
 				</div>
@@ -73,7 +75,7 @@
 					{#each data.credits as entry}
 						<div class="taccount-entry">
 							<span class="entry-desc" title={entry.description}>{entry.description}</span>
-							<span class="entry-amount credit-amount">{fmtCurrency(entry.amount, currency)}</span>
+							<span class="entry-amount credit-amount">{fmtCurrency(entry.credit, currency)}</span>
 						</div>
 					{/each}
 				</div>

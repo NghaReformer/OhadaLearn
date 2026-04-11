@@ -8,6 +8,7 @@
 	let lang = $derived(page.params.lang);
 	let pg = $derived(data.pg);
 	let iframeEl: HTMLIFrameElement | undefined = $state();
+	let nativeContainerEl: HTMLDivElement | undefined = $state();
 	let iframeLoaded = $state(false);
 	let isFullscreen = $state(false);
 
@@ -33,15 +34,25 @@
 	}
 
 	function toggleFullscreen() {
-		if (!iframeEl) return;
+		const target = data.isNativeModule ? nativeContainerEl : iframeEl;
+		if (!target) return;
 		if (!document.fullscreenElement) {
-			iframeEl.requestFullscreen();
+			target.requestFullscreen();
 			isFullscreen = true;
 		} else {
 			document.exitFullscreen();
 			isFullscreen = false;
 		}
 	}
+
+	$effect(() => {
+		const handler = () => {
+			isFullscreen = Boolean(document.fullscreenElement);
+		};
+
+		document.addEventListener('fullscreenchange', handler);
+		return () => document.removeEventListener('fullscreenchange', handler);
+	});
 </script>
 
 <svelte:head>
@@ -81,7 +92,7 @@
 	</header>
 
 	{#if data.isNativeModule}
-		<div class="native-container">
+		<div class="native-container" bind:this={nativeContainerEl}>
 			{#await import('$lib/playgrounds/journal-entry/Playground.svelte') then module}
 				<module.default
 					learnSections={data.learnSections}
