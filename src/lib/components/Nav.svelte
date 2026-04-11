@@ -36,6 +36,9 @@
 			<div class="nav-links">
 				<a href={`/${lang}/`} class="nav-link" onclick={closeMobile}>{$t('nav.home')}</a>
 				<a href={`/${lang}/playgrounds`} class="nav-link" onclick={closeMobile}>{$t('nav.playgrounds')}</a>
+				<a href={`/${lang}/learn`} class="nav-link" onclick={closeMobile}>{$t('nav.learn')}</a>
+				<a href={`/${lang}/scenarios`} class="nav-link" onclick={closeMobile}>{$t('nav.scenarios')}</a>
+				<a href={`/${lang}/chart-of-accounts`} class="nav-link" onclick={closeMobile}>{$t('nav.coa')}</a>
 			</div>
 
 			<div class="nav-actions">

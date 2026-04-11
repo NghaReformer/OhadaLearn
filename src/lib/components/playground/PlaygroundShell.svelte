@@ -36,7 +36,15 @@
 		playground: Snippet<[state: Record<string, unknown>, updateState: (partial: Record<string, unknown>) => void]>;
 	} = $props();
 
-	let activeTab: Tab = $state('playground');
+	// Read initial tab from URL ?tab= so library pages can deep-link.
+	// Falls back to 'playground' for any unknown value.
+	function readInitialTab(): Tab {
+		const v = page.url.searchParams.get('tab');
+		if (v === 'learn' || v === 'scenarios' || v === 'playground') return v;
+		return 'playground';
+	}
+
+	let activeTab: Tab = $state(readInitialTab());
 	let exercisesOpen = $state(false);
 
 	// Store is created once at mount — storeKey/stateDefaults are initialization-only.
