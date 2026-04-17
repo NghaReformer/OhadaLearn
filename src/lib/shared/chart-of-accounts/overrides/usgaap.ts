@@ -2,6 +2,7 @@ import type { FrameworkOverride } from '../types';
 
 export const usgaapOverrides: Map<string, FrameworkOverride> = new Map([
 	['shareCapital', { code: '-', nameFr: 'Common Stock', nameEn: 'Common Stock' }],
+	['ownerDrawings', { code: '-', nameFr: "Owner's Draws", nameEn: "Owner's Draws" }],
 	['legalReserve', { code: '-', nameFr: 'Additional Paid-in Capital', nameEn: 'APIC' }],
 	['retainedEarnings', { code: '-', nameFr: 'Retained Earnings', nameEn: 'Retained Earnings' }],
 	['currentYearResult', { code: '-', nameFr: 'Net Income', nameEn: 'Net Income' }],

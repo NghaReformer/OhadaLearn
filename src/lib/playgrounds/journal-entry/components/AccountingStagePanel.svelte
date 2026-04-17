@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/i18n';
-	import { currency$ } from '$lib/stores/preferences';
+	import { currency$, accountingStandard$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
+	import { getAccount } from '$lib/shared/chart-of-accounts';
+	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
+	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type {
 		BalanceSheetData,
 		CashFlowStatement,
@@ -47,8 +50,16 @@
 		onSelectAccount: (accountKey: string) => void;
 	} = $props();
 
+	const standardToFramework: Record<AccountingStandard, AccountingFramework> = {
+		syscohada: 'ohada',
+		ifrs: 'ifrs',
+		'french-pcg': 'pcg',
+		'us-gaap': 'usgaap'
+	};
+
 	let currency = $derived($currency$);
 	let currentLocale = $derived($locale);
+	let framework = $derived(standardToFramework[$accountingStandard$]);
 
 	const stageMeta: Array<{ key: PipelineStage; labelKey: string }> = [
 		{ key: 'ledger', labelKey: 'je.stage.ledger' },
@@ -62,6 +73,12 @@
 		const label =
 			currentLocale === 'fr' ? account.frameworkNameFr : account.frameworkNameEn;
 		return `${account.frameworkCode} — ${label}`;
+	}
+
+	function accountDisplayFromKey(accountKey: string): string {
+		const resolved = getAccount(accountKey, framework);
+		if (!resolved) return accountKey;
+		return accountName(resolved);
 	}
 
 	function isSelectedAccount(accountKey: string): boolean {
@@ -100,8 +117,9 @@
 						class="impact-line"
 						type="button"
 						onclick={() => onSelectAccount(line.accountKey)}
+						title={accountDisplayFromKey(line.accountKey)}
 					>
-						<span class="impact-account">{line.accountKey}</span>
+						<span class="impact-account">{accountDisplayFromKey(line.accountKey)}</span>
 						<span class="impact-side">{lineSide(line)}</span>
 						<span class="impact-amount">{fmtCurrency(lineAmount(line), currency)}</span>
 					</button>

@@ -129,6 +129,58 @@ describe('Chart of Accounts', () => {
 			expect(results.length).toBeGreaterThan(0);
 			expect(results[0].key).toBe('bank');
 		});
+
+		it('returns Bank (521) as the top "cash" synonym hit', () => {
+			const results = searchAccounts('cash', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('bank');
+			expect(results.map((r) => r.key)).toContain('pettyCash');
+		});
+
+		it('returns Merchandise (37) first for "inventory"', () => {
+			const results = searchAccounts('inventory', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('merchandise');
+		});
+
+		it('surfaces Accumulated Depreciation accounts for "accumulated"', () => {
+			const results = searchAccounts('accumulated', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			const keys = results.map((r) => r.key);
+			expect(keys).toContain('accDeprEquipment');
+		});
+
+		it('surfaces Allowance for Doubtful Accounts for "allowance"', () => {
+			const results = searchAccounts('allowance', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('allowanceDoubtful');
+		});
+
+		it('surfaces Owner\'s Drawings for "drawings"', () => {
+			const results = searchAccounts('drawings', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('ownerDrawings');
+		});
+	});
+
+	describe('equity cash-flow classification', () => {
+		it('tags equity accounts as financing activities', () => {
+			const equityKeys = [
+				'shareCapital',
+				'legalReserve',
+				'statutoryReserve',
+				'revaluationSurplus',
+				'retainedEarnings',
+				'currentYearResult',
+				'incomeSummary',
+				'ownerDrawings'
+			];
+			for (const key of equityKeys) {
+				const account = getAccount(key, 'ohada');
+				expect(account, `missing account ${key}`).not.toBeNull();
+				expect(account!.cfClass, `${key} should be classified as financing`).toBe('financing');
+			}
+		});
 	});
 
 	describe('getAccountsByClass', () => {

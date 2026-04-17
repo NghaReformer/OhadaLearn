@@ -167,11 +167,15 @@
 					class:highlighted={i === highlightIndex}
 					role="option"
 					aria-selected={i === highlightIndex}
+					title={`${account.frameworkCode} — ${getAccountDisplayName(account)}`}
 					onmousedown={(e) => { e.preventDefault(); selectAccount(account); }}
 					onmouseenter={() => (highlightIndex = i)}
 				>
 					<span class="option-code">{account.frameworkCode}</span>
 					<span class="option-name">{getAccountDisplayName(account)}</span>
+					<span class="option-side" aria-label={account.normalBalance === 'debit' ? 'debit-normal' : 'credit-normal'}>
+						{account.normalBalance === 'debit' ? 'Dr' : 'Cr'}
+					</span>
 					<span class="option-type">{account.type}</span>
 				</li>
 			{/each}
@@ -224,7 +228,6 @@
 		position: absolute;
 		top: 100%;
 		left: 0;
-		right: 0;
 		z-index: 50;
 		margin: 0.25rem 0 0;
 		padding: 0.25rem 0;
@@ -232,9 +235,14 @@
 		border: 1px solid var(--border);
 		border-radius: var(--radius-sm);
 		box-shadow: var(--shadow-sm);
-		max-height: 200px;
+		max-height: 280px;
 		overflow-y: auto;
 		list-style: none;
+		/* Let the dropdown extend well beyond the narrow account column so
+		   long SYSCOHADA labels are readable without being clipped. */
+		min-width: 100%;
+		width: max-content;
+		max-width: min(420px, 96vw);
 	}
 
 	.picker-option {
@@ -267,6 +275,16 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.option-side {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		color: var(--text-secondary);
+		flex-shrink: 0;
+		padding: 0.0625rem 0.3125rem;
+		border-radius: var(--radius-sm);
+		background: var(--bg-subtle);
 	}
 
 	.option-type {

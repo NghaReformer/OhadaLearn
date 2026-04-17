@@ -35,7 +35,8 @@ function sortByCode(
 export class JournalEntryEngine {
 	/**
 	 * Validate a draft entry before posting.
-	 * Checks: all accounts valid, debits === credits, at least 2 lines, non-negative amounts.
+	 * Checks: all accounts valid, no duplicated accounts, debits === credits,
+	 * at least 2 lines, non-negative amounts.
 	 */
 	validate(draft: DraftEntry, framework: AccountingFramework): ValidationResult {
 		const errors: string[] = [];
@@ -55,6 +56,9 @@ export class JournalEntryEngine {
 			errors.push('Description is required');
 		}
 
+		const seenAccounts = new Set<string>();
+		const duplicateAccounts = new Set<string>();
+
 		for (const line of filledLines) {
 			if (!line.accountKey) {
 				errors.push('Each line must have an account');
@@ -67,6 +71,14 @@ export class JournalEntryEngine {
 				continue;
 			}
 
+			if (seenAccounts.has(line.accountKey)) {
+				duplicateAccounts.add(line.accountKey);
+			} else {
+				seenAccounts.add(line.accountKey);
+			}
+
+			const accountLabel = this.formatAccountLabel(account);
+
 			const debit = typeof line.debit === 'number' ? line.debit : 0;
 			const credit = typeof line.credit === 'number' ? line.credit : 0;
 
@@ -75,19 +87,28 @@ export class JournalEntryEngine {
 			}
 
 			if (debit === 0 && credit === 0) {
-				errors.push(`Line for ${line.accountKey} has no amount`);
+				errors.push(`${accountLabel} has no amount`);
 			}
 
 			if (debit > 0 && credit > 0) {
-				errors.push(`Line for ${line.accountKey} has both debit and credit`);
+				errors.push(`${accountLabel} has both a debit and a credit — use one side per line`);
 			}
 
 			totalDebit += debit;
 			totalCredit += credit;
 		}
 
+		for (const key of duplicateAccounts) {
+			const account = getAccount(key, framework);
+			const label = account ? this.formatAccountLabel(account) : key;
+			errors.push(`${label} appears more than once — combine into a single line`);
+		}
+
 		if (filledLines.length >= 2 && Math.abs(totalDebit - totalCredit) > EPSILON) {
-			errors.push(`Entry is unbalanced: debits ${totalDebit} ≠ credits ${totalCredit}`);
+			const diff = Math.abs(totalDebit - totalCredit);
+			errors.push(
+				`Entry is unbalanced by ${this.formatAmount(diff)} — debits ${this.formatAmount(totalDebit)}, credits ${this.formatAmount(totalCredit)}`
+			);
 		}
 
 		return {
@@ -96,6 +117,26 @@ export class JournalEntryEngine {
 			totalDebit,
 			totalCredit
 		};
+	}
+
+	private formatAccountLabel(account: {
+		frameworkCode: string;
+		frameworkNameEn: string;
+	}): string {
+		const code = account.frameworkCode && account.frameworkCode !== '-' ? account.frameworkCode : '';
+		return code ? `${code} — ${account.frameworkNameEn}` : account.frameworkNameEn;
+	}
+
+	private formatAmount(n: number): string {
+		// Group thousands with a thin space, two decimal digits only when needed.
+		const rounded = Math.round(n * 100) / 100;
+		const hasFraction = Math.abs(rounded - Math.trunc(rounded)) > 1e-9;
+		const formatter = new Intl.NumberFormat('en-US', {
+			minimumFractionDigits: hasFraction ? 2 : 0,
+			maximumFractionDigits: 2,
+			useGrouping: true
+		});
+		return formatter.format(rounded).replace(/,/g, ' ');
 	}
 
 	/**

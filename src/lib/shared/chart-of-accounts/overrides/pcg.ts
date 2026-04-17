@@ -2,6 +2,7 @@ import type { FrameworkOverride } from '../types';
 
 export const pcgOverrides: Map<string, FrameworkOverride> = new Map([
 	['shareCapital', { code: '101', nameFr: 'Capital social', nameEn: 'Share Capital' }],
+	['ownerDrawings', { code: '108', nameFr: 'Compte de l\'exploitant', nameEn: "Owner's Drawings" }],
 	['legalReserve', { code: '1061', nameFr: 'Réserve légale', nameEn: 'Legal Reserve' }],
 	['retainedEarnings', { code: '12', nameFr: 'Report à nouveau', nameEn: 'Retained Earnings' }],
 	['currentYearResult', { code: '12', nameFr: 'Résultat de l\'exercice', nameEn: 'Current Year Result' }],

@@ -31,6 +31,7 @@
 	};
 
 	let expandedIds = $state(new Set<string>());
+	let pendingDeleteId = $state<string | null>(null);
 	let currency = $derived($currency$);
 	let framework = $derived(standardToFramework[$accountingStandard$]);
 	let currentLocale = $derived($locale);
@@ -131,16 +132,38 @@
 									{/each}
 								</tbody>
 							</table>
-							<button
-								class="btn-delete"
-								type="button"
-								onclick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
-							>
-								<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-									<path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-								</svg>
-								{$t('je.history.delete')}
-							</button>
+							{#if pendingDeleteId === entry.id}
+								<div class="delete-confirm" role="alertdialog" aria-label={$t('je.history.deleteConfirmTitle')}>
+									<p class="delete-confirm-text">{$t('je.history.deleteConfirm')}</p>
+									<div class="delete-confirm-actions">
+										<button
+											class="btn-confirm"
+											type="button"
+											onclick={(e) => { e.stopPropagation(); pendingDeleteId = null; onDelete(entry.id); }}
+										>
+											{$t('je.history.deleteConfirmYes')}
+										</button>
+										<button
+											class="btn-cancel"
+											type="button"
+											onclick={(e) => { e.stopPropagation(); pendingDeleteId = null; }}
+										>
+											{$t('je.history.deleteConfirmNo')}
+										</button>
+									</div>
+								</div>
+							{:else}
+								<button
+									class="btn-delete"
+									type="button"
+									onclick={(e) => { e.stopPropagation(); pendingDeleteId = entry.id; }}
+								>
+									<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+										<path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+									</svg>
+									{$t('je.history.delete')}
+								</button>
+							{/if}
 						</div>
 					{/if}
 				</li>
@@ -341,5 +364,55 @@
 	.btn-delete:hover {
 		background: color-mix(in srgb, var(--error) 10%, transparent);
 		border-color: var(--error);
+	}
+
+	.delete-confirm {
+		margin-top: 0.5rem;
+		padding: 0.5rem 0.625rem;
+		background: color-mix(in srgb, var(--error) 6%, transparent);
+		border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+		border-radius: var(--radius-sm);
+	}
+
+	.delete-confirm-text {
+		margin: 0 0 0.375rem;
+		font-size: 0.75rem;
+		color: var(--text-primary);
+	}
+
+	.delete-confirm-actions {
+		display: flex;
+		gap: 0.375rem;
+	}
+
+	.btn-confirm,
+	.btn-cancel {
+		padding: 0.25rem 0.625rem;
+		border-radius: var(--radius-sm);
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		cursor: pointer;
+		transition: all var(--transition-fast);
+	}
+
+	.btn-confirm {
+		background: var(--error);
+		border: 1px solid var(--error);
+		color: #fff;
+	}
+
+	.btn-confirm:hover {
+		filter: brightness(1.1);
+	}
+
+	.btn-cancel {
+		background: none;
+		border: 1px solid var(--border-subtle);
+		color: var(--text-secondary);
+	}
+
+	.btn-cancel:hover {
+		border-color: var(--border);
+		color: var(--text-primary);
 	}
 </style>
