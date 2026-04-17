@@ -81,19 +81,60 @@
 	}
 
 	let pmtDisabledByContinuous = $derived(state.compoundingFrequency === 'continuous');
+
+	let pillRefs: HTMLButtonElement[] = [];
+
+	function focusPillAt(index: number) {
+		const wrapped = ((index % modes.length) + modes.length) % modes.length;
+		const btn = pillRefs[wrapped];
+		if (btn) btn.focus();
+		selectMode(modes[wrapped]);
+	}
+
+	function handleTablistKeydown(event: KeyboardEvent) {
+		const currentIndex = modes.indexOf(state.mode);
+		switch (event.key) {
+			case 'ArrowRight':
+			case 'ArrowDown':
+				event.preventDefault();
+				focusPillAt(currentIndex + 1);
+				break;
+			case 'ArrowLeft':
+			case 'ArrowUp':
+				event.preventDefault();
+				focusPillAt(currentIndex - 1);
+				break;
+			case 'Home':
+				event.preventDefault();
+				focusPillAt(0);
+				break;
+			case 'End':
+				event.preventDefault();
+				focusPillAt(modes.length - 1);
+				break;
+		}
+	}
 </script>
 
 <section class="solver">
-	<div class="mode-picker" role="tablist" aria-label={$t('tvm.mode.solveFor')}>
-		<span class="mode-label">{$t('tvm.mode.solveFor')}</span>
-		<div class="mode-pills">
-			{#each modes as mode (mode)}
+	<div class="mode-picker">
+		<span class="mode-label" id="tvm-mode-label">{$t('tvm.mode.solveFor')}</span>
+		<div
+			class="mode-pills"
+			role="tablist"
+			aria-labelledby="tvm-mode-label"
+			tabindex={-1}
+			onkeydown={handleTablistKeydown}
+		>
+			{#each modes as mode, i (mode)}
 				<button
+					bind:this={pillRefs[i]}
 					class="mode-pill"
 					class:active={state.mode === mode}
 					type="button"
 					role="tab"
 					aria-selected={state.mode === mode}
+					tabindex={state.mode === mode ? 0 : -1}
 					onclick={() => selectMode(mode)}
 				>
 					{$t(`tvm.mode.${mode}`)}
@@ -254,6 +295,11 @@
 
 	.mode-pill:hover:not(.active) {
 		color: var(--text-secondary);
+	}
+
+	.mode-pill:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
 	}
 
 	.mode-pill.active {
