@@ -1,0 +1,17 @@
+{
+  "slug": "retirement",
+  "titleKey": "tvm.scenario.retirement.title",
+  "descKey": "tvm.scenario.retirement.desc",
+  "presetValues": {
+    "mode": "fv",
+    "pv": 0,
+    "fv": 0,
+    "pmt": -50000,
+    "rate": 7,
+    "periods": 25,
+    "periodsUnit": "years",
+    "compoundingFrequency": "monthly",
+    "paymentFrequency": "monthly",
+    "paymentTiming": "end"
+  }
+}

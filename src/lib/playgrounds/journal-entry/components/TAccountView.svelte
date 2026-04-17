@@ -3,6 +3,7 @@
 	import { locale } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
+	import { formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { TAccountData } from '../types';
 
 	let {
@@ -23,9 +24,7 @@
 
 	let accountName = $derived.by(() => {
 		if (!data) return '';
-		return currentLocale === 'fr'
-			? `${data.account.frameworkCode} — ${data.account.frameworkNameFr}`
-			: `${data.account.frameworkCode} — ${data.account.frameworkNameEn}`;
+		return formatAccountLabel(data.account, currentLocale);
 	});
 </script>
 
@@ -85,14 +84,14 @@
 			<div class="taccount-totals">
 				<div class="taccount-col debit-col">
 					<div class="total-row">
-						<span class="total-label">Total</span>
+						<span class="total-label">{$t('je.stage.total')}</span>
 						<span class="total-amount">{fmtCurrency(data.debitTotal, currency)}</span>
 					</div>
 				</div>
 				<div class="taccount-divider" aria-hidden="true"></div>
 				<div class="taccount-col credit-col">
 					<div class="total-row">
-						<span class="total-label">Total</span>
+						<span class="total-label">{$t('je.stage.total')}</span>
 						<span class="total-amount">{fmtCurrency(data.creditTotal, currency)}</span>
 					</div>
 				</div>

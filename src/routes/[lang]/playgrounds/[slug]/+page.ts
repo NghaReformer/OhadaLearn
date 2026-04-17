@@ -3,6 +3,7 @@ import { playgrounds } from '$lib/data/playgrounds';
 import { isRegistered } from '$lib/playgrounds/_registry';
 import type { PageLoad } from './$types';
 
+// Ensure native playground modules register themselves (side-effect imports)
 import '$lib/playgrounds';
 
 export const load: PageLoad = ({ params, data }) => {

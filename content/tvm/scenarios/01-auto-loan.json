@@ -1,0 +1,17 @@
+{
+  "slug": "auto-loan",
+  "titleKey": "tvm.scenario.autoLoan.title",
+  "descKey": "tvm.scenario.autoLoan.desc",
+  "presetValues": {
+    "mode": "pmt",
+    "pv": 3500000,
+    "fv": 0,
+    "pmt": 0,
+    "rate": 9,
+    "periods": 5,
+    "periodsUnit": "years",
+    "compoundingFrequency": "monthly",
+    "paymentFrequency": "monthly",
+    "paymentTiming": "end"
+  }
+}

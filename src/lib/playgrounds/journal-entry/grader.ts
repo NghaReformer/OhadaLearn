@@ -2,12 +2,21 @@ import type { JournalLine } from './types';
 import type { Locale } from '$lib/i18n/types';
 import { getAccount } from '$lib/shared/chart-of-accounts';
 import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
+import { fmtCurrency } from '$lib/format';
+
+export type FeedbackStatus = 'correct' | 'partial' | 'extra' | 'missing';
+
+export interface FeedbackParts {
+	key: string;
+	params: Record<string, string>;
+}
 
 export interface LineFeedback {
-	status: 'correct' | 'partial' | 'extra' | 'missing';
+	status: FeedbackStatus;
 	studentLine: JournalLine | null;
 	modelLine: JournalLine | null;
 	explanation: string;
+	feedback: FeedbackParts;
 }
 
 export interface GradeResult {
@@ -21,10 +30,20 @@ export function gradeJournalEntry(
 	modelLines: JournalLine[],
 	framework: AccountingFramework,
 	locale: Locale,
+	currencyCode: string = 'XOF',
 ): GradeResult {
 	const results: LineFeedback[] = [];
 	const unmatchedStudent = [...studentLines];
 	const unmatchedModel = [...modelLines];
+
+	const buildLineFeedback = (
+		status: FeedbackStatus,
+		modelLine: JournalLine | null,
+		studentLine: JournalLine | null,
+	): { explanation: string; feedback: FeedbackParts } => {
+		const feedback = buildFeedback(status, modelLine, studentLine, framework, locale, currencyCode);
+		return { feedback, explanation: renderFeedback(feedback, locale) };
+	};
 
 	// Pass 1: Exact matches (same account, same side, amount within 1%)
 	for (let i = unmatchedModel.length - 1; i >= 0; i--) {
@@ -43,7 +62,7 @@ export function gradeJournalEntry(
 				status: 'correct',
 				studentLine: unmatchedStudent[studentIdx],
 				modelLine: model,
-				explanation: buildFeedback('correct', model, null, framework, locale),
+				...buildLineFeedback('correct', model, null),
 			});
 			unmatchedStudent.splice(studentIdx, 1);
 			unmatchedModel.splice(i, 1);
@@ -61,7 +80,7 @@ export function gradeJournalEntry(
 				status: 'partial',
 				studentLine: student,
 				modelLine: model,
-				explanation: buildFeedback('partial', model, student, framework, locale),
+				...buildLineFeedback('partial', model, student),
 			});
 			unmatchedStudent.splice(studentIdx, 1);
 			unmatchedModel.splice(i, 1);
@@ -74,7 +93,7 @@ export function gradeJournalEntry(
 			status: 'missing',
 			studentLine: null,
 			modelLine: model,
-			explanation: buildFeedback('missing', model, null, framework, locale),
+			...buildLineFeedback('missing', model, null),
 		});
 	}
 
@@ -83,7 +102,7 @@ export function gradeJournalEntry(
 			status: 'extra',
 			studentLine: student,
 			modelLine: null,
-			explanation: buildFeedback('extra', null, student, framework, locale),
+			...buildLineFeedback('extra', null, student),
 		});
 	}
 
@@ -106,13 +125,36 @@ export function gradeJournalEntry(
 	};
 }
 
+const FEEDBACK_TEMPLATES: Record<Locale, Record<string, string>> = {
+	en: {
+		'je.feedback.correct': 'Correct — {code} {name}',
+		'je.feedback.partial':
+			'Right account ({name}), but the amount or side is wrong. Expected: {side} {amount}.',
+		'je.feedback.missing': 'Missing line: {code} {name} — {side} {amount}.',
+		'je.feedback.extra': 'Extra line: {code} {name} is not expected in this entry.',
+	},
+	fr: {
+		'je.feedback.correct': 'Correct — {code} {name}',
+		'je.feedback.partial':
+			'Compte correct ({name}), mais le montant ou le sens est incorrect. Attendu : {side} {amount}.',
+		'je.feedback.missing': 'Ligne manquante : {code} {name} — {side} {amount}.',
+		'je.feedback.extra': 'Ligne en trop : {code} {name} n’est pas attendu dans cette écriture.',
+	},
+};
+
+function renderFeedback(feedback: FeedbackParts, locale: Locale): string {
+	const template = FEEDBACK_TEMPLATES[locale]?.[feedback.key] ?? feedback.key;
+	return template.replace(/\{(\w+)\}/g, (_, name: string) => feedback.params[name] ?? `{${name}}`);
+}
+
 function buildFeedback(
-	status: 'correct' | 'partial' | 'missing' | 'extra',
+	status: FeedbackStatus,
 	modelLine: JournalLine | null,
 	studentLine: JournalLine | null,
 	framework: AccountingFramework,
 	locale: Locale,
-): string {
+	currencyCode: string,
+): FeedbackParts {
 	const getAccountName = (key: string) => {
 		const acc = getAccount(key, framework);
 		if (!acc) return key;
@@ -124,32 +166,55 @@ function buildFeedback(
 		return acc?.frameworkCode ?? key;
 	};
 
+	const sideLabel = (line: JournalLine) =>
+		line.debit > 0
+			? locale === 'fr'
+				? 'débit'
+				: 'debit'
+			: locale === 'fr'
+				? 'crédit'
+				: 'credit';
+
 	switch (status) {
 		case 'correct':
-			return locale === 'fr'
-				? `Correct — ${getCode(modelLine!.accountKey)} ${getAccountName(modelLine!.accountKey)}`
-				: `Correct — ${getCode(modelLine!.accountKey)} ${getAccountName(modelLine!.accountKey)}`;
+			return {
+				key: 'je.feedback.correct',
+				params: {
+					code: getCode(modelLine!.accountKey),
+					name: getAccountName(modelLine!.accountKey),
+				},
+			};
 		case 'partial': {
-			const modelSide =
-				modelLine!.debit > 0
-					? locale === 'fr'
-						? 'débit'
-						: 'debit'
-					: locale === 'fr'
-						? 'crédit'
-						: 'credit';
-			const modelAmt = modelLine!.debit > 0 ? modelLine!.debit : modelLine!.credit;
-			return locale === 'fr'
-				? `Compte correct (${getAccountName(modelLine!.accountKey)}), mais le montant ou le sens est incorrect. Attendu : ${modelSide} ${modelAmt.toLocaleString()}`
-				: `Right account (${getAccountName(modelLine!.accountKey)}), but amount or side is wrong. Expected: ${modelSide} ${modelAmt.toLocaleString()}`;
+			const amount = modelLine!.debit > 0 ? modelLine!.debit : modelLine!.credit;
+			return {
+				key: 'je.feedback.partial',
+				params: {
+					code: getCode(modelLine!.accountKey),
+					name: getAccountName(modelLine!.accountKey),
+					side: sideLabel(modelLine!),
+					amount: fmtCurrency(amount, currencyCode),
+				},
+			};
 		}
-		case 'missing':
-			return locale === 'fr'
-				? `Ligne manquante : ${getCode(modelLine!.accountKey)} ${getAccountName(modelLine!.accountKey)} — ${modelLine!.debit > 0 ? 'débit' : 'crédit'} ${(modelLine!.debit || modelLine!.credit).toLocaleString()}`
-				: `Missing line: ${getCode(modelLine!.accountKey)} ${getAccountName(modelLine!.accountKey)} — ${modelLine!.debit > 0 ? 'debit' : 'credit'} ${(modelLine!.debit || modelLine!.credit).toLocaleString()}`;
+		case 'missing': {
+			const amount = modelLine!.debit > 0 ? modelLine!.debit : modelLine!.credit;
+			return {
+				key: 'je.feedback.missing',
+				params: {
+					code: getCode(modelLine!.accountKey),
+					name: getAccountName(modelLine!.accountKey),
+					side: sideLabel(modelLine!),
+					amount: fmtCurrency(amount, currencyCode),
+				},
+			};
+		}
 		case 'extra':
-			return locale === 'fr'
-				? `Ligne en trop : ${getCode(studentLine!.accountKey)} ${getAccountName(studentLine!.accountKey)} n'est pas attendu dans cette écriture`
-				: `Extra line: ${getCode(studentLine!.accountKey)} ${getAccountName(studentLine!.accountKey)} is not expected in this entry`;
+			return {
+				key: 'je.feedback.extra',
+				params: {
+					code: getCode(studentLine!.accountKey),
+					name: getAccountName(studentLine!.accountKey),
+				},
+			};
 	}
 }

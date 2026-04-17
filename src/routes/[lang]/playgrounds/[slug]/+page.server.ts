@@ -3,6 +3,7 @@ import { loadLearnSections, loadScenarios, loadExercises } from '$lib/content/lo
 import { isRegistered } from '$lib/playgrounds/_registry';
 import type { Locale } from '$lib/i18n/types';
 
+// Ensure native playground modules register themselves
 import '$lib/playgrounds';
 
 export const load: PageServerLoad = async ({ params }) => {

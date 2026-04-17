@@ -8,6 +8,7 @@ import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 import type {
 	DraftEntry,
 	JournalEntry,
+	ValidationError,
 	ValidationResult,
 	LedgerAccount,
 	TAccountData,
@@ -35,10 +36,14 @@ function sortByCode(
 export class JournalEntryEngine {
 	/**
 	 * Validate a draft entry before posting.
-	 * Checks: all accounts valid, debits === credits, at least 2 lines, non-negative amounts.
+	 * Checks: all accounts valid, no duplicated accounts, debits === credits,
+	 * at least 2 lines, non-negative amounts.
+	 *
+	 * Errors are emitted as { key, params } so the UI can translate + format
+	 * them for the user's locale / currency.
 	 */
 	validate(draft: DraftEntry, framework: AccountingFramework): ValidationResult {
-		const errors: string[] = [];
+		const errors: ValidationError[] = [];
 		let totalDebit = 0;
 		let totalCredit = 0;
 
@@ -48,46 +53,80 @@ export class JournalEntryEngine {
 		);
 
 		if (filledLines.length < 2) {
-			errors.push('At least 2 lines required');
+			errors.push({ key: 'je.validation.minLines' });
 		}
 
 		if (!draft.description.trim()) {
-			errors.push('Description is required');
+			errors.push({ key: 'je.validation.descRequired' });
 		}
+
+		let seenAccountRequired = false;
+		let seenNegative = false;
+		const seenUnknown = new Set<string>();
+		const seenNoAmount = new Set<string>();
+		const seenBothSides = new Set<string>();
+		const seenAccounts = new Set<string>();
+		const duplicateAccounts = new Set<string>();
 
 		for (const line of filledLines) {
 			if (!line.accountKey) {
-				errors.push('Each line must have an account');
+				if (!seenAccountRequired) {
+					errors.push({ key: 'je.validation.accountRequired' });
+					seenAccountRequired = true;
+				}
 				continue;
 			}
 
 			const account = getAccount(line.accountKey, framework);
 			if (!account) {
-				errors.push(`Unknown account: ${line.accountKey}`);
+				if (!seenUnknown.has(line.accountKey)) {
+					errors.push({ key: 'je.validation.unknownAccount', params: { account: line.accountKey } });
+					seenUnknown.add(line.accountKey);
+				}
 				continue;
+			}
+
+			if (seenAccounts.has(line.accountKey)) {
+				duplicateAccounts.add(line.accountKey);
+			} else {
+				seenAccounts.add(line.accountKey);
 			}
 
 			const debit = typeof line.debit === 'number' ? line.debit : 0;
 			const credit = typeof line.credit === 'number' ? line.credit : 0;
 
-			if (debit < 0 || credit < 0) {
-				errors.push('Amounts must be non-negative');
+			if ((debit < 0 || credit < 0) && !seenNegative) {
+				errors.push({ key: 'je.validation.negative' });
+				seenNegative = true;
 			}
 
-			if (debit === 0 && credit === 0) {
-				errors.push(`Line for ${line.accountKey} has no amount`);
+			if (debit === 0 && credit === 0 && !seenNoAmount.has(line.accountKey)) {
+				errors.push({ key: 'je.validation.noAmount', params: { account: account.frameworkCode } });
+				seenNoAmount.add(line.accountKey);
 			}
 
-			if (debit > 0 && credit > 0) {
-				errors.push(`Line for ${line.accountKey} has both debit and credit`);
+			if (debit > 0 && credit > 0 && !seenBothSides.has(line.accountKey)) {
+				errors.push({ key: 'je.validation.bothSides', params: { account: account.frameworkCode } });
+				seenBothSides.add(line.accountKey);
 			}
 
 			totalDebit += debit;
 			totalCredit += credit;
 		}
 
+		for (const key of duplicateAccounts) {
+			const account = getAccount(key, framework);
+			errors.push({
+				key: 'je.validation.duplicateAccount',
+				params: { account: account?.frameworkCode ?? key }
+			});
+		}
+
 		if (filledLines.length >= 2 && Math.abs(totalDebit - totalCredit) > EPSILON) {
-			errors.push(`Entry is unbalanced: debits ${totalDebit} ≠ credits ${totalCredit}`);
+			errors.push({
+				key: 'je.validation.unbalanced',
+				params: { debit: totalDebit, credit: totalCredit, diff: Math.abs(totalDebit - totalCredit) }
+			});
 		}
 
 		return {

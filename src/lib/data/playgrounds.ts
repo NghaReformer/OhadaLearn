@@ -2,9 +2,11 @@ export interface PlaygroundMeta {
 	slug: string;
 	titleKey: string;
 	descKey: string;
-	staticFile: string;
+	/** Path to the legacy iframe HTML. Omit for playgrounds migrated to a native Svelte module. */
+	staticFile?: string;
 	icon: string;
 	category: 'financial-accounting' | 'managerial-accounting' | 'business-math';
+	/** LOC of the legacy HTML. 0 once migrated. */
 	lineCount: number;
 }
 
@@ -13,10 +15,9 @@ export const playgrounds: PlaygroundMeta[] = [
 		slug: 'tvm',
 		titleKey: 'pg.tvm.title',
 		descKey: 'pg.tvm.desc',
-		staticFile: '/playgrounds/tvm-playground.html',
 		icon: '📐',
 		category: 'business-math',
-		lineCount: 11900,
+		lineCount: 0,
 	},
 	{
 		slug: 'cvp',

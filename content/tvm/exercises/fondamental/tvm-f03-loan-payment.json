@@ -1,0 +1,24 @@
+{
+  "id": "tvm-f03-loan-payment",
+  "playgroundSlug": "tvm",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "tvm.exercise.f03.prompt",
+    "parameters": [
+      { "name": "pv", "type": "currency", "min": 2000000, "max": 8000000, "step": 500000 },
+      { "name": "rate", "type": "rate", "min": 5, "max": 12, "step": 0.25 },
+      { "name": "years", "type": "integer", "min": 3, "max": 7, "step": 1 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "loanPayment",
+    "answerType": "numeric",
+    "tolerance": 0.005,
+    "toleranceType": "relative",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "tvm.exercise.f03.correct",
+    "incorrect": "tvm.exercise.f03.incorrect"
+  }
+}

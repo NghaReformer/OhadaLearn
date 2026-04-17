@@ -9,8 +9,15 @@ import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 import type { Locale } from '$lib/i18n/types';
 import type { JournalLine } from './types';
 import { gradeJournalEntry } from './grader';
+import { fmtNumber } from '$lib/format';
 
 type ExerciseSolver = (params: Record<string, number>) => JournalLine[];
+
+const SYSCOHADA_VAT_RATE = 0.1925;
+
+function roundTax(amount: number): number {
+	return Math.round(amount);
+}
 
 const exerciseSolvers: Record<string, ExerciseSolver> = {
 	basicCashSale: ({ saleAmount }) => [
@@ -32,6 +39,32 @@ const exerciseSolvers: Record<string, ExerciseSolver> = {
 	rentPayment: ({ rentAmount }) => [
 		{ accountKey: 'rentExpense', debit: rentAmount, credit: 0 },
 		{ accountKey: 'bank', debit: 0, credit: rentAmount }
+	],
+	cashSaleWithVat: ({ saleAmountHt }) => {
+		const vat = roundTax(saleAmountHt * SYSCOHADA_VAT_RATE);
+		const ttc = saleAmountHt + vat;
+		return [
+			{ accountKey: 'bank', debit: ttc, credit: 0 },
+			{ accountKey: 'salesMerchandise', debit: 0, credit: saleAmountHt },
+			{ accountKey: 'vatCollected', debit: 0, credit: vat }
+		];
+	},
+	creditPurchaseWithVat: ({ purchaseAmountHt }) => {
+		const vat = roundTax(purchaseAmountHt * SYSCOHADA_VAT_RATE);
+		const ttc = purchaseAmountHt + vat;
+		return [
+			{ accountKey: 'purchasesMerchandise', debit: purchaseAmountHt, credit: 0 },
+			{ accountKey: 'vatDeductible', debit: vat, credit: 0 },
+			{ accountKey: 'accountsPayable', debit: 0, credit: ttc }
+		];
+	},
+	salaryAccrual: ({ salaryAmount }) => [
+		{ accountKey: 'salaryExpense', debit: salaryAmount, credit: 0 },
+		{ accountKey: 'employeesPayable', debit: 0, credit: salaryAmount }
+	],
+	monthlyDepreciation: ({ depreciationAmount }) => [
+		{ accountKey: 'depreciationExpense', debit: depreciationAmount, credit: 0 },
+		{ accountKey: 'accDeprEquipment', debit: 0, credit: depreciationAmount }
 	]
 };
 
@@ -94,6 +127,50 @@ const supportedExerciseMeta: Array<{
 		parameters: [{ name: 'rentAmount', type: 'currency', min: 200000, max: 2000000, step: 50000 }],
 		correctKey: 'je.exercise.f05.correct',
 		incorrectKey: 'je.exercise.f05.incorrect'
+	},
+	{
+		slug: 'cash-sale-with-vat',
+		solverFunction: 'cashSaleWithVat',
+		promptKey: 'je.exercise.f06.prompt',
+		difficulty: 'fondamental',
+		parameters: [
+			{ name: 'saleAmountHt', type: 'currency', min: 500000, max: 5000000, step: 100000 }
+		],
+		correctKey: 'je.exercise.f06.correct',
+		incorrectKey: 'je.exercise.f06.incorrect'
+	},
+	{
+		slug: 'credit-purchase-with-vat',
+		solverFunction: 'creditPurchaseWithVat',
+		promptKey: 'je.exercise.f07.prompt',
+		difficulty: 'fondamental',
+		parameters: [
+			{ name: 'purchaseAmountHt', type: 'currency', min: 500000, max: 5000000, step: 100000 }
+		],
+		correctKey: 'je.exercise.f07.correct',
+		incorrectKey: 'je.exercise.f07.incorrect'
+	},
+	{
+		slug: 'salary-accrual',
+		solverFunction: 'salaryAccrual',
+		promptKey: 'je.exercise.f08.prompt',
+		difficulty: 'fondamental',
+		parameters: [
+			{ name: 'salaryAmount', type: 'currency', min: 250000, max: 2500000, step: 50000 }
+		],
+		correctKey: 'je.exercise.f08.correct',
+		incorrectKey: 'je.exercise.f08.incorrect'
+	},
+	{
+		slug: 'monthly-depreciation',
+		solverFunction: 'monthlyDepreciation',
+		promptKey: 'je.exercise.f09.prompt',
+		difficulty: 'fondamental',
+		parameters: [
+			{ name: 'depreciationAmount', type: 'currency', min: 50000, max: 1000000, step: 25000 }
+		],
+		correctKey: 'je.exercise.f09.correct',
+		incorrectKey: 'je.exercise.f09.incorrect'
 	}
 ];
 
@@ -150,12 +227,12 @@ export function renderExercisePrompt(
 	params: Record<string, number>,
 	locale: 'en' | 'fr'
 ): string {
-	const numberFormatter = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US');
+	const formatLocale = locale === 'fr' ? 'fr-FR' : 'en-US';
 
 	return template.replace(/\{(\w+)\}/g, (_, key: string) => {
 		const value = params[key];
 		if (typeof value !== 'number') return `{${key}}`;
-		return numberFormatter.format(value);
+		return fmtNumber(value, 0, formatLocale);
 	});
 }
 
@@ -164,10 +241,11 @@ export function buildExerciseFeedback(
 	exercise: ExerciseTemplateFile,
 	params: Record<string, number>,
 	framework: AccountingFramework = 'ohada',
-	locale: Locale = 'en'
+	locale: Locale = 'en',
+	currencyCode: string = 'XOF'
 ): ExerciseFeedback & { lineFeedback: ReturnType<typeof gradeJournalEntry>['lineResults'] } {
 	const correctLines = solveExerciseTemplate(exercise, params);
-	const result = gradeJournalEntry(studentLines, correctLines, framework, locale);
+	const result = gradeJournalEntry(studentLines, correctLines, framework, locale, currencyCode);
 
 	return {
 		isCorrect: result.isCorrect,
@@ -194,6 +272,8 @@ export const exerciseTypes: ExerciseTypeDef[] = supportedExerciseMeta.map((meta)
 	feedback: (studentAnswer, correctAnswer) => {
 		const studentLines = JSON.parse(String(studentAnswer.answer ?? '[]')) as JournalLine[];
 		const correctLines = JSON.parse(String(correctAnswer.answer ?? '[]')) as JournalLine[];
+		// Headless feedback (used by the shared exercise contract). The Playground
+		// component re-grades with the live framework/locale/currency for UI display.
 		const result = gradeJournalEntry(studentLines, correctLines, 'ohada', 'en');
 		return {
 			isCorrect: result.isCorrect,
