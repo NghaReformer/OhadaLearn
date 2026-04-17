@@ -1,0 +1,25 @@
+{
+  "id": "cvp-i01-aftertax",
+  "playgroundSlug": "cvp",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "cvp.ex.aftertax.prompt",
+    "parameters": [
+      { "name": "price", "type": "currency", "min": 25, "max": 200, "step": 5 },
+      { "name": "variableCost", "type": "currency", "min": 5, "max": 100, "step": 1 },
+      { "name": "fixedCosts", "type": "currency", "min": 50000, "max": 400000, "step": 10000 },
+      { "name": "targetProfit", "type": "currency", "min": 20000, "max": 300000, "step": 10000 },
+      { "name": "taxRate", "type": "rate", "min": 10, "max": 40, "step": 5 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "aftertax",
+    "answerType": "numeric",
+    "tolerance": 1,
+    "toleranceType": "absolute"
+  },
+  "feedbackTemplates": {
+    "correct": "cvp.ex.correct",
+    "incorrect": "cvp.ex.incorrect"
+  }
+}

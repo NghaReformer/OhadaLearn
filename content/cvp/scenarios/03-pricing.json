@@ -1,0 +1,17 @@
+{
+  "slug": "pricing",
+  "titleKey": "cvp.scenario.pricing.title",
+  "descKey": "cvp.scenario.pricing.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 50,
+    "variableCost": 20,
+    "fixedCosts": 150000,
+    "volume": 8000,
+    "targetProfit": 80000,
+    "taxRate": 20,
+    "multiProduct": false,
+    "chartView": "pv",
+    "overlays": { "bep": true, "target": true, "mos": false, "dol": false }
+  }
+}

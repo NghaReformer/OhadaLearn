@@ -1,0 +1,17 @@
+{
+  "slug": "ohada",
+  "titleKey": "cvp.scenario.ohada.title",
+  "descKey": "cvp.scenario.ohada.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 2500,
+    "variableCost": 1500,
+    "fixedCosts": 5000000,
+    "volume": 10000,
+    "targetProfit": 3000000,
+    "taxRate": 30,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": true, "mos": true, "dol": true }
+  }
+}

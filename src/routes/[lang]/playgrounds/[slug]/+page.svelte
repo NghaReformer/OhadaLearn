@@ -2,11 +2,18 @@
 	import { page } from '$app/state';
 	import { t } from '$lib/i18n';
 	import { locale$, currency$ } from '$lib/stores/preferences';
+	import { getPlayground } from '$lib/playgrounds/_registry';
+	import '$lib/playgrounds';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	let lang = $derived(page.params.lang);
 	let pg = $derived(data.pg);
+	let nativeLoader = $derived(
+		data.isNativeModule
+			? getPlayground(pg.slug).then((mod) => mod?.loadPlaygroundComponent())
+			: null,
+	);
 	let iframeEl: HTMLIFrameElement | undefined = $state();
 	let nativeContainerEl: HTMLDivElement | undefined = $state();
 	let iframeLoaded = $state(false);
@@ -91,14 +98,21 @@
 		</div>
 	</header>
 
-	{#if data.isNativeModule}
+	{#if data.isNativeModule && nativeLoader}
 		<div class="native-container" bind:this={nativeContainerEl}>
-			{#await import('$lib/playgrounds/journal-entry/Playground.svelte') then module}
-				<module.default
-					learnSections={data.learnSections}
-					scenarios={data.scenarios}
-					exercises={data.exercises}
-				/>
+			{#await nativeLoader}
+				<div class="iframe-loading">
+					<div class="spinner"></div>
+					<span>{$t('playgrounds.loading')}</span>
+				</div>
+			{:then module}
+				{#if module}
+					<module.default
+						learnSections={data.learnSections}
+						scenarios={data.scenarios}
+						exercises={data.exercises}
+					/>
+				{/if}
 			{/await}
 		</div>
 	{:else}

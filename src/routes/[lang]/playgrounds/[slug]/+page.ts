@@ -3,8 +3,7 @@ import { playgrounds } from '$lib/data/playgrounds';
 import { isRegistered } from '$lib/playgrounds/_registry';
 import type { PageLoad } from './$types';
 
-// Ensure journal-entry module registers itself (side-effect import)
-import '$lib/playgrounds/journal-entry/index';
+import '$lib/playgrounds';
 
 export const load: PageLoad = ({ params, data }) => {
 	const pg = playgrounds.find((p) => p.slug === params.slug);

@@ -1,0 +1,17 @@
+{
+  "slug": "restaurant",
+  "titleKey": "cvp.scenario.restaurant.title",
+  "descKey": "cvp.scenario.restaurant.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 25,
+    "variableCost": 10,
+    "fixedCosts": 45000,
+    "volume": 5000,
+    "targetProfit": 30000,
+    "taxRate": 20,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": true, "mos": true, "dol": false }
+  }
+}

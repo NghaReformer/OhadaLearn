@@ -1,0 +1,17 @@
+{
+  "slug": "bakery",
+  "titleKey": "cvp.scenario.bakery.title",
+  "descKey": "cvp.scenario.bakery.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 12,
+    "variableCost": 4,
+    "fixedCosts": 25000,
+    "volume": 5000,
+    "targetProfit": 15000,
+    "taxRate": 20,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": true, "mos": false, "dol": false }
+  }
+}

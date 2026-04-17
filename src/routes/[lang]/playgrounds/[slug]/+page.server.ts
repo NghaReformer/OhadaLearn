@@ -3,13 +3,11 @@ import { loadLearnSections, loadScenarios, loadExercises } from '$lib/content/lo
 import { isRegistered } from '$lib/playgrounds/_registry';
 import type { Locale } from '$lib/i18n/types';
 
-// Ensure journal-entry module registers itself
-import '$lib/playgrounds/journal-entry/index';
+import '$lib/playgrounds';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const { slug, lang } = params;
 
-	// Only load content for registered Svelte playgrounds
 	if (!isRegistered(slug)) {
 		return { learnSections: [], scenarios: [], exercises: [] };
 	}

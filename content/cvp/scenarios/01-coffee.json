@@ -1,0 +1,17 @@
+{
+  "slug": "coffee",
+  "titleKey": "cvp.scenario.coffee.title",
+  "descKey": "cvp.scenario.coffee.desc",
+  "presetValues": {
+    "mode": "simple",
+    "price": 5.5,
+    "variableCost": 1.8,
+    "fixedCosts": 8500,
+    "volume": 2500,
+    "targetProfit": 5000,
+    "taxRate": 0,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": true, "mos": false, "dol": false }
+  }
+}
