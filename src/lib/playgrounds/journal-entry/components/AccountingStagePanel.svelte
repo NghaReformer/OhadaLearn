@@ -3,7 +3,7 @@
 	import { locale } from '$lib/i18n';
 	import { currency$, accountingStandard$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
-	import { getAccount } from '$lib/shared/chart-of-accounts';
+	import { getAccount, formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type {
@@ -70,9 +70,7 @@
 	];
 
 	function accountName(account: { frameworkNameEn: string; frameworkNameFr: string; frameworkCode: string }) {
-		const label =
-			currentLocale === 'fr' ? account.frameworkNameFr : account.frameworkNameEn;
-		return `${account.frameworkCode} — ${label}`;
+		return formatAccountLabel(account, currentLocale);
 	}
 
 	function accountDisplayFromKey(accountKey: string): string {

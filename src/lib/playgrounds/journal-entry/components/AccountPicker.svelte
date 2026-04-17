@@ -2,7 +2,7 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/i18n';
 	import { accountingStandard$ } from '$lib/stores/preferences';
-	import { searchAccounts, getAccount } from '$lib/shared/chart-of-accounts';
+	import { searchAccounts, getAccount, formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type { ResolvedAccount } from '$lib/shared/chart-of-accounts';
@@ -38,10 +38,7 @@
 
 	let displayText = $derived.by(() => {
 		if (!isOpen && selectedAccount) {
-			const name = currentLocale === 'fr'
-				? selectedAccount.frameworkNameFr
-				: selectedAccount.frameworkNameEn;
-			return `${selectedAccount.frameworkCode} \u2014 ${name}`;
+			return formatAccountLabel(selectedAccount, currentLocale);
 		}
 		return query;
 	});
@@ -133,7 +130,25 @@
 
 <svelte:document onclick={handleClickOutside} />
 
-<div class="account-picker">
+<!--
+	The wrapper commits focus on mousedown (before the click fires) so that
+	any click landing on the padding around the input — or on the sr-only
+	label — synchronously transfers focus to our input and causes whatever
+	input was previously focused (typically a sibling row's Debit/Credit
+	number input) to blur before the user's next keystroke arrives. Without
+	this, digits typed into the picker could leak into the previously
+	focused number field. See Bug 1 in the QA report.
+-->
+<div
+	class="account-picker"
+	onmousedown={(e) => {
+		if (inputEl && e.target !== inputEl) {
+			e.preventDefault();
+			inputEl.focus();
+		}
+	}}
+	role="presentation"
+>
 	<label class="picker-label" for={undefined}>
 		<span class="sr-only">{$t('je.form.account')}</span>
 	</label>
@@ -162,16 +177,19 @@
 			id="account-picker-listbox"
 		>
 			{#each results as account, i (account.key)}
+				{@const hasCode = account.frameworkCode && account.frameworkCode !== '-'}
 				<li
 					class="picker-option"
 					class:highlighted={i === highlightIndex}
 					role="option"
 					aria-selected={i === highlightIndex}
-					title={`${account.frameworkCode} — ${getAccountDisplayName(account)}`}
+					title={formatAccountLabel(account, currentLocale)}
 					onmousedown={(e) => { e.preventDefault(); selectAccount(account); }}
 					onmouseenter={() => (highlightIndex = i)}
 				>
-					<span class="option-code">{account.frameworkCode}</span>
+					{#if hasCode}
+						<span class="option-code">{account.frameworkCode}</span>
+					{/if}
 					<span class="option-name">{getAccountDisplayName(account)}</span>
 					<span class="option-side" aria-label={account.normalBalance === 'debit' ? 'debit-normal' : 'credit-normal'}>
 						{account.normalBalance === 'debit' ? 'Dr' : 'Cr'}
@@ -255,9 +273,19 @@
 		font-size: 0.8125rem;
 	}
 
-	.picker-option:hover,
-	.picker-option.highlighted {
+	.picker-option:hover {
 		background: var(--panel-hover);
+	}
+
+	.picker-option.highlighted {
+		/* Distinct, high-contrast state so keyboard users can clearly track
+		   the focused row. Uses the accent glow plus a left border marker. */
+		background: var(--accent-glow);
+		box-shadow: inset 3px 0 0 0 var(--accent);
+	}
+
+	.picker-option.highlighted .option-name {
+		color: var(--accent);
 	}
 
 	.option-code {

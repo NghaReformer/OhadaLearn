@@ -3,7 +3,8 @@ import {
 	getAccount,
 	getAllAccounts,
 	searchAccounts,
-	getAccountsByClass
+	getAccountsByClass,
+	formatAccountLabel
 } from '$lib/shared/chart-of-accounts';
 
 describe('Chart of Accounts', () => {
@@ -160,6 +161,27 @@ describe('Chart of Accounts', () => {
 			const results = searchAccounts('drawings', 'ohada', 'en');
 			expect(results.length).toBeGreaterThan(0);
 			expect(results[0].key).toBe('ownerDrawings');
+		});
+	});
+
+	describe('formatAccountLabel', () => {
+		it('uses "code — name" when a real code exists (OHADA)', () => {
+			const account = getAccount('bank', 'ohada')!;
+			expect(formatAccountLabel(account, 'en')).toBe('521 \u2014 Bank');
+			expect(formatAccountLabel(account, 'fr')).toBe('521 \u2014 Banque');
+		});
+
+		it('falls back to just the name when code is the "-" placeholder (IFRS)', () => {
+			const account = getAccount('bank', 'ifrs')!;
+			expect(account.frameworkCode).toBe('-');
+			expect(formatAccountLabel(account, 'en')).toBe('Cash & Cash Equivalents');
+			expect(formatAccountLabel(account, 'en')).not.toContain('-');
+		});
+
+		it('falls back to just the name under US-GAAP', () => {
+			const account = getAccount('shareCapital', 'usgaap')!;
+			expect(account.frameworkCode).toBe('-');
+			expect(formatAccountLabel(account, 'en')).toBe('Common Stock');
 		});
 	});
 

@@ -3,7 +3,7 @@
  * Pure computation — no DOM, no Svelte.
  */
 
-import { getAccount } from '$lib/shared/chart-of-accounts';
+import { getAccount, formatAccountLabel as formatAccountLabelShared } from '$lib/shared/chart-of-accounts';
 import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 import type {
 	DraftEntry,
@@ -122,9 +122,9 @@ export class JournalEntryEngine {
 	private formatAccountLabel(account: {
 		frameworkCode: string;
 		frameworkNameEn: string;
+		frameworkNameFr: string;
 	}): string {
-		const code = account.frameworkCode && account.frameworkCode !== '-' ? account.frameworkCode : '';
-		return code ? `${code} — ${account.frameworkNameEn}` : account.frameworkNameEn;
+		return formatAccountLabelShared(account, 'en');
 	}
 
 	private formatAmount(n: number): string {

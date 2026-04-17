@@ -4,7 +4,7 @@
 	import { currency$ } from '$lib/stores/preferences';
 	import { accountingStandard$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
-	import { getAccount } from '$lib/shared/chart-of-accounts';
+	import { getAccount, formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type { JournalEntry } from '../types';
@@ -53,8 +53,7 @@
 	function getAccountDisplay(key: string): string {
 		const account = getAccount(key, framework);
 		if (!account) return key;
-		const name = currentLocale === 'fr' ? account.frameworkNameFr : account.frameworkNameEn;
-		return `${account.frameworkCode} ${name}`;
+		return formatAccountLabel(account, currentLocale);
 	}
 </script>
 
