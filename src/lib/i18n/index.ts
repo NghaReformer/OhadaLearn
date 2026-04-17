@@ -63,9 +63,12 @@ import { journalEntryEn } from './namespaces/journal-entry.en';
 import { journalEntryFr } from './namespaces/journal-entry.fr';
 import { tvmEn } from './namespaces/tvm.en';
 import { tvmFr } from './namespaces/tvm.fr';
+import { cvpEn } from './namespaces/cvp.en';
+import { cvpFr } from './namespaces/cvp.fr';
 
 registerNamespace('common', { en: commonEn, fr: commonFr });
 registerNamespace('landing', { en: landingEn, fr: landingFr });
 registerNamespace('playgrounds', { en: playgroundsEn, fr: playgroundsFr });
 registerNamespace('journal-entry', { en: journalEntryEn, fr: journalEntryFr });
 registerNamespace('tvm', { en: tvmEn, fr: tvmFr });
+registerNamespace('cvp', { en: cvpEn, fr: cvpFr });

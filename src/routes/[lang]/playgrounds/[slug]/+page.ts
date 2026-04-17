@@ -4,8 +4,7 @@ import { isRegistered } from '$lib/playgrounds/_registry';
 import type { PageLoad } from './$types';
 
 // Ensure native playground modules register themselves (side-effect imports)
-import '$lib/playgrounds/journal-entry/index';
-import '$lib/playgrounds/tvm/index';
+import '$lib/playgrounds';
 
 export const load: PageLoad = ({ params, data }) => {
 	const pg = playgrounds.find((p) => p.slug === params.slug);

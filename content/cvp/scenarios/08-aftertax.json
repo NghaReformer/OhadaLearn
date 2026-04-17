@@ -1,0 +1,17 @@
+{
+  "slug": "aftertax",
+  "titleKey": "cvp.scenario.aftertax.title",
+  "descKey": "cvp.scenario.aftertax.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 75,
+    "variableCost": 30,
+    "fixedCosts": 200000,
+    "volume": 7500,
+    "targetProfit": 100000,
+    "taxRate": 30,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": true, "mos": true, "dol": true }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "cvp-f01-bep",
+  "playgroundSlug": "cvp",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "cvp.ex.bep.prompt",
+    "parameters": [
+      { "name": "price", "type": "currency", "min": 10, "max": 200, "step": 5 },
+      { "name": "variableCost", "type": "currency", "min": 2, "max": 100, "step": 1 },
+      { "name": "fixedCosts", "type": "currency", "min": 10000, "max": 200000, "step": 5000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "bep",
+    "answerType": "numeric",
+    "tolerance": 1,
+    "toleranceType": "absolute"
+  },
+  "feedbackTemplates": {
+    "correct": "cvp.ex.correct",
+    "incorrect": "cvp.ex.incorrect"
+  }
+}

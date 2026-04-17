@@ -1,0 +1,17 @@
+{
+  "slug": "saas",
+  "titleKey": "cvp.scenario.saas.title",
+  "descKey": "cvp.scenario.saas.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 29,
+    "variableCost": 1.2,
+    "fixedCosts": 180000,
+    "volume": 9000,
+    "targetProfit": 50000,
+    "taxRate": 25,
+    "multiProduct": false,
+    "chartView": "pv",
+    "overlays": { "bep": true, "target": true, "mos": false, "dol": true }
+  }
+}

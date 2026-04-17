@@ -1,0 +1,17 @@
+{
+  "slug": "icecream",
+  "titleKey": "cvp.scenario.icecream.title",
+  "descKey": "cvp.scenario.icecream.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 6,
+    "variableCost": 2.5,
+    "fixedCosts": 36000,
+    "volume": 15000,
+    "targetProfit": 20000,
+    "taxRate": 15,
+    "multiProduct": false,
+    "chartView": "stack",
+    "overlays": { "bep": true, "target": true, "mos": true, "dol": false }
+  }
+}

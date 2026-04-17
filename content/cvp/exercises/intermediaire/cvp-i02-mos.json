@@ -1,0 +1,24 @@
+{
+  "id": "cvp-i02-mos",
+  "playgroundSlug": "cvp",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "cvp.ex.mos.prompt",
+    "parameters": [
+      { "name": "price", "type": "currency", "min": 20, "max": 200, "step": 5 },
+      { "name": "variableCost", "type": "currency", "min": 5, "max": 100, "step": 1 },
+      { "name": "fixedCosts", "type": "currency", "min": 20000, "max": 300000, "step": 5000 },
+      { "name": "volume", "type": "integer", "min": 2000, "max": 15000, "step": 500 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "mos",
+    "answerType": "numeric",
+    "tolerance": 0.05,
+    "toleranceType": "absolute"
+  },
+  "feedbackTemplates": {
+    "correct": "cvp.ex.correct",
+    "incorrect": "cvp.ex.incorrect"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "factory",
+  "titleKey": "cvp.scenario.factory.title",
+  "descKey": "cvp.scenario.factory.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 120,
+    "variableCost": 35,
+    "fixedCosts": 425000,
+    "volume": 6000,
+    "targetProfit": 100000,
+    "taxRate": 25,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": true, "mos": true, "dol": true }
+  }
+}

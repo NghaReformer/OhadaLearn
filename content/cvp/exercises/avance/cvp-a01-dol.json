@@ -1,0 +1,24 @@
+{
+  "id": "cvp-a01-dol",
+  "playgroundSlug": "cvp",
+  "difficulty": "avance",
+  "template": {
+    "promptKey": "cvp.ex.dol.prompt",
+    "parameters": [
+      { "name": "price", "type": "currency", "min": 25, "max": 200, "step": 5 },
+      { "name": "variableCost", "type": "currency", "min": 10, "max": 100, "step": 1 },
+      { "name": "fixedCosts", "type": "currency", "min": 50000, "max": 400000, "step": 10000 },
+      { "name": "volume", "type": "integer", "min": 3000, "max": 20000, "step": 500 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "dol",
+    "answerType": "numeric",
+    "tolerance": 0.02,
+    "toleranceType": "relative"
+  },
+  "feedbackTemplates": {
+    "correct": "cvp.ex.correct",
+    "incorrect": "cvp.ex.incorrect"
+  }
+}

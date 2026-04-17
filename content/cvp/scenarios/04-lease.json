@@ -1,0 +1,19 @@
+{
+  "slug": "lease",
+  "titleKey": "cvp.scenario.lease.title",
+  "descKey": "cvp.scenario.lease.desc",
+  "presetValues": {
+    "mode": "advanced",
+    "price": 80,
+    "variableCost": 45,
+    "fixedCosts": 80000,
+    "volume": 5000,
+    "targetProfit": 50000,
+    "taxRate": 25,
+    "multiProduct": false,
+    "chartView": "classic",
+    "overlays": { "bep": true, "target": false, "mos": false, "dol": true },
+    "indifference": { "fcA": 80000, "vA": 45, "fcB": 120000, "vB": 35 },
+    "rightTab": "compare"
+  }
+}

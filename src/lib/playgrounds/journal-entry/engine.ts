@@ -36,7 +36,11 @@ function sortByCode(
 export class JournalEntryEngine {
 	/**
 	 * Validate a draft entry before posting.
-	 * Checks: all accounts valid, debits === credits, at least 2 lines, non-negative amounts.
+	 * Checks: all accounts valid, no duplicated accounts, debits === credits,
+	 * at least 2 lines, non-negative amounts.
+	 *
+	 * Errors are emitted as { key, params } so the UI can translate + format
+	 * them for the user's locale / currency.
 	 */
 	validate(draft: DraftEntry, framework: AccountingFramework): ValidationResult {
 		const errors: ValidationError[] = [];
@@ -61,6 +65,8 @@ export class JournalEntryEngine {
 		const seenUnknown = new Set<string>();
 		const seenNoAmount = new Set<string>();
 		const seenBothSides = new Set<string>();
+		const seenAccounts = new Set<string>();
+		const duplicateAccounts = new Set<string>();
 
 		for (const line of filledLines) {
 			if (!line.accountKey) {
@@ -78,6 +84,12 @@ export class JournalEntryEngine {
 					seenUnknown.add(line.accountKey);
 				}
 				continue;
+			}
+
+			if (seenAccounts.has(line.accountKey)) {
+				duplicateAccounts.add(line.accountKey);
+			} else {
+				seenAccounts.add(line.accountKey);
 			}
 
 			const debit = typeof line.debit === 'number' ? line.debit : 0;
@@ -100,6 +112,14 @@ export class JournalEntryEngine {
 
 			totalDebit += debit;
 			totalCredit += credit;
+		}
+
+		for (const key of duplicateAccounts) {
+			const account = getAccount(key, framework);
+			errors.push({
+				key: 'je.validation.duplicateAccount',
+				params: { account: account?.frameworkCode ?? key }
+			});
 		}
 
 		if (filledLines.length >= 2 && Math.abs(totalDebit - totalCredit) > EPSILON) {

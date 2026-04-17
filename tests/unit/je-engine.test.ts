@@ -83,6 +83,110 @@ describe('JournalEntryEngine.validate', () => {
 		const result = engine.validate(draft, 'ohada');
 		expect(result.valid).toBe(false);
 	});
+
+	it('rejects an entry that reuses the same account on two lines', () => {
+		const draft: DraftEntry = {
+			date: '2024-03-15',
+			description: 'Duplicate account',
+			lines: [
+				{ accountKey: 'bank', debit: 1000, credit: '' },
+				{ accountKey: 'bank', debit: '', credit: 1000 }
+			]
+		};
+		const result = engine.validate(draft, 'ohada');
+		expect(result.valid).toBe(false);
+		expect(result.errors.some((e) => e.key === 'je.validation.duplicateAccount')).toBe(true);
+	});
+
+	it('surfaces the account reference on missing-amount errors via structured params', () => {
+		const draft: DraftEntry = {
+			date: '2024-03-15',
+			description: 'Missing amount',
+			lines: [
+				{ accountKey: 'shareCapital', debit: '', credit: '' },
+				{ accountKey: 'bank', debit: 1000, credit: '' }
+			]
+		};
+		const result = engine.validate(draft, 'ohada');
+		expect(result.valid).toBe(false);
+		const noAmount = result.errors.find((e) => e.key === 'je.validation.noAmount');
+		expect(noAmount).toBeTruthy();
+		// The engine emits the framework code (e.g. "101" for shareCapital); the
+		// UI is responsible for resolving that code to the account name.
+		expect(noAmount?.params?.account).toBeTruthy();
+		expect(String(noAmount?.params?.account)).not.toBe('shareCapital');
+	});
+
+	it('carries both totals as numeric params on the unbalanced error', () => {
+		const draft: DraftEntry = {
+			date: '2024-03-15',
+			description: 'Unbalanced',
+			lines: [
+				{ accountKey: 'bank', debit: 1000000, credit: '' },
+				{ accountKey: 'salesMerchandise', debit: '', credit: 900000 }
+			]
+		};
+		const result = engine.validate(draft, 'ohada');
+		expect(result.valid).toBe(false);
+		const unbalanced = result.errors.find((e) => e.key === 'je.validation.unbalanced');
+		expect(unbalanced).toBeTruthy();
+		expect(unbalanced?.params?.debit).toBe(1000000);
+		expect(unbalanced?.params?.credit).toBe(900000);
+	});
+});
+
+describe('JournalEntryEngine.buildCashFlow', () => {
+	it('classifies owner capital contributions as financing activities', () => {
+		const entries: JournalEntry[] = [
+			{
+				id: '1',
+				date: '2024-01-01',
+				description: 'Owner invests cash',
+				lines: [
+					{ accountKey: 'bank', debit: 1_000_000, credit: 0 },
+					{ accountKey: 'shareCapital', debit: 0, credit: 1_000_000 }
+				]
+			}
+		];
+		const cashFlow = engine.buildCashFlow(entries, 'ohada');
+		expect(cashFlow.totalFinancing).toBe(1_000_000);
+		expect(cashFlow.totalOperating).toBe(0);
+		expect(cashFlow.totalInvesting).toBe(0);
+		expect(cashFlow.financing.some((i) => i.accountKey === 'shareCapital')).toBe(true);
+	});
+
+	it('classifies owner drawings as financing outflows', () => {
+		const entries: JournalEntry[] = [
+			{
+				id: '1',
+				date: '2024-01-15',
+				description: 'Owner withdrawal',
+				lines: [
+					{ accountKey: 'ownerDrawings', debit: 50_000, credit: 0 },
+					{ accountKey: 'bank', debit: 0, credit: 50_000 }
+				]
+			}
+		];
+		const cashFlow = engine.buildCashFlow(entries, 'ohada');
+		expect(cashFlow.totalFinancing).toBe(-50_000);
+		expect(cashFlow.totalOperating).toBe(0);
+	});
+
+	it('classifies dividend payments as financing outflows', () => {
+		const entries: JournalEntry[] = [
+			{
+				id: '1',
+				date: '2024-03-31',
+				description: 'Pay dividends',
+				lines: [
+					{ accountKey: 'dividendsPayable', debit: 200_000, credit: 0 },
+					{ accountKey: 'bank', debit: 0, credit: 200_000 }
+				]
+			}
+		];
+		const cashFlow = engine.buildCashFlow(entries, 'ohada');
+		expect(cashFlow.totalFinancing).toBe(-200_000);
+	});
 });
 
 describe('JournalEntryEngine.buildLedger', () => {
