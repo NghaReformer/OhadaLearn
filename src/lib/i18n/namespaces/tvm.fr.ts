@@ -121,5 +121,59 @@ export const tvmFr: TranslationMap = {
 	'tvm.panel.result': 'R\u00e9sultat',
 	'tvm.panel.global': 'Global',
 	'tvm.panel.cashflow': 'Flux de tr\u00e9sorerie',
-	'tvm.badge.advanced': 'Avanc\u00e9'
+	'tvm.badge.advanced': 'Avanc\u00e9',
+
+	/* ── Groupes ── */
+	'tvm.group.core': 'Base',
+	'tvm.group.annuity': 'Annuit\u00e9s & Perp\u00e9tuit\u00e9s',
+	'tvm.group.investment': 'Analyse d\u2019investissement',
+	'tvm.group.selector': 'Groupe',
+
+	/* ── Modes annuit\u00e9 ── */
+	'tvm.ann.mode.annuityPv': 'VA d\u2019annuit\u00e9',
+	'tvm.ann.mode.annuityFv': 'VF d\u2019annuit\u00e9',
+	'tvm.ann.mode.growingAnnuityPv': 'VA d\u2019annuit\u00e9 croissante',
+	'tvm.ann.mode.growingAnnuityFv': 'VF d\u2019annuit\u00e9 croissante',
+	'tvm.ann.mode.perpetuityPv': 'VA de perp\u00e9tuit\u00e9',
+	'tvm.ann.mode.growingPerpetuityPv': 'VA de perp\u00e9tuit\u00e9 croissante',
+	'tvm.ann.mode.ear': 'Taux effectif annuel',
+
+	/* ── Entr\u00e9es annuit\u00e9 ── */
+	'tvm.ann.input.pmt': 'Paiement par p\u00e9riode (PMT)',
+	'tvm.ann.input.rate': 'Taux annuel (r)',
+	'tvm.ann.input.growth': 'Taux de croissance annuel (g)',
+	'tvm.ann.input.periods': 'Nombre de p\u00e9riodes (N)',
+
+	/* ── D\u00e9tails annuit\u00e9 ── */
+	'tvm.ann.workings.nominal': 'Taux nominal',
+	'tvm.ann.workings.compoundingPerYear': 'P\u00e9riodes de capitalisation / an',
+	'tvm.ann.workings.ear': 'Taux effectif annuel',
+	'tvm.ann.workings.effectiveGrowth': 'Croissance p\u00e9riodique effective',
+	'tvm.ann.workings.solve.annuityPv': 'VA de l\u2019annuit\u00e9',
+	'tvm.ann.workings.solve.annuityFv': 'VF de l\u2019annuit\u00e9',
+	'tvm.ann.workings.solve.growingAnnuityPv': 'VA de l\u2019annuit\u00e9 croissante',
+	'tvm.ann.workings.solve.growingAnnuityFv': 'VF de l\u2019annuit\u00e9 croissante',
+	'tvm.ann.workings.solve.perpetuityPv': 'VA de la perp\u00e9tuit\u00e9',
+	'tvm.ann.workings.solve.growingPerpetuityPv': 'VA de la perp\u00e9tuit\u00e9 croissante',
+
+	/* ── Formules annuit\u00e9 ── */
+	'tvm.ann.formula.annuityPv': 'VA = PMT \u00b7 (1 \u2212 (1+r)^\u2212N) / r  \u00b7 D',
+	'tvm.ann.formula.annuityFv': 'VF = PMT \u00b7 ((1+r)^N \u2212 1) / r  \u00b7 D',
+	'tvm.ann.formula.growingAnnuityPv': 'VA = PMT \u00b7 (1 \u2212 ((1+g)/(1+r))^N) / (r \u2212 g)  \u00b7 D',
+	'tvm.ann.formula.growingAnnuityFv': 'VF = PMT \u00b7 ((1+r)^N \u2212 (1+g)^N) / (r \u2212 g)  \u00b7 D',
+	'tvm.ann.formula.perpetuityPv': 'VA = PMT / r',
+	'tvm.ann.formula.growingPerpetuityPv': 'VA = PMT / (r \u2212 g),  r > g',
+	'tvm.ann.formula.ear': 'TEA = (1 + r/m)^m \u2212 1   (e^r \u2212 1 pour continu)',
+
+	/* ── Validation annuit\u00e9 ── */
+	'tvm.ann.validation.growthGeRate': 'Le taux de croissance doit \u00eatre strictement inf\u00e9rieur au taux d\u2019actualisation pour qu\u2019une perp\u00e9tuit\u00e9 croissante converge.',
+
+	/* ── Interpr\u00e9tations annuit\u00e9 ── */
+	'tvm.ann.interpretation.annuityPv': 'Valeur d\u2019aujourd\u2019hui de l\u2019ensemble du flux de paiements.',
+	'tvm.ann.interpretation.annuityFv': 'Solde accumul\u00e9 apr\u00e8s le dernier paiement.',
+	'tvm.ann.interpretation.growingAnnuityPv': 'Valeur d\u2019aujourd\u2019hui d\u2019un flux dont le paiement cro\u00eet de g chaque p\u00e9riode.',
+	'tvm.ann.interpretation.growingAnnuityFv': 'Solde accumul\u00e9 au terme avec des paiements croissant de g.',
+	'tvm.ann.interpretation.perpetuityPv': 'Valeur d\u2019aujourd\u2019hui d\u2019un paiement constant perp\u00e9tuel.',
+	'tvm.ann.interpretation.growingPerpetuityPv': 'Valeur d\u2019aujourd\u2019hui d\u2019un paiement qui cro\u00eet de g \u00e0 l\u2019infini ; n\u00e9cessite r > g.',
+	'tvm.ann.interpretation.ear': 'Taux effectif annuel \u2014 le taux gagn\u00e9 sur un d\u00e9p\u00f4t d\u2019un an.'
 };

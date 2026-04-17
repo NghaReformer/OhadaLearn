@@ -65,7 +65,44 @@ export interface ValidationResult {
 	warnings: ValidationError[];
 }
 
+export type PlaygroundGroup = 'core' | 'annuity' | 'investment';
+
+export type AnnuityMode =
+	| 'annuityPv'
+	| 'annuityFv'
+	| 'growingAnnuityPv'
+	| 'growingAnnuityFv'
+	| 'perpetuityPv'
+	| 'growingPerpetuityPv'
+	| 'ear';
+
+export interface AnnuitySolveInput {
+	mode: AnnuityMode;
+	pmt?: number;
+	rate?: number;
+	growthRate?: number;
+	periods?: number;
+	periodsUnit: PeriodsUnit;
+	compoundingFrequency: CompoundingFrequency;
+	paymentFrequency: PaymentFrequency;
+	paymentTiming: PaymentTiming;
+}
+
+export interface AnnuitySolveResult {
+	mode: AnnuityMode;
+	value: number;
+	valueKind: 'currency' | 'rate';
+	signNote: 'inflow' | 'outflow' | 'neutral';
+	effectivePeriodicRate: number;
+	effectivePeriodicGrowth: number | null;
+	totalPeriods: number | null;
+	formulaKey: string;
+	workings: WorkingStep[];
+}
+
 export interface TVMPlaygroundState {
+	group: PlaygroundGroup;
+	/* ── Core group state ── */
 	mode: SolveMode;
 	pv: number | '';
 	fv: number | '';
@@ -76,6 +113,13 @@ export interface TVMPlaygroundState {
 	compoundingFrequency: CompoundingFrequency;
 	paymentFrequency: PaymentFrequency;
 	paymentTiming: PaymentTiming;
+	/* ── Annuity group state ── */
+	annMode: AnnuityMode;
+	annPmt: number | '';
+	annRate: number | '';
+	annGrowth: number | '';
+	annPeriods: number | '';
+	/* ── Shared ── */
 	advancedOpen: boolean;
 	selectedExerciseId: string | null;
 	exerciseParams: Record<string, number> | null;

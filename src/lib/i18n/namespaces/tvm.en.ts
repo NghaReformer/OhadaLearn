@@ -121,5 +121,59 @@ export const tvmEn: TranslationMap = {
 	'tvm.panel.result': 'Result',
 	'tvm.panel.global': 'Global',
 	'tvm.panel.cashflow': 'Cash flow',
-	'tvm.badge.advanced': 'Advanced'
+	'tvm.badge.advanced': 'Advanced',
+
+	/* ── Groups ── */
+	'tvm.group.core': 'Core',
+	'tvm.group.annuity': 'Annuity & Perpetuity',
+	'tvm.group.investment': 'Investment Analysis',
+	'tvm.group.selector': 'Group',
+
+	/* ── Annuity modes ── */
+	'tvm.ann.mode.annuityPv': 'Annuity PV',
+	'tvm.ann.mode.annuityFv': 'Annuity FV',
+	'tvm.ann.mode.growingAnnuityPv': 'Growing annuity PV',
+	'tvm.ann.mode.growingAnnuityFv': 'Growing annuity FV',
+	'tvm.ann.mode.perpetuityPv': 'Perpetuity PV',
+	'tvm.ann.mode.growingPerpetuityPv': 'Growing perpetuity PV',
+	'tvm.ann.mode.ear': 'Effective annual rate',
+
+	/* ── Annuity inputs ── */
+	'tvm.ann.input.pmt': 'Payment per period (PMT)',
+	'tvm.ann.input.rate': 'Annual rate (r)',
+	'tvm.ann.input.growth': 'Annual growth rate (g)',
+	'tvm.ann.input.periods': 'Number of periods (N)',
+
+	/* ── Annuity workings ── */
+	'tvm.ann.workings.nominal': 'Nominal rate',
+	'tvm.ann.workings.compoundingPerYear': 'Compounding periods / year',
+	'tvm.ann.workings.ear': 'Effective annual rate',
+	'tvm.ann.workings.effectiveGrowth': 'Effective periodic growth',
+	'tvm.ann.workings.solve.annuityPv': 'PV of the annuity',
+	'tvm.ann.workings.solve.annuityFv': 'FV of the annuity',
+	'tvm.ann.workings.solve.growingAnnuityPv': 'PV of the growing annuity',
+	'tvm.ann.workings.solve.growingAnnuityFv': 'FV of the growing annuity',
+	'tvm.ann.workings.solve.perpetuityPv': 'PV of the perpetuity',
+	'tvm.ann.workings.solve.growingPerpetuityPv': 'PV of the growing perpetuity',
+
+	/* ── Annuity formulas ── */
+	'tvm.ann.formula.annuityPv': 'PV = PMT · (1 − (1+r)^−N) / r  · D',
+	'tvm.ann.formula.annuityFv': 'FV = PMT · ((1+r)^N − 1) / r  · D',
+	'tvm.ann.formula.growingAnnuityPv': 'PV = PMT · (1 − ((1+g)/(1+r))^N) / (r − g)  · D',
+	'tvm.ann.formula.growingAnnuityFv': 'FV = PMT · ((1+r)^N − (1+g)^N) / (r − g)  · D',
+	'tvm.ann.formula.perpetuityPv': 'PV = PMT / r',
+	'tvm.ann.formula.growingPerpetuityPv': 'PV = PMT / (r − g),  r > g',
+	'tvm.ann.formula.ear': 'EAR = (1 + r/m)^m − 1   (e^r − 1 for continuous)',
+
+	/* ── Annuity validation ── */
+	'tvm.ann.validation.growthGeRate': 'Growth rate must be strictly below the discount rate for a growing perpetuity to converge.',
+
+	/* ── Annuity interpretation ── */
+	'tvm.ann.interpretation.annuityPv': 'Lump-sum value today of the whole payment stream.',
+	'tvm.ann.interpretation.annuityFv': 'Accumulated balance after the final payment.',
+	'tvm.ann.interpretation.growingAnnuityPv': 'Value today of a stream whose payment grows at g each period.',
+	'tvm.ann.interpretation.growingAnnuityFv': 'Accumulated balance at horizon end with payments growing at g.',
+	'tvm.ann.interpretation.perpetuityPv': 'Value today of a constant payment that never ends.',
+	'tvm.ann.interpretation.growingPerpetuityPv': 'Value today of a payment that grows at g forever; requires r > g.',
+	'tvm.ann.interpretation.ear': 'Effective annual rate — the rate you would earn on a one-year deposit.'
 };
