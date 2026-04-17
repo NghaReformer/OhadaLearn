@@ -61,8 +61,11 @@ import { playgroundsEn } from './namespaces/playgrounds.en';
 import { playgroundsFr } from './namespaces/playgrounds.fr';
 import { journalEntryEn } from './namespaces/journal-entry.en';
 import { journalEntryFr } from './namespaces/journal-entry.fr';
+import { tvmEn } from './namespaces/tvm.en';
+import { tvmFr } from './namespaces/tvm.fr';
 
 registerNamespace('common', { en: commonEn, fr: commonFr });
 registerNamespace('landing', { en: landingEn, fr: landingFr });
 registerNamespace('playgrounds', { en: playgroundsEn, fr: playgroundsFr });
 registerNamespace('journal-entry', { en: journalEntryEn, fr: journalEntryFr });
+registerNamespace('tvm', { en: tvmEn, fr: tvmFr });

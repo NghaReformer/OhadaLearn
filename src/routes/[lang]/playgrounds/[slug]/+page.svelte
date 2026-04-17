@@ -53,6 +53,18 @@
 		document.addEventListener('fullscreenchange', handler);
 		return () => document.removeEventListener('fullscreenchange', handler);
 	});
+
+	// Dynamic dispatch — keep imports static so Vite can pre-bundle them.
+	function loadNativeModule(slug: string) {
+		switch (slug) {
+			case 'journal-entry':
+				return import('$lib/playgrounds/journal-entry/Playground.svelte');
+			case 'tvm':
+				return import('$lib/playgrounds/tvm/Playground.svelte');
+			default:
+				return Promise.reject(new Error(`No native module for slug: ${slug}`));
+		}
+	}
 </script>
 
 <svelte:head>
@@ -93,7 +105,7 @@
 
 	{#if data.isNativeModule}
 		<div class="native-container" bind:this={nativeContainerEl}>
-			{#await import('$lib/playgrounds/journal-entry/Playground.svelte') then module}
+			{#await loadNativeModule(pg.slug) then module}
 				<module.default
 					learnSections={data.learnSections}
 					scenarios={data.scenarios}

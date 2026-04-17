@@ -1,0 +1,17 @@
+{
+  "slug": "savings-goal",
+  "titleKey": "tvm.scenario.savingsGoal.title",
+  "descKey": "tvm.scenario.savingsGoal.desc",
+  "presetValues": {
+    "mode": "pv",
+    "pv": 0,
+    "fv": 10000000,
+    "pmt": 0,
+    "rate": 6.5,
+    "periods": 4,
+    "periodsUnit": "years",
+    "compoundingFrequency": "monthly",
+    "paymentFrequency": "monthly",
+    "paymentTiming": "end"
+  }
+}

@@ -3,8 +3,9 @@ import { loadLearnSections, loadScenarios, loadExercises } from '$lib/content/lo
 import { isRegistered } from '$lib/playgrounds/_registry';
 import type { Locale } from '$lib/i18n/types';
 
-// Ensure journal-entry module registers itself
+// Ensure native playground modules register themselves
 import '$lib/playgrounds/journal-entry/index';
+import '$lib/playgrounds/tvm/index';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const { slug, lang } = params;

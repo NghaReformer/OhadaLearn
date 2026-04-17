@@ -1,0 +1,24 @@
+{
+  "id": "tvm-f04-implicit-rate",
+  "playgroundSlug": "tvm",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "tvm.exercise.f04.prompt",
+    "parameters": [
+      { "name": "pv", "type": "currency", "min": 500000, "max": 5000000, "step": 250000 },
+      { "name": "fv", "type": "currency", "min": 1000000, "max": 20000000, "step": 500000 },
+      { "name": "years", "type": "integer", "min": 3, "max": 20, "step": 1 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "implicitRate",
+    "answerType": "numeric",
+    "tolerance": 0.005,
+    "toleranceType": "relative",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "tvm.exercise.f04.correct",
+    "incorrect": "tvm.exercise.f04.incorrect"
+  }
+}
