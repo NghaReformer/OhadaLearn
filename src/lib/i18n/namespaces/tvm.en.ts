@@ -36,6 +36,10 @@ export const tvmEn: TranslationMap = {
 	'tvm.timing.beginShort': 'Begin',
 	'tvm.unit.years': 'Years',
 	'tvm.unit.months': 'Months',
+	'tvm.unit.year': 'year',
+	'tvm.unit.month': 'month',
+	'tvm.unit.yearsLower': 'years',
+	'tvm.unit.monthsLower': 'months',
 
 	/* ── Result card ── */
 	'tvm.result.headline': 'Solved value',

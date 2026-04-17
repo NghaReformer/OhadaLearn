@@ -502,6 +502,7 @@ export class TVMEngine {
 			signNote,
 			effectivePeriodicRate: rp,
 			totalPeriods,
+			periodsUnit: input.periodsUnit,
 			formulaKey: FORMULA_KEY[input.mode],
 			workings: buildWorkings(input.mode, core, rp, totalPeriods, value)
 		};

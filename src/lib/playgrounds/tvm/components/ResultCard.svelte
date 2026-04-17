@@ -21,8 +21,12 @@
 		switch (result.mode) {
 			case 'rate':
 				return fmtPct(result.value, 4);
-			case 'periods':
-				return `${fmtNumber(result.value, 2)} ${translate(`tvm.unit.${result.mode === 'periods' ? 'years' : 'years'}`)}`;
+			case 'periods': {
+				const isSingular = Math.abs(result.value - 1) < 0.005;
+				const stem = result.periodsUnit === 'months' ? 'month' : 'year';
+				const unitKey = isSingular ? `tvm.unit.${stem}` : `tvm.unit.${stem}sLower`;
+				return `${fmtNumber(result.value, 2)} ${translate(unitKey)}`;
+			}
 			default:
 				return fmtCurrency(result.value, currency);
 		}

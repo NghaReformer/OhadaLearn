@@ -47,6 +47,8 @@ export interface SolveResult {
 	effectivePeriodicRate: number;
 	/** Total number of payment periods. */
 	totalPeriods: number;
+	/** Unit in which the `periods` mode result is expressed. */
+	periodsUnit: PeriodsUnit;
 	/** i18n key for the symbolic formula displayed in Advanced mode. */
 	formulaKey: string;
 	workings: WorkingStep[];

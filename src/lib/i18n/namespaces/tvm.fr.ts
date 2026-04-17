@@ -36,6 +36,10 @@ export const tvmFr: TranslationMap = {
 	'tvm.timing.beginShort': 'D\u00e9but',
 	'tvm.unit.years': 'Ann\u00e9es',
 	'tvm.unit.months': 'Mois',
+	'tvm.unit.year': 'an',
+	'tvm.unit.month': 'mois',
+	'tvm.unit.yearsLower': 'ans',
+	'tvm.unit.monthsLower': 'mois',
 
 	/* ── Carte r\u00e9sultat ── */
 	'tvm.result.headline': 'Valeur r\u00e9solue',
