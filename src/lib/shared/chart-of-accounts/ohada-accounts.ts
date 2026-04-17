@@ -16,14 +16,20 @@ function a(
 }
 
 export const ohadaAccounts: Map<string, AccountBase> = new Map([
-	/* ── CLASS 1: Equity & Long-Term Liabilities ── */
-	a('shareCapital', '101', 'Capital social', 'Share Capital', 'equity', 'credit', 'noncurrent', 'equity', null, '10'),
-	a('legalReserve', '111', 'Réserve légale', 'Legal Reserve', 'equity', 'credit', 'noncurrent', 'equity', null, '11'),
-	a('statutoryReserve', '112', 'Réserves statutaires', 'Statutory Reserve', 'equity', 'credit', 'noncurrent', 'equity', null, '11'),
-	a('revaluationSurplus', '106', 'Écarts de réévaluation', 'Revaluation Surplus', 'equity', 'credit', 'noncurrent', 'equity', null, '10'),
-	a('retainedEarnings', '12', 'Report à nouveau', 'Retained Earnings', 'equity', 'credit', 'noncurrent', 'equity', null, '1'),
-	a('currentYearResult', '13', 'Résultat net de l\'exercice', 'Current Year Result', 'equity', 'credit', 'noncurrent', 'equity', null, '1'),
-	a('incomeSummary', '139', 'Résultat en instance d\'affectation', 'Income Summary', 'equity', 'credit', 'noncurrent', 'equity', null, '13'),
+	/* ── CLASS 1: Equity & Long-Term Liabilities ──
+	 * Equity cash movements (capital contributions, owner drawings, dividends
+	 * declared, reserve transfers that hit cash) are financing activities.
+	 * Non-cash reclassifications within equity never reach the CFS because
+	 * the engine only processes entries that touch a cash account.
+	 */
+	a('shareCapital', '101', 'Capital social', 'Share Capital', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '10'),
+	a('legalReserve', '111', 'Réserve légale', 'Legal Reserve', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '11'),
+	a('statutoryReserve', '112', 'Réserves statutaires', 'Statutory Reserve', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '11'),
+	a('revaluationSurplus', '106', 'Écarts de réévaluation', 'Revaluation Surplus', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '10'),
+	a('retainedEarnings', '12', 'Report à nouveau', 'Retained Earnings', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '1'),
+	a('currentYearResult', '13', 'Résultat net de l\'exercice', 'Current Year Result', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '1'),
+	a('incomeSummary', '139', 'Résultat en instance d\'affectation', 'Income Summary', 'equity', 'credit', 'noncurrent', 'equity', 'financing', '13'),
+	a('ownerDrawings', '109', 'Compte de l\'exploitant - prélèvements', "Owner's Drawings", 'equity', 'debit', 'noncurrent', 'equity', 'financing', '10'),
 	a('bankLoan', '162', 'Emprunts auprès des établissements de crédit', 'Bank Loan', 'liability', 'credit', 'noncurrent', 'ltDebt', 'financing', '16'),
 	a('otherLtDebt', '165', 'Dépôts et cautionnements reçus', 'Other LT Debt', 'liability', 'credit', 'noncurrent', 'ltDebt', 'financing', '16'),
 	a('leaseLiability', '17', 'Dettes de location-financement', 'Lease Liability', 'liability', 'credit', 'noncurrent', 'ltDebt', 'financing', '1'),

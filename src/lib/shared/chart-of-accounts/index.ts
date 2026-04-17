@@ -67,6 +67,22 @@ export function searchAccounts(
 }
 
 /**
+ * Format an account for display: "code — name" when a real code exists,
+ * or just the name when the code is absent or a placeholder (e.g. IFRS /
+ * US-GAAP overrides that use "-" because those frameworks don't prescribe
+ * account numbers).
+ */
+export function formatAccountLabel(
+	account: Pick<ResolvedAccount, 'frameworkCode' | 'frameworkNameEn' | 'frameworkNameFr'>,
+	locale: 'en' | 'fr' = 'en'
+): string {
+	const name = locale === 'fr' ? account.frameworkNameFr : account.frameworkNameEn;
+	const code = account.frameworkCode?.trim();
+	if (!code || code === '-') return name;
+	return `${code} \u2014 ${name}`;
+}
+
+/**
  * Get accounts whose code starts with the given OHADA class number (1-9).
  */
 export function getAccountsByClass(

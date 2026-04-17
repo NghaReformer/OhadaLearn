@@ -2,6 +2,7 @@ import type { FrameworkOverride } from '../types';
 
 export const ifrsOverrides: Map<string, FrameworkOverride> = new Map([
 	['shareCapital', { code: '-', nameFr: 'Share Capital', nameEn: 'Share Capital' }],
+	['ownerDrawings', { code: '-', nameFr: "Owner's Drawings", nameEn: "Owner's Drawings" }],
 	['legalReserve', { code: '-', nameFr: 'Other Reserves', nameEn: 'Other Reserves' }],
 	['retainedEarnings', { code: '-', nameFr: 'Retained Earnings', nameEn: 'Retained Earnings' }],
 	['currentYearResult', { code: '-', nameFr: 'Profit/(Loss) for the Year', nameEn: 'Current Year Result' }],

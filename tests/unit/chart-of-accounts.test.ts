@@ -3,7 +3,8 @@ import {
 	getAccount,
 	getAllAccounts,
 	searchAccounts,
-	getAccountsByClass
+	getAccountsByClass,
+	formatAccountLabel
 } from '$lib/shared/chart-of-accounts';
 
 describe('Chart of Accounts', () => {
@@ -128,6 +129,79 @@ describe('Chart of Accounts', () => {
 			const results = searchAccounts('521', 'ohada', 'en');
 			expect(results.length).toBeGreaterThan(0);
 			expect(results[0].key).toBe('bank');
+		});
+
+		it('returns Bank (521) as the top "cash" synonym hit', () => {
+			const results = searchAccounts('cash', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('bank');
+			expect(results.map((r) => r.key)).toContain('pettyCash');
+		});
+
+		it('returns Merchandise (37) first for "inventory"', () => {
+			const results = searchAccounts('inventory', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('merchandise');
+		});
+
+		it('surfaces Accumulated Depreciation accounts for "accumulated"', () => {
+			const results = searchAccounts('accumulated', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			const keys = results.map((r) => r.key);
+			expect(keys).toContain('accDeprEquipment');
+		});
+
+		it('surfaces Allowance for Doubtful Accounts for "allowance"', () => {
+			const results = searchAccounts('allowance', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('allowanceDoubtful');
+		});
+
+		it('surfaces Owner\'s Drawings for "drawings"', () => {
+			const results = searchAccounts('drawings', 'ohada', 'en');
+			expect(results.length).toBeGreaterThan(0);
+			expect(results[0].key).toBe('ownerDrawings');
+		});
+	});
+
+	describe('formatAccountLabel', () => {
+		it('uses "code — name" when a real code exists (OHADA)', () => {
+			const account = getAccount('bank', 'ohada')!;
+			expect(formatAccountLabel(account, 'en')).toBe('521 \u2014 Bank');
+			expect(formatAccountLabel(account, 'fr')).toBe('521 \u2014 Banque');
+		});
+
+		it('falls back to just the name when code is the "-" placeholder (IFRS)', () => {
+			const account = getAccount('bank', 'ifrs')!;
+			expect(account.frameworkCode).toBe('-');
+			expect(formatAccountLabel(account, 'en')).toBe('Cash & Cash Equivalents');
+			expect(formatAccountLabel(account, 'en')).not.toContain('-');
+		});
+
+		it('falls back to just the name under US-GAAP', () => {
+			const account = getAccount('shareCapital', 'usgaap')!;
+			expect(account.frameworkCode).toBe('-');
+			expect(formatAccountLabel(account, 'en')).toBe('Common Stock');
+		});
+	});
+
+	describe('equity cash-flow classification', () => {
+		it('tags equity accounts as financing activities', () => {
+			const equityKeys = [
+				'shareCapital',
+				'legalReserve',
+				'statutoryReserve',
+				'revaluationSurplus',
+				'retainedEarnings',
+				'currentYearResult',
+				'incomeSummary',
+				'ownerDrawings'
+			];
+			for (const key of equityKeys) {
+				const account = getAccount(key, 'ohada');
+				expect(account, `missing account ${key}`).not.toBeNull();
+				expect(account!.cfClass, `${key} should be classified as financing`).toBe('financing');
+			}
 		});
 	});
 

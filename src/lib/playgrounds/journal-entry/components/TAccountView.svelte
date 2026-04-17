@@ -3,6 +3,7 @@
 	import { locale } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
+	import { formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { TAccountData } from '../types';
 
 	let {
@@ -23,9 +24,7 @@
 
 	let accountName = $derived.by(() => {
 		if (!data) return '';
-		return currentLocale === 'fr'
-			? `${data.account.frameworkCode} — ${data.account.frameworkNameFr}`
-			: `${data.account.frameworkCode} — ${data.account.frameworkNameEn}`;
+		return formatAccountLabel(data.account, currentLocale);
 	});
 </script>
 

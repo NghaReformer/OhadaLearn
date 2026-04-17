@@ -3,7 +3,7 @@
 	import { locale } from '$lib/i18n';
 	import { currency$, accountingStandard$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
-	import { getAccount } from '$lib/shared/chart-of-accounts';
+	import { getAccount, formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type {
@@ -70,14 +70,13 @@
 	];
 
 	function accountName(account: { frameworkNameEn: string; frameworkNameFr: string; frameworkCode: string }) {
-		const label =
-			currentLocale === 'fr' ? account.frameworkNameFr : account.frameworkNameEn;
-		return `${account.frameworkCode} — ${label}`;
+		return formatAccountLabel(account, currentLocale);
 	}
 
-	function accountKeyDisplay(key: string): string {
-		const account = getAccount(key, framework);
-		return account ? accountName(account) : key;
+	function accountDisplayFromKey(accountKey: string): string {
+		const resolved = getAccount(accountKey, framework);
+		if (!resolved) return accountKey;
+		return accountName(resolved);
 	}
 
 	function isSelectedAccount(accountKey: string): boolean {
@@ -128,8 +127,9 @@
 						class="impact-line"
 						type="button"
 						onclick={() => onSelectAccount(line.accountKey)}
+						title={accountDisplayFromKey(line.accountKey)}
 					>
-						<span class="impact-account">{accountKeyDisplay(line.accountKey)}</span>
+						<span class="impact-account">{accountDisplayFromKey(line.accountKey)}</span>
 						<span class="impact-side">{lineSide(line)}</span>
 						<span class="impact-amount">{fmtCurrency(lineAmount(line), currency)}</span>
 					</button>

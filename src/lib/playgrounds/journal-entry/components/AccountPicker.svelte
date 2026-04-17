@@ -2,7 +2,7 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/i18n';
 	import { accountingStandard$ } from '$lib/stores/preferences';
-	import { searchAccounts, getAccount } from '$lib/shared/chart-of-accounts';
+	import { searchAccounts, getAccount, formatAccountLabel } from '$lib/shared/chart-of-accounts';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type { ResolvedAccount } from '$lib/shared/chart-of-accounts';
@@ -38,10 +38,7 @@
 
 	let displayText = $derived.by(() => {
 		if (!isOpen && selectedAccount) {
-			const name = currentLocale === 'fr'
-				? selectedAccount.frameworkNameFr
-				: selectedAccount.frameworkNameEn;
-			return `${selectedAccount.frameworkCode} \u2014 ${name}`;
+			return formatAccountLabel(selectedAccount, currentLocale);
 		}
 		return query;
 	});
@@ -133,7 +130,24 @@
 
 <svelte:document onclick={handleClickOutside} />
 
-<div class="account-picker">
+<!--
+	The wrapper commits focus on mousedown (before the click fires) so that
+	any click landing on the padding around the input synchronously transfers
+	focus to our input and causes whatever input was previously focused
+	(typically a sibling row's Debit/Credit number input) to blur before the
+	user's next keystroke arrives. Without this, digits typed into the picker
+	could leak into the previously focused number field. See Bug 1 in QA.
+-->
+<div
+	class="account-picker"
+	onmousedown={(e) => {
+		if (inputEl && e.target !== inputEl) {
+			e.preventDefault();
+			inputEl.focus();
+		}
+	}}
+	role="presentation"
+>
 	<input
 		bind:this={inputEl}
 		type="text"
@@ -160,16 +174,23 @@
 			id="account-picker-listbox"
 		>
 			{#each results as account, i (account.key)}
+				{@const hasCode = account.frameworkCode && account.frameworkCode !== '-'}
 				<li
 					class="picker-option"
 					class:highlighted={i === highlightIndex}
 					role="option"
 					aria-selected={i === highlightIndex}
+					title={formatAccountLabel(account, currentLocale)}
 					onmousedown={(e) => { e.preventDefault(); selectAccount(account); }}
 					onmouseenter={() => (highlightIndex = i)}
 				>
-					<span class="option-code">{account.frameworkCode}</span>
+					{#if hasCode}
+						<span class="option-code">{account.frameworkCode}</span>
+					{/if}
 					<span class="option-name">{getAccountDisplayName(account)}</span>
+					<span class="option-side" aria-label={account.normalBalance === 'debit' ? 'debit-normal' : 'credit-normal'}>
+						{account.normalBalance === 'debit' ? 'Dr' : 'Cr'}
+					</span>
 					<span class="option-type">{account.type}</span>
 				</li>
 			{/each}
@@ -210,7 +231,6 @@
 		position: absolute;
 		top: 100%;
 		left: 0;
-		right: 0;
 		z-index: 50;
 		margin: 0.25rem 0 0;
 		padding: 0.25rem 0;
@@ -218,9 +238,14 @@
 		border: 1px solid var(--border);
 		border-radius: var(--radius-sm);
 		box-shadow: var(--shadow-sm);
-		max-height: 200px;
+		max-height: 280px;
 		overflow-y: auto;
 		list-style: none;
+		/* Let the dropdown extend well beyond the narrow account column so
+		   long SYSCOHADA labels are readable without being clipped. */
+		min-width: 100%;
+		width: max-content;
+		max-width: min(420px, 96vw);
 	}
 
 	.picker-option {
@@ -233,9 +258,19 @@
 		font-size: 0.8125rem;
 	}
 
-	.picker-option:hover,
-	.picker-option.highlighted {
+	.picker-option:hover {
 		background: var(--panel-hover);
+	}
+
+	.picker-option.highlighted {
+		/* Distinct, high-contrast state so keyboard users can clearly track
+		   the focused row. Uses the accent glow plus a left border marker. */
+		background: var(--accent-glow);
+		box-shadow: inset 3px 0 0 0 var(--accent);
+	}
+
+	.picker-option.highlighted .option-name {
+		color: var(--accent);
 	}
 
 	.option-code {
@@ -253,6 +288,16 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.option-side {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		color: var(--text-secondary);
+		flex-shrink: 0;
+		padding: 0.0625rem 0.3125rem;
+		border-radius: var(--radius-sm);
+		background: var(--bg-subtle);
 	}
 
 	.option-type {
