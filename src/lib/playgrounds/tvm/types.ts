@@ -100,6 +100,30 @@ export interface AnnuitySolveResult {
 	workings: WorkingStep[];
 }
 
+export interface CashFlow {
+	period: number;
+	amount: number;
+}
+
+export interface InvestmentSolveInput {
+	flows: CashFlow[];
+	discountRate: number; // percent
+	financeRate: number; // percent, for MIRR negative flows
+	reinvestRate: number; // percent, for MIRR positive flows
+	periodsPerYear: number;
+}
+
+export interface InvestmentMetrics {
+	npv: number;
+	irr: number | null; // percent
+	mirr: number | null; // percent
+	payback: number | null; // periods
+	discountedPayback: number | null; // periods
+	profitabilityIndex: number | null;
+	totalInflow: number;
+	totalOutflow: number;
+}
+
 export interface TVMPlaygroundState {
 	group: PlaygroundGroup;
 	/* ── Core group state ── */
@@ -119,6 +143,11 @@ export interface TVMPlaygroundState {
 	annRate: number | '';
 	annGrowth: number | '';
 	annPeriods: number | '';
+	/* ── Investment group state ── */
+	invFlows: CashFlow[];
+	invDiscountRate: number | '';
+	invFinanceRate: number | '';
+	invReinvestRate: number | '';
 	/* ── Shared ── */
 	advancedOpen: boolean;
 	selectedExerciseId: string | null;

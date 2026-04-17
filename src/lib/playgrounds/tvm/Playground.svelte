@@ -14,6 +14,7 @@
 	import ResultCard from './components/ResultCard.svelte';
 	import WorkingsPanel from './components/WorkingsPanel.svelte';
 	import AnnuityPanel from './components/AnnuityPanel.svelte';
+	import InvestmentPanel from './components/InvestmentPanel.svelte';
 
 	let {
 		learnSections = [],
@@ -44,6 +45,17 @@
 		annRate: 8,
 		annGrowth: '',
 		annPeriods: 20,
+		invFlows: [
+			{ period: 0, amount: -100000 },
+			{ period: 1, amount: 30000 },
+			{ period: 2, amount: 30000 },
+			{ period: 3, amount: 30000 },
+			{ period: 4, amount: 30000 },
+			{ period: 5, amount: 30000 }
+		],
+		invDiscountRate: 8,
+		invFinanceRate: 10,
+		invReinvestRate: 8,
 		advancedOpen: false,
 		selectedExerciseId: null,
 		exerciseParams: null
@@ -65,10 +77,14 @@
 		'annPmt',
 		'annRate',
 		'annGrowth',
-		'annPeriods'
+		'annPeriods',
+		'invDiscountRate',
+		'invFinanceRate',
+		'invReinvestRate',
+		'invFlows'
 	];
 
-	const groups: PlaygroundGroup[] = ['core', 'annuity'];
+	const groups: PlaygroundGroup[] = ['core', 'annuity', 'investment'];
 	let groupPillRefs: HTMLButtonElement[] = [];
 
 	function toSolveInput(state: TVMPlaygroundState): SolveInput {
@@ -148,6 +164,11 @@
 
 			{#if group === 'annuity'}
 				<AnnuityPanel
+					{state}
+					onUpdate={(partial) => updateState(partial as Record<string, unknown>)}
+				/>
+			{:else if group === 'investment'}
+				<InvestmentPanel
 					{state}
 					onUpdate={(partial) => updateState(partial as Record<string, unknown>)}
 				/>
