@@ -134,9 +134,6 @@
 <svelte:document onclick={handleClickOutside} />
 
 <div class="account-picker">
-	<label class="picker-label" for={undefined}>
-		<span class="sr-only">{$t('je.form.account')}</span>
-	</label>
 	<input
 		bind:this={inputEl}
 		type="text"
@@ -147,6 +144,7 @@
 		onfocus={handleFocus}
 		onkeydown={handleKeydown}
 		role="combobox"
+		aria-label={$t('je.form.account')}
 		aria-expanded={isOpen && results.length > 0}
 		aria-haspopup="listbox"
 		aria-autocomplete="list"
@@ -183,18 +181,6 @@
 	.account-picker {
 		position: relative;
 		width: 100%;
-	}
-
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
 	}
 
 	.picker-input {

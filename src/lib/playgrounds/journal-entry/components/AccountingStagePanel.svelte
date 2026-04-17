@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/i18n';
-	import { currency$ } from '$lib/stores/preferences';
+	import { currency$, accountingStandard$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
+	import { getAccount } from '$lib/shared/chart-of-accounts';
+	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
+	import type { AccountingStandard } from '$lib/contracts/playground';
 	import type {
 		BalanceSheetData,
 		CashFlowStatement,
@@ -47,8 +50,16 @@
 		onSelectAccount: (accountKey: string) => void;
 	} = $props();
 
+	const standardToFramework: Record<AccountingStandard, AccountingFramework> = {
+		syscohada: 'ohada',
+		ifrs: 'ifrs',
+		'french-pcg': 'pcg',
+		'us-gaap': 'usgaap'
+	};
+
 	let currency = $derived($currency$);
 	let currentLocale = $derived($locale);
+	let framework = $derived(standardToFramework[$accountingStandard$]);
 
 	const stageMeta: Array<{ key: PipelineStage; labelKey: string }> = [
 		{ key: 'ledger', labelKey: 'je.stage.ledger' },
@@ -62,6 +73,11 @@
 		const label =
 			currentLocale === 'fr' ? account.frameworkNameFr : account.frameworkNameEn;
 		return `${account.frameworkCode} — ${label}`;
+	}
+
+	function accountKeyDisplay(key: string): string {
+		const account = getAccount(key, framework);
+		return account ? accountName(account) : key;
 	}
 
 	function isSelectedAccount(accountKey: string): boolean {
@@ -88,9 +104,21 @@
 				</div>
 
 				<div class="impact-badges">
-					<span class="impact-badge">{entryImpact.affectsBalanceSheet ? 'BS' : '—'}</span>
-					<span class="impact-badge">{entryImpact.affectsIncomeStatement ? 'IS' : '—'}</span>
-					<span class="impact-badge">{entryImpact.affectsCashFlow ? 'CFS' : '—'}</span>
+					<span
+						class="impact-badge"
+						class:active={entryImpact.affectsBalanceSheet}
+						title={$t('je.stage.balanceSheet')}
+					>{entryImpact.affectsBalanceSheet ? $t('je.impact.bs') : '—'}</span>
+					<span
+						class="impact-badge"
+						class:active={entryImpact.affectsIncomeStatement}
+						title={$t('je.stage.incomeStatement')}
+					>{entryImpact.affectsIncomeStatement ? $t('je.impact.is') : '—'}</span>
+					<span
+						class="impact-badge"
+						class:active={entryImpact.affectsCashFlow}
+						title={$t('je.stage.cashFlow')}
+					>{entryImpact.affectsCashFlow ? $t('je.impact.cfs') : '—'}</span>
 				</div>
 			</div>
 
@@ -101,7 +129,7 @@
 						type="button"
 						onclick={() => onSelectAccount(line.accountKey)}
 					>
-						<span class="impact-account">{line.accountKey}</span>
+						<span class="impact-account">{accountKeyDisplay(line.accountKey)}</span>
 						<span class="impact-side">{lineSide(line)}</span>
 						<span class="impact-amount">{fmtCurrency(lineAmount(line), currency)}</span>
 					</button>
@@ -277,7 +305,7 @@
 	{:else if stage === 'balanceSheet'}
 		<div class="panel-section">
 			<h3 class="panel-title">{$t('je.stage.balanceSheet')}</h3>
-			{#if balanceSheet.totalAssets === 0 && balanceSheet.totalLiabilitiesAndEquity === 0}
+			{#if balanceSheet.nonCurrentAssets.length === 0 && balanceSheet.currentAssets.length === 0 && balanceSheet.nonCurrentLiabilities.length === 0 && balanceSheet.currentLiabilities.length === 0 && balanceSheet.equity.length === 0 && Math.abs(balanceSheet.derivedNetIncome) < 0.01}
 				<p class="empty-text">{$t('je.empty.balanceSheet')}</p>
 			{:else}
 				<div class="statement-grid">
@@ -486,7 +514,12 @@
 		padding: 0.25rem 0.5rem;
 		border-radius: var(--radius-md);
 		background: var(--bg-subtle);
-		color: var(--text-secondary);
+		color: var(--text-muted);
+	}
+
+	.impact-badge.active {
+		background: color-mix(in srgb, var(--accent) 15%, transparent);
+		color: var(--accent);
 	}
 
 	.impact-lines {

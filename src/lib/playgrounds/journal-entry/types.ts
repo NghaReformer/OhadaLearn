@@ -39,9 +39,14 @@ export interface JournalEntryPlaygroundState {
 	exerciseParams: Record<string, number> | null;
 }
 
+export interface ValidationError {
+	key: string;
+	params?: Record<string, string | number>;
+}
+
 export interface ValidationResult {
 	valid: boolean;
-	errors: string[];
+	errors: ValidationError[];
 	totalDebit: number;
 	totalCredit: number;
 }

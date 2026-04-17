@@ -2,7 +2,7 @@
 	import PlaygroundShell from '$lib/components/playground/PlaygroundShell.svelte';
 	import { manifest } from './manifest';
 	import { JournalEntryEngine } from './engine';
-	import { accountingStandard$ } from '$lib/stores/preferences';
+	import { accountingStandard$, currency$ } from '$lib/stores/preferences';
 	import { locale, t } from '$lib/i18n';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
@@ -94,6 +94,7 @@
 
 	let framework: AccountingFramework = $derived(standardToFramework[$accountingStandard$]);
 	let currentLocale = $derived($locale);
+	let currentCurrency = $derived($currency$);
 	let translate = $derived($t);
 	let exerciseFeedback = $state<ExerciseFeedbackState>(null);
 </script>
@@ -176,7 +177,8 @@
 								selectedExercise,
 								typedState.exerciseParams,
 								framework,
-								currentLocale
+								currentLocale,
+								currentCurrency
 							);
 
 							exerciseFeedback = {

@@ -1,0 +1,20 @@
+{
+  "id": "je-f06-cash-sale-with-vat",
+  "playgroundSlug": "journal-entry",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "je.exercise.f06.prompt",
+    "parameters": [
+      { "name": "saleAmountHt", "type": "currency", "min": 500000, "max": 5000000, "step": 100000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "cashSaleWithVat",
+    "answerType": "journal-entry",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "je.exercise.f06.correct",
+    "incorrect": "je.exercise.f06.incorrect"
+  }
+}

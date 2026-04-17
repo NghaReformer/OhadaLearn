@@ -8,6 +8,7 @@ import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 import type {
 	DraftEntry,
 	JournalEntry,
+	ValidationError,
 	ValidationResult,
 	LedgerAccount,
 	TAccountData,
@@ -38,7 +39,7 @@ export class JournalEntryEngine {
 	 * Checks: all accounts valid, debits === credits, at least 2 lines, non-negative amounts.
 	 */
 	validate(draft: DraftEntry, framework: AccountingFramework): ValidationResult {
-		const errors: string[] = [];
+		const errors: ValidationError[] = [];
 		let totalDebit = 0;
 		let totalCredit = 0;
 
@@ -48,38 +49,53 @@ export class JournalEntryEngine {
 		);
 
 		if (filledLines.length < 2) {
-			errors.push('At least 2 lines required');
+			errors.push({ key: 'je.validation.minLines' });
 		}
 
 		if (!draft.description.trim()) {
-			errors.push('Description is required');
+			errors.push({ key: 'je.validation.descRequired' });
 		}
+
+		let seenAccountRequired = false;
+		let seenNegative = false;
+		const seenUnknown = new Set<string>();
+		const seenNoAmount = new Set<string>();
+		const seenBothSides = new Set<string>();
 
 		for (const line of filledLines) {
 			if (!line.accountKey) {
-				errors.push('Each line must have an account');
+				if (!seenAccountRequired) {
+					errors.push({ key: 'je.validation.accountRequired' });
+					seenAccountRequired = true;
+				}
 				continue;
 			}
 
 			const account = getAccount(line.accountKey, framework);
 			if (!account) {
-				errors.push(`Unknown account: ${line.accountKey}`);
+				if (!seenUnknown.has(line.accountKey)) {
+					errors.push({ key: 'je.validation.unknownAccount', params: { account: line.accountKey } });
+					seenUnknown.add(line.accountKey);
+				}
 				continue;
 			}
 
 			const debit = typeof line.debit === 'number' ? line.debit : 0;
 			const credit = typeof line.credit === 'number' ? line.credit : 0;
 
-			if (debit < 0 || credit < 0) {
-				errors.push('Amounts must be non-negative');
+			if ((debit < 0 || credit < 0) && !seenNegative) {
+				errors.push({ key: 'je.validation.negative' });
+				seenNegative = true;
 			}
 
-			if (debit === 0 && credit === 0) {
-				errors.push(`Line for ${line.accountKey} has no amount`);
+			if (debit === 0 && credit === 0 && !seenNoAmount.has(line.accountKey)) {
+				errors.push({ key: 'je.validation.noAmount', params: { account: account.frameworkCode } });
+				seenNoAmount.add(line.accountKey);
 			}
 
-			if (debit > 0 && credit > 0) {
-				errors.push(`Line for ${line.accountKey} has both debit and credit`);
+			if (debit > 0 && credit > 0 && !seenBothSides.has(line.accountKey)) {
+				errors.push({ key: 'je.validation.bothSides', params: { account: account.frameworkCode } });
+				seenBothSides.add(line.accountKey);
 			}
 
 			totalDebit += debit;
@@ -87,7 +103,10 @@ export class JournalEntryEngine {
 		}
 
 		if (filledLines.length >= 2 && Math.abs(totalDebit - totalCredit) > EPSILON) {
-			errors.push(`Entry is unbalanced: debits ${totalDebit} ≠ credits ${totalCredit}`);
+			errors.push({
+				key: 'je.validation.unbalanced',
+				params: { debit: totalDebit, credit: totalCredit, diff: Math.abs(totalDebit - totalCredit) }
+			});
 		}
 
 		return {

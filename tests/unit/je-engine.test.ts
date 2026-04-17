@@ -31,7 +31,7 @@ describe('JournalEntryEngine.validate', () => {
 		};
 		const result = engine.validate(draft, 'ohada');
 		expect(result.valid).toBe(false);
-		expect(result.errors.some((e) => e.includes('unbalanced'))).toBe(true);
+		expect(result.errors.some((e) => e.key === 'je.validation.unbalanced')).toBe(true);
 	});
 
 	it('rejects entry with fewer than 2 lines', () => {
@@ -55,7 +55,7 @@ describe('JournalEntryEngine.validate', () => {
 		};
 		const result = engine.validate(draft, 'ohada');
 		expect(result.valid).toBe(false);
-		expect(result.errors.some((e) => e.includes('Unknown account'))).toBe(true);
+		expect(result.errors.some((e) => e.key === 'je.validation.unknownAccount')).toBe(true);
 	});
 
 	it('rejects entry with empty description', () => {

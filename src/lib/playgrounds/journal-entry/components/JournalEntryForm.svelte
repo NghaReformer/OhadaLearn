@@ -2,7 +2,7 @@
 	import { t } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
-	import type { DraftEntry, DraftLine, ValidationResult } from '../types';
+	import type { DraftEntry, DraftLine, ValidationError, ValidationResult } from '../types';
 	import AccountPicker from './AccountPicker.svelte';
 	import BalanceIndicator from './BalanceIndicator.svelte';
 
@@ -18,8 +18,6 @@
 		validation: ValidationResult | null;
 	} = $props();
 
-	let currency = $derived($currency$);
-
 	let totalDebit = $derived(
 		draft.lines.reduce((sum, l) => sum + (typeof l.debit === 'number' ? l.debit : 0), 0)
 	);
@@ -28,8 +26,20 @@
 		draft.lines.reduce((sum, l) => sum + (typeof l.credit === 'number' ? l.credit : 0), 0)
 	);
 
-	let isBalanced = $derived(Math.abs(totalDebit - totalCredit) < 0.01);
 	let canPost = $derived(validation !== null && validation.valid);
+	let translate = $derived($t);
+	let currency = $derived($currency$);
+
+	function renderError(error: ValidationError): string {
+		const message = translate(error.key);
+		if (!error.params) return message;
+		return message.replace(/\{(\w+)\}/g, (_, name: string) => {
+			const value = error.params?.[name];
+			if (value === undefined) return `{${name}}`;
+			if (typeof value === 'number') return fmtCurrency(value, currency);
+			return String(value);
+		});
+	}
 
 	function updateDate(e: Event) {
 		const target = e.target as HTMLInputElement;
@@ -184,8 +194,8 @@
 	<!-- Validation errors -->
 	{#if validation && !validation.valid && validation.errors.length > 0}
 		<ul class="validation-errors" role="alert">
-			{#each validation.errors as error}
-				<li class="validation-error">{error}</li>
+			{#each validation.errors as error, i (i)}
+				<li class="validation-error">{renderError(error)}</li>
 			{/each}
 		</ul>
 	{/if}
@@ -420,7 +430,7 @@
 	.btn-post {
 		padding: 0.625rem 1.25rem;
 		background: var(--accent);
-		color: #fff;
+		color: var(--text-primary);
 		border: none;
 		border-radius: var(--radius-sm);
 		font-family: var(--font-body);

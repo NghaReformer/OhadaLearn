@@ -3,11 +3,13 @@
 	import type { ExerciseTemplateFile } from '$lib/content/types';
 	import type { ExerciseDifficulty } from '$lib/contracts/playground';
 
+	type FeedbackStatus = 'correct' | 'partial' | 'extra' | 'missing';
+
 	type ExerciseFeedback = {
 		score: number;
 		isCorrect: boolean;
 		messageKey: string;
-		lineFeedback: Array<{ status: 'correct' | 'partial' | 'extra' | 'missing'; explanation: string }>;
+		lineFeedback: Array<{ status: FeedbackStatus; explanation: string }>;
 	} | null;
 
 	let {
@@ -34,10 +36,26 @@
 		intermediaire: 'je.exercise.level.intermediaire',
 		avance: 'je.exercise.level.avance'
 	};
+	const statusKey: Record<FeedbackStatus, string> = {
+		correct: 'je.feedback.status.correct',
+		partial: 'je.feedback.status.partial',
+		missing: 'je.feedback.status.missing',
+		extra: 'je.feedback.status.extra'
+	};
 
+	let translate = $derived($t);
 	let selectedExercise = $derived(
 		exercises.find((exercise) => exercise.id === selectedExerciseId) ?? null
 	);
+
+	function exerciseTitle(exercise: ExerciseTemplateFile): string {
+		// Each exercise's prompt key has a corresponding `.title` short label
+		// (e.g. je.exercise.f01.prompt → je.exercise.f01.title). Fall back to
+		// the prompt itself if the short title isn't defined.
+		const titleKey = exercise.template.promptKey.replace(/\.prompt$/, '.title');
+		const title = translate(titleKey);
+		return title === titleKey ? translate(exercise.template.promptKey) : title;
+	}
 </script>
 
 <section class="exercise-workspace">
@@ -60,7 +78,7 @@
 								type="button"
 								onclick={() => onSelectExercise(exercise.id)}
 							>
-								{$t(exercise.template.promptKey)}
+								{exerciseTitle(exercise)}
 							</button>
 						{/each}
 					</div>
@@ -97,7 +115,7 @@
 						<ul class="feedback-list">
 							{#each feedback.lineFeedback as line, index (index)}
 								<li class="feedback-item">
-									<span class="feedback-status">{line.status}</span>
+									<span class="feedback-status feedback-status-{line.status}">{$t(statusKey[line.status])}</span>
 									<span>{line.explanation}</span>
 								</li>
 							{/each}
@@ -212,7 +230,7 @@
 	.primary-btn {
 		border: 1px solid var(--accent);
 		background: var(--accent);
-		color: white;
+		color: var(--text-primary);
 	}
 
 	.secondary-btn {
@@ -281,6 +299,19 @@
 		font-size: 0.6875rem;
 		text-transform: uppercase;
 		color: var(--text-muted);
+	}
+
+	.feedback-status-correct {
+		color: var(--green);
+	}
+
+	.feedback-status-partial {
+		color: var(--amber);
+	}
+
+	.feedback-status-missing,
+	.feedback-status-extra {
+		color: var(--error);
 	}
 
 	.exercise-empty {

@@ -85,14 +85,14 @@
 			<div class="taccount-totals">
 				<div class="taccount-col debit-col">
 					<div class="total-row">
-						<span class="total-label">Total</span>
+						<span class="total-label">{$t('je.stage.total')}</span>
 						<span class="total-amount">{fmtCurrency(data.debitTotal, currency)}</span>
 					</div>
 				</div>
 				<div class="taccount-divider" aria-hidden="true"></div>
 				<div class="taccount-col credit-col">
 					<div class="total-row">
-						<span class="total-label">Total</span>
+						<span class="total-label">{$t('je.stage.total')}</span>
 						<span class="total-amount">{fmtCurrency(data.creditTotal, currency)}</span>
 					</div>
 				</div>
