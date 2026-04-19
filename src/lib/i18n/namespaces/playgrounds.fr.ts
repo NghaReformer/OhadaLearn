@@ -11,7 +11,7 @@ export const playgroundsFr: TranslationMap = {
 	'pg.je.title': 'Écritures comptables',
 	'pg.je.desc': 'Comptabilité en partie double avec le plan comptable SYSCOHADA.',
 	'pg.amort.title': "Amortissement d'emprunts",
-	'pg.amort.desc': "Tableaux d'amortissement : français, linéaire, in fine et progressif.",
+	'pg.amort.desc': "Annuité, linéaire, in fine, progressif et ballon — avec écritures multi-référentiels.",
 	'pg.deprec.title': 'Amortissement des immobilisations',
 	'pg.deprec.desc': 'Méthodes linéaire, dégressive, SOFTY et MACRS.',
 	'playgrounds.back': 'Playgrounds',

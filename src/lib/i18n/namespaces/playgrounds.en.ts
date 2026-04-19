@@ -11,7 +11,7 @@ export const playgroundsEn: TranslationMap = {
 	'pg.je.title': 'Journal Entries',
 	'pg.je.desc': 'Double-entry bookkeeping with SYSCOHADA chart of accounts.',
 	'pg.amort.title': 'Loan Amortization',
-	'pg.amort.desc': 'French, linear, bullet, and progressive amortization schedules.',
+	'pg.amort.desc': 'Annuity, linear, bullet, progressive, and balloon schedules with multi-framework journal entries.',
 	'pg.deprec.title': 'Asset Depreciation',
 	'pg.deprec.desc': 'Straight-line, declining balance, SYD, and MACRS methods.',
 	'playgrounds.back': 'Playgrounds',
