@@ -3,8 +3,7 @@ import { playgrounds } from '$lib/data/playgrounds';
 import { isRegistered } from '$lib/playgrounds/_registry';
 
 // Ensure native modules register themselves so isRegistered() returns true for migrated playgrounds.
-import '$lib/playgrounds/journal-entry/index';
-import '$lib/playgrounds/tvm/index';
+import '$lib/playgrounds';
 
 describe('playground catalog data', () => {
 	it('has 5 playgrounds', () => {

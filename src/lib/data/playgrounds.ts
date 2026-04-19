@@ -41,10 +41,9 @@ export const playgrounds: PlaygroundMeta[] = [
 		slug: 'amortization',
 		titleKey: 'pg.amort.title',
 		descKey: 'pg.amort.desc',
-		staticFile: '/playgrounds/amortization-playground.html',
 		icon: '🏦',
 		category: 'business-math',
-		lineCount: 3887,
+		lineCount: 0,
 	},
 	{
 		slug: 'depreciation',

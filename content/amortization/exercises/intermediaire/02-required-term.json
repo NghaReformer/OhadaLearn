@@ -1,0 +1,24 @@
+{
+  "id": "required-term",
+  "playgroundSlug": "amortization",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "am.exercise.requiredTerm.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 5000000, "max": 15000000, "step": 1000000 },
+      { "name": "annualRate", "type": "rate", "min": 0.05, "max": 0.10, "step": 0.005 },
+      { "name": "payment", "type": "currency", "min": 120000, "max": 400000, "step": 10000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "requiredTerm",
+    "answerType": "numeric",
+    "tolerance": 1,
+    "toleranceType": "absolute",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "am.exercise.requiredTerm.correct",
+    "incorrect": "am.exercise.requiredTerm.incorrect"
+  }
+}

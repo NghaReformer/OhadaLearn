@@ -1,0 +1,25 @@
+{
+  "id": "remaining-balance",
+  "playgroundSlug": "amortization",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "am.exercise.remainingBalance.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 5000000, "max": 20000000, "step": 1000000 },
+      { "name": "annualRate", "type": "rate", "min": 0.05, "max": 0.12, "step": 0.005 },
+      { "name": "months", "type": "periods", "min": 36, "max": 120, "step": 12 },
+      { "name": "afterPeriod", "type": "periods", "min": 6, "max": 48, "step": 6 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "remainingBalanceAt",
+    "answerType": "numeric",
+    "tolerance": 0.005,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "am.exercise.remainingBalance.correct",
+    "incorrect": "am.exercise.remainingBalance.incorrect"
+  }
+}

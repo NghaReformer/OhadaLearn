@@ -1,0 +1,25 @@
+{
+  "slug": "grace-infra",
+  "titleKey": "am.scenario.graceInfra.title",
+  "descKey": "am.scenario.graceInfra.desc",
+  "presetValues": {
+    "inputs": {
+      "principal": 50000000,
+      "nominalRate": 0.07,
+      "termPeriods": 84,
+      "frequency": "monthly",
+      "customPeriodsPerYear": 12,
+      "method": "annuity",
+      "dayCount": "30/360",
+      "startDate": "2026-01-01",
+      "firstPaymentDate": "2026-02-01",
+      "grace": { "type": "total", "periods": 6 },
+      "insurance": { "rate": 0, "basis": "initial" },
+      "fees": { "origination": 500000, "prepaymentPenaltyPct": 0 },
+      "variableRates": [],
+      "extras": { "perPeriod": 0, "lumpSum": 0, "lumpPeriod": 0 },
+      "balloonDueAt": 0,
+      "progressiveStep": 0.02
+    }
+  }
+}

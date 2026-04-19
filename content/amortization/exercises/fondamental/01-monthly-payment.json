@@ -1,0 +1,24 @@
+{
+  "id": "monthly-payment",
+  "playgroundSlug": "amortization",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "am.exercise.monthlyPayment.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 3000000, "max": 20000000, "step": 500000 },
+      { "name": "annualRate", "type": "rate", "min": 0.04, "max": 0.14, "step": 0.005 },
+      { "name": "months", "type": "periods", "min": 12, "max": 120, "step": 12 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "monthlyPayment",
+    "answerType": "numeric",
+    "tolerance": 0.005,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "am.exercise.monthlyPayment.correct",
+    "incorrect": "am.exercise.monthlyPayment.incorrect"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "linear-equipment",
+  "titleKey": "am.scenario.linearEquipment.title",
+  "descKey": "am.scenario.linearEquipment.desc",
+  "presetValues": {
+    "inputs": {
+      "principal": 5000000,
+      "nominalRate": 0.075,
+      "termPeriods": 36,
+      "frequency": "monthly",
+      "customPeriodsPerYear": 12,
+      "method": "linear",
+      "dayCount": "30/360",
+      "startDate": "2026-01-01",
+      "firstPaymentDate": "2026-02-01",
+      "grace": { "type": "none", "periods": 0 },
+      "insurance": { "rate": 0, "basis": "initial" },
+      "fees": { "origination": 50000, "prepaymentPenaltyPct": 0 },
+      "variableRates": [],
+      "extras": { "perPeriod": 0, "lumpSum": 0, "lumpPeriod": 0 },
+      "balloonDueAt": 0,
+      "progressiveStep": 0.02
+    }
+  }
+}

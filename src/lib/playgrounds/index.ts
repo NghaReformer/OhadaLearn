@@ -9,3 +9,4 @@
 import './journal-entry/index';
 import './tvm/index';
 import './cvp/index';
+import './amortization/index';

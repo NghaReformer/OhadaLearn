@@ -1,0 +1,25 @@
+{
+  "slug": "bullet-bridge",
+  "titleKey": "am.scenario.bulletBridge.title",
+  "descKey": "am.scenario.bulletBridge.desc",
+  "presetValues": {
+    "inputs": {
+      "principal": 20000000,
+      "nominalRate": 0.10,
+      "termPeriods": 12,
+      "frequency": "monthly",
+      "customPeriodsPerYear": 12,
+      "method": "bullet",
+      "dayCount": "actual/360",
+      "startDate": "2026-01-01",
+      "firstPaymentDate": "2026-02-01",
+      "grace": { "type": "none", "periods": 0 },
+      "insurance": { "rate": 0, "basis": "initial" },
+      "fees": { "origination": 100000, "prepaymentPenaltyPct": 0 },
+      "variableRates": [],
+      "extras": { "perPeriod": 0, "lumpSum": 0, "lumpPeriod": 0 },
+      "balloonDueAt": 0,
+      "progressiveStep": 0.02
+    }
+  }
+}

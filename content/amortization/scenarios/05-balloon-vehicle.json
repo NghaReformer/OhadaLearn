@@ -1,0 +1,25 @@
+{
+  "slug": "balloon-vehicle",
+  "titleKey": "am.scenario.balloonVehicle.title",
+  "descKey": "am.scenario.balloonVehicle.desc",
+  "presetValues": {
+    "inputs": {
+      "principal": 8000000,
+      "nominalRate": 0.09,
+      "termPeriods": 48,
+      "frequency": "monthly",
+      "customPeriodsPerYear": 12,
+      "method": "balloon",
+      "dayCount": "30/360",
+      "startDate": "2026-01-01",
+      "firstPaymentDate": "2026-02-01",
+      "grace": { "type": "none", "periods": 0 },
+      "insurance": { "rate": 0, "basis": "initial" },
+      "fees": { "origination": 80000, "prepaymentPenaltyPct": 0 },
+      "variableRates": [],
+      "extras": { "perPeriod": 0, "lumpSum": 0, "lumpPeriod": 0 },
+      "balloonDueAt": 48,
+      "progressiveStep": 0.02
+    }
+  }
+}

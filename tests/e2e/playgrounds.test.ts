@@ -11,15 +11,15 @@ test.describe('Playground catalog', () => {
 });
 
 test.describe('Playground wrapper', () => {
-  test('TVM playground loads in iframe', async ({ page }) => {
-    await page.goto('/en/playgrounds/tvm');
+  test('Depreciation playground still loads in iframe (not yet migrated)', async ({ page }) => {
+    await page.goto('/en/playgrounds/depreciation');
     const iframe = page.locator('iframe');
     await expect(iframe).toBeVisible();
-    await expect(iframe).toHaveAttribute('src', /tvm-playground\.html/);
+    await expect(iframe).toHaveAttribute('src', /depreciation-playground\.html/);
   });
 
   test('back link returns to catalog', async ({ page }) => {
-    await page.goto('/en/playgrounds/tvm');
+    await page.goto('/en/playgrounds/depreciation');
     const backLink = page.locator('a[href*="/playgrounds"]').first();
     await expect(backLink).toBeVisible();
   });

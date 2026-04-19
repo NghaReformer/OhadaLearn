@@ -1,0 +1,24 @@
+{
+  "id": "total-interest",
+  "playgroundSlug": "amortization",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "am.exercise.totalInterest.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 2000000, "max": 15000000, "step": 500000 },
+      { "name": "annualRate", "type": "rate", "min": 0.05, "max": 0.12, "step": 0.005 },
+      { "name": "months", "type": "periods", "min": 24, "max": 84, "step": 12 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "totalInterest",
+    "answerType": "numeric",
+    "tolerance": 0.005,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "am.exercise.totalInterest.correct",
+    "incorrect": "am.exercise.totalInterest.incorrect"
+  }
+}
