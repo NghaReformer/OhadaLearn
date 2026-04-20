@@ -3,7 +3,7 @@
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency, fmtNumber, getCurrencyLocale } from '$lib/format';
 	import { calcIndifference } from '../engine';
-	import NumberField from './NumberField.svelte';
+	import NumberField from '$lib/components/playground/NumberField.svelte';
 	import type { IndifferenceInputs } from '../types';
 
 	let {

@@ -7,7 +7,7 @@ import type {
 import type { ExerciseParameter, ExerciseTemplateFile } from '$lib/content/types';
 import { fmtNumber } from '$lib/format';
 import { TVMEngine } from './engine';
-import { gradeNumeric } from './grader';
+import { gradeNumeric } from '$lib/grading/numeric';
 import type { SolveMode, SolveInput } from './types';
 
 const engine = new TVMEngine();
@@ -205,7 +205,10 @@ export function buildExerciseFeedback(
 	params: Record<string, number>
 ): ExerciseFeedback {
 	const modelAnswer = solveExercise(exercise.solutionLogic.solverFunction, params);
-	const { isCorrect, score } = gradeNumeric(studentAnswer, modelAnswer);
+	const { isCorrect, score } = gradeNumeric(studentAnswer, modelAnswer, 0.005, 'relative', {
+		scoringStrategy: 'binary',
+		scoreScale: 100,
+	});
 	return {
 		isCorrect,
 		score,
@@ -229,7 +232,10 @@ export const exerciseTypes: ExerciseTypeDef[] = supportedExerciseMeta.map((meta)
 	feedback: (studentAnswer, correctAnswer) => {
 		const student = Number(studentAnswer.answer ?? NaN);
 		const correct = Number(correctAnswer.answer ?? NaN);
-		const { isCorrect, score } = gradeNumeric(student, correct);
+		const { isCorrect, score } = gradeNumeric(student, correct, 0.005, 'relative', {
+			scoringStrategy: 'binary',
+			scoreScale: 100,
+		});
 		return {
 			isCorrect,
 			score,

@@ -6,7 +6,7 @@ import type {
 import type { ExerciseParameter, ExerciseTemplateFile } from '$lib/content/types';
 import type { Locale } from '$lib/i18n/types';
 import { calcSingle } from './engine';
-import { gradeNumeric } from './grader';
+import { gradeNumeric } from '$lib/grading/numeric';
 import type { CVPExerciseParams } from './types';
 
 type ExerciseSlug = 'bep' | 'target' | 'aftertax' | 'mos' | 'dol';

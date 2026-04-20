@@ -3,12 +3,9 @@ import type {
 	NormalBalance,
 	ResolvedAccount
 } from '$lib/shared/chart-of-accounts/types';
+import type { JournalLine } from '$lib/grading/journal-entry';
 
-export interface JournalLine {
-	accountKey: string;
-	debit: number;
-	credit: number;
-}
+export type { JournalLine };
 
 export interface JournalEntry {
 	id: string;

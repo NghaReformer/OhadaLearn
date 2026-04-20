@@ -5,14 +5,18 @@
 	import type {
 		AmortizationPlaygroundState,
 		AmortizationInputs,
+		AmortizationKpis,
 		LifecycleStage,
 	} from './types';
 	import type { LearnSection, Scenario, ExerciseTemplateFile } from '$lib/content/types';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
-	import { accountingStandard$, setAccountingStandard } from '$lib/stores/preferences';
+	import { accountingStandard$, setAccountingStandard, currency$ } from '$lib/stores/preferences';
+	import { t } from '$lib/i18n';
+	import { fmtCurrency, fmtPct } from '$lib/format';
 	import InputsPanel from './components/InputsPanel.svelte';
-	import KpiStrip from './components/KpiStrip.svelte';
+	import KpiStrip from '$lib/components/playground/KpiStrip.svelte';
+	import type { KpiItem } from '$lib/components/playground/kpi-strip-types';
 	import ScheduleTable from './components/ScheduleTable.svelte';
 	import ChartPanel from './components/ChartPanel.svelte';
 	import LifecyclePanel from './components/LifecyclePanel.svelte';
@@ -94,6 +98,24 @@
 	];
 
 	const engine = new AmortizationEngine();
+
+	function buildKpiItems(kpis: AmortizationKpis, translate: (k: string) => string, currency: string): KpiItem[] {
+		const money = (v: number) => (Number.isFinite(v) ? fmtCurrency(v, currency) : '—');
+		const percent = (v: number) => (Number.isFinite(v) ? fmtPct(v * 100, 2) : '—');
+		const items: KpiItem[] = [
+			{ label: translate('am.kpis.firstPayment'), value: money(kpis.firstPayment) },
+			{ label: translate('am.kpis.totalInterest'), value: money(kpis.totalInterest) },
+			{ label: translate('am.kpis.totalInsurance'), value: money(kpis.totalInsurance) },
+			{ label: translate('am.kpis.totalPaid'), value: money(kpis.totalPaid) },
+			{ label: translate('am.kpis.apr'), value: percent(kpis.apr), variant: 'accent' },
+			{ label: translate('am.kpis.effectiveRate'), value: percent(kpis.effectiveAnnualRate) },
+			{ label: translate('am.kpis.ratio'), value: fmtPct(kpis.interestToPrincipalRatio * 100, 1) },
+		];
+		if (kpis.balloonAmount !== null) {
+			items.push({ label: translate('am.kpis.balloonAmount'), value: money(kpis.balloonAmount), variant: 'warn' });
+		}
+		return items;
+	}
 </script>
 
 <PlaygroundShell
@@ -120,7 +142,7 @@
 			/>
 
 			<div class="am-workspace">
-				<KpiStrip {kpis} />
+				<KpiStrip items={buildKpiItems(kpis, $t, $currency$)} />
 				<div class="am-grid">
 					<ChartPanel
 						{result}

@@ -1,14 +1,21 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
 
 	let {
 		totalDebit,
 		totalCredit,
+		debitLabel = 'Debit',
+		creditLabel = 'Credit',
+		balancedLabel = 'Balanced',
+		unbalancedLabel = 'Unbalanced',
 	}: {
 		totalDebit: number;
 		totalCredit: number;
+		debitLabel?: string;
+		creditLabel?: string;
+		balancedLabel?: string;
+		unbalancedLabel?: string;
 	} = $props();
 
 	let diff = $derived(Math.abs(totalDebit - totalCredit));
@@ -18,14 +25,14 @@
 
 <div class="balance-bar" role="status" aria-live="polite">
 	<span class="balance-item">
-		<span class="balance-label">{$t('je.form.debit')}:</span>
+		<span class="balance-label">{debitLabel}:</span>
 		<span class="balance-value debit">{fmtCurrency(totalDebit, currency)}</span>
 	</span>
 
 	<span class="balance-sep" aria-hidden="true">|</span>
 
 	<span class="balance-item">
-		<span class="balance-label">{$t('je.form.credit')}:</span>
+		<span class="balance-label">{creditLabel}:</span>
 		<span class="balance-value credit">{fmtCurrency(totalCredit, currency)}</span>
 	</span>
 
@@ -41,10 +48,10 @@
 				<svg class="status-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 					<path d="M3 8.5l3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 				</svg>
-				{$t('je.form.balanced')}
+				{balancedLabel}
 			{:else}
 				<span class="diff-amount">{fmtCurrency(diff, currency)}</span>
-				{$t('je.form.unbalanced')}
+				{unbalancedLabel}
 			{/if}
 		</span>
 	</span>

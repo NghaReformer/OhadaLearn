@@ -6,6 +6,7 @@ import type {
 } from '$lib/contracts/playground';
 import { pmt, remainingBalance } from '$lib/finance/pmt';
 import { irr } from '$lib/finance/irr';
+import { gradeNumeric } from '$lib/grading/numeric';
 
 type ExerciseSolver = (params: Record<string, number>) => Record<string, number>;
 
@@ -183,14 +184,11 @@ function gradeNumericAnswer(
 	tolerance: number,
 	toleranceType: 'absolute' | 'relative',
 ): { isCorrect: boolean; score: number } {
-	if (!Number.isFinite(student)) return { isCorrect: false, score: 0 };
-	const diff = Math.abs(student - correct);
-	const limit = toleranceType === 'absolute' ? tolerance : Math.abs(correct) * tolerance;
-	const isCorrect = diff <= limit;
-	if (isCorrect) return { isCorrect: true, score: 1 };
-	const softLimit = limit * 3;
-	if (diff <= softLimit) return { isCorrect: false, score: 0.5 };
-	return { isCorrect: false, score: 0 };
+	const { isCorrect, score } = gradeNumeric(student, correct, tolerance, toleranceType, {
+		scoringStrategy: 'soft',
+		softMultiplier: 3,
+	});
+	return { isCorrect, score };
 }
 
 export const exerciseTypes: ExerciseTypeDef[] = exerciseMeta.map((meta) => ({

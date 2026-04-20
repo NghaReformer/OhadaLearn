@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { gradeNumeric } from '$lib/playgrounds/cvp/grader';
+import { gradeNumeric } from '$lib/grading/numeric';
 
 describe('gradeNumeric', () => {
 	it('accepts exact match as correct with full score', () => {

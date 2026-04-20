@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
 	import { locale } from '$lib/i18n';
 	import { accountingStandard$ } from '$lib/stores/preferences';
 	import { searchAccounts, getAccount, formatAccountLabel } from '$lib/shared/chart-of-accounts';
@@ -10,9 +9,13 @@
 	let {
 		value,
 		onchange,
+		placeholder = '',
+		ariaLabel,
 	}: {
 		value: string;
 		onchange: (key: string) => void;
+		placeholder?: string;
+		ariaLabel?: string;
 	} = $props();
 
 	const standardToFramework: Record<AccountingStandard, AccountingFramework> = {
@@ -30,6 +33,7 @@
 
 	let framework = $derived(standardToFramework[$accountingStandard$]);
 	let currentLocale = $derived($locale);
+	let resolvedAriaLabel = $derived(ariaLabel ?? placeholder);
 
 	let selectedAccount = $derived.by(() => {
 		if (!value) return null;
@@ -130,14 +134,6 @@
 
 <svelte:document onclick={handleClickOutside} />
 
-<!--
-	The wrapper commits focus on mousedown (before the click fires) so that
-	any click landing on the padding around the input synchronously transfers
-	focus to our input and causes whatever input was previously focused
-	(typically a sibling row's Debit/Credit number input) to blur before the
-	user's next keystroke arrives. Without this, digits typed into the picker
-	could leak into the previously focused number field. See Bug 1 in QA.
--->
 <div
 	class="account-picker"
 	onmousedown={(e) => {
@@ -152,13 +148,13 @@
 		bind:this={inputEl}
 		type="text"
 		class="picker-input"
-		placeholder={$t('je.form.account')}
+		{placeholder}
 		value={displayText}
 		oninput={handleInput}
 		onfocus={handleFocus}
 		onkeydown={handleKeydown}
 		role="combobox"
-		aria-label={$t('je.form.account')}
+		aria-label={resolvedAriaLabel}
 		aria-expanded={isOpen && results.length > 0}
 		aria-haspopup="listbox"
 		aria-autocomplete="list"
@@ -241,8 +237,6 @@
 		max-height: 280px;
 		overflow-y: auto;
 		list-style: none;
-		/* Let the dropdown extend well beyond the narrow account column so
-		   long SYSCOHADA labels are readable without being clipped. */
 		min-width: 100%;
 		width: max-content;
 		max-width: min(420px, 96vw);
@@ -263,8 +257,6 @@
 	}
 
 	.picker-option.highlighted {
-		/* Distinct, high-contrast state so keyboard users can clearly track
-		   the focused row. Uses the accent glow plus a left border marker. */
 		background: var(--accent-glow);
 		box-shadow: inset 3px 0 0 0 var(--accent);
 	}

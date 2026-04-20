@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { gradeJournalEntry } from '$lib/playgrounds/journal-entry/grader';
+import { gradeJournalEntry } from '$lib/grading/journal-entry';
 import type { JournalLine } from '$lib/playgrounds/journal-entry/types';
 
 describe('gradeJournalEntry', () => {

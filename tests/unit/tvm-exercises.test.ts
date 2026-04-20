@@ -4,7 +4,10 @@ import {
 	solveExercise,
 	renderExercisePrompt
 } from '$lib/playgrounds/tvm/exercises';
-import { gradeNumeric } from '$lib/playgrounds/tvm/grader';
+import { gradeNumeric } from '$lib/grading/numeric';
+
+const tvmOptions = { scoringStrategy: 'binary' as const, scoreScale: 100 as const };
+const tvmGrade = (s: number, c: number) => gradeNumeric(s, c, 0.005, 'relative', tvmOptions);
 
 describe('tvm exercises', () => {
 	it('registers four foundation exercises', () => {
@@ -59,19 +62,19 @@ describe('tvm exercises', () => {
 
 describe('gradeNumeric', () => {
 	it('marks within-tolerance answers correct', () => {
-		const r = gradeNumeric(1000.5, 1000);
+		const r = tvmGrade(1000.5, 1000);
 		expect(r.isCorrect).toBe(true);
 		expect(r.score).toBe(100);
 	});
 
 	it('marks beyond-tolerance answers incorrect', () => {
-		const r = gradeNumeric(1100, 1000);
+		const r = tvmGrade(1100, 1000);
 		expect(r.isCorrect).toBe(false);
 		expect(r.score).toBe(0);
 	});
 
 	it('handles non-finite inputs gracefully', () => {
-		expect(gradeNumeric(NaN, 100).isCorrect).toBe(false);
-		expect(gradeNumeric(100, Infinity).isCorrect).toBe(false);
+		expect(tvmGrade(NaN, 100).isCorrect).toBe(false);
+		expect(tvmGrade(100, Infinity).isCorrect).toBe(false);
 	});
 });

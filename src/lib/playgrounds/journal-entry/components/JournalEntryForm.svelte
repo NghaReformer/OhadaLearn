@@ -3,8 +3,8 @@
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
 	import type { DraftEntry, DraftLine, ValidationError, ValidationResult } from '../types';
-	import AccountPicker from './AccountPicker.svelte';
-	import BalanceIndicator from './BalanceIndicator.svelte';
+	import AccountPicker from '$lib/components/playground/AccountPicker.svelte';
+	import BalanceIndicator from '$lib/components/playground/BalanceIndicator.svelte';
 
 	let {
 		draft,
@@ -134,6 +134,8 @@
 					<AccountPicker
 						value={line.accountKey}
 						onchange={(key) => updateLineAccount(i, key)}
+						placeholder={$t('je.form.account')}
+						ariaLabel={$t('je.form.account')}
 					/>
 				</div>
 				<div class="col-debit" role="cell">
@@ -189,7 +191,14 @@
 	</button>
 
 	<!-- Balance indicator -->
-	<BalanceIndicator {totalDebit} {totalCredit} />
+	<BalanceIndicator
+		{totalDebit}
+		{totalCredit}
+		debitLabel={$t('je.form.debit')}
+		creditLabel={$t('je.form.credit')}
+		balancedLabel={$t('je.form.balanced')}
+		unbalancedLabel={$t('je.form.unbalanced')}
+	/>
 
 	<!-- Validation errors -->
 	{#if validation && !validation.valid && validation.errors.length > 0}

@@ -1,8 +1,13 @@
-import type { JournalLine } from './types';
 import type { Locale } from '$lib/i18n/types';
 import { getAccount } from '$lib/shared/chart-of-accounts';
 import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 import { fmtCurrency } from '$lib/format';
+
+export interface JournalLine {
+	accountKey: string;
+	debit: number;
+	credit: number;
+}
 
 export type FeedbackStatus = 'correct' | 'partial' | 'extra' | 'missing';
 
@@ -20,9 +25,34 @@ export interface LineFeedback {
 }
 
 export interface GradeResult {
-	score: number; // 0-100
+	score: number;
 	isCorrect: boolean;
 	lineResults: LineFeedback[];
+}
+
+export type FeedbackTemplateMap = Record<Locale, Record<FeedbackStatus, string>>;
+
+const DEFAULT_TEMPLATES: FeedbackTemplateMap = {
+	en: {
+		correct: 'Correct — {code} {name}',
+		partial: 'Right account ({name}), but the amount or side is wrong. Expected: {side} {amount}.',
+		missing: 'Missing line: {code} {name} — {side} {amount}.',
+		extra: 'Extra line: {code} {name} is not expected in this entry.',
+	},
+	fr: {
+		correct: 'Correct — {code} {name}',
+		partial:
+			'Compte correct ({name}), mais le montant ou le sens est incorrect. Attendu : {side} {amount}.',
+		missing: 'Ligne manquante : {code} {name} — {side} {amount}.',
+		extra: 'Ligne en trop : {code} {name} n’est pas attendu dans cette écriture.',
+	},
+};
+
+const DEFAULT_KEY_PREFIX = 'je.feedback';
+
+export interface GradeJournalEntryOptions {
+	templates?: FeedbackTemplateMap;
+	feedbackKeyPrefix?: string;
 }
 
 export function gradeJournalEntry(
@@ -31,7 +61,10 @@ export function gradeJournalEntry(
 	framework: AccountingFramework,
 	locale: Locale,
 	currencyCode: string = 'XOF',
+	options: GradeJournalEntryOptions = {},
 ): GradeResult {
+	const templates = options.templates ?? DEFAULT_TEMPLATES;
+	const keyPrefix = options.feedbackKeyPrefix ?? DEFAULT_KEY_PREFIX;
 	const results: LineFeedback[] = [];
 	const unmatchedStudent = [...studentLines];
 	const unmatchedModel = [...modelLines];
@@ -41,11 +74,10 @@ export function gradeJournalEntry(
 		modelLine: JournalLine | null,
 		studentLine: JournalLine | null,
 	): { explanation: string; feedback: FeedbackParts } => {
-		const feedback = buildFeedback(status, modelLine, studentLine, framework, locale, currencyCode);
-		return { feedback, explanation: renderFeedback(feedback, locale) };
+		const feedback = buildFeedback(status, modelLine, studentLine, framework, locale, currencyCode, keyPrefix);
+		return { feedback, explanation: renderFeedback(feedback, locale, templates) };
 	};
 
-	// Pass 1: Exact matches (same account, same side, amount within 1%)
 	for (let i = unmatchedModel.length - 1; i >= 0; i--) {
 		const model = unmatchedModel[i];
 		const studentIdx = unmatchedStudent.findIndex(
@@ -69,7 +101,6 @@ export function gradeJournalEntry(
 		}
 	}
 
-	// Pass 2: Partial matches (same account, wrong amount or wrong side)
 	for (let i = unmatchedModel.length - 1; i >= 0; i--) {
 		const model = unmatchedModel[i];
 		const studentIdx = unmatchedStudent.findIndex((s) => s.accountKey === model.accountKey);
@@ -87,7 +118,6 @@ export function gradeJournalEntry(
 		}
 	}
 
-	// Pass 3: Unmatched lines
 	for (const model of unmatchedModel) {
 		results.push({
 			status: 'missing',
@@ -106,8 +136,6 @@ export function gradeJournalEntry(
 		});
 	}
 
-	// Score: correct = full points, partial = half, extra/missing = 0.
-	// Extra lines expand the denominator so over-posting cannot still earn 100%.
 	const totalLines = modelLines.length;
 	const correctCount = results.filter((r) => r.status === 'correct').length;
 	const partialCount = results.filter((r) => r.status === 'partial').length;
@@ -125,25 +153,13 @@ export function gradeJournalEntry(
 	};
 }
 
-const FEEDBACK_TEMPLATES: Record<Locale, Record<string, string>> = {
-	en: {
-		'je.feedback.correct': 'Correct — {code} {name}',
-		'je.feedback.partial':
-			'Right account ({name}), but the amount or side is wrong. Expected: {side} {amount}.',
-		'je.feedback.missing': 'Missing line: {code} {name} — {side} {amount}.',
-		'je.feedback.extra': 'Extra line: {code} {name} is not expected in this entry.',
-	},
-	fr: {
-		'je.feedback.correct': 'Correct — {code} {name}',
-		'je.feedback.partial':
-			'Compte correct ({name}), mais le montant ou le sens est incorrect. Attendu : {side} {amount}.',
-		'je.feedback.missing': 'Ligne manquante : {code} {name} — {side} {amount}.',
-		'je.feedback.extra': 'Ligne en trop : {code} {name} n’est pas attendu dans cette écriture.',
-	},
-};
-
-function renderFeedback(feedback: FeedbackParts, locale: Locale): string {
-	const template = FEEDBACK_TEMPLATES[locale]?.[feedback.key] ?? feedback.key;
+function renderFeedback(
+	feedback: FeedbackParts,
+	locale: Locale,
+	templates: FeedbackTemplateMap,
+): string {
+	const status = feedback.key.split('.').pop() as FeedbackStatus;
+	const template = templates[locale]?.[status] ?? feedback.key;
 	return template.replace(/\{(\w+)\}/g, (_, name: string) => feedback.params[name] ?? `{${name}}`);
 }
 
@@ -154,6 +170,7 @@ function buildFeedback(
 	framework: AccountingFramework,
 	locale: Locale,
 	currencyCode: string,
+	keyPrefix: string,
 ): FeedbackParts {
 	const getAccountName = (key: string) => {
 		const acc = getAccount(key, framework);
@@ -175,10 +192,12 @@ function buildFeedback(
 				? 'crédit'
 				: 'credit';
 
+	const key = `${keyPrefix}.${status}`;
+
 	switch (status) {
 		case 'correct':
 			return {
-				key: 'je.feedback.correct',
+				key,
 				params: {
 					code: getCode(modelLine!.accountKey),
 					name: getAccountName(modelLine!.accountKey),
@@ -187,7 +206,7 @@ function buildFeedback(
 		case 'partial': {
 			const amount = modelLine!.debit > 0 ? modelLine!.debit : modelLine!.credit;
 			return {
-				key: 'je.feedback.partial',
+				key,
 				params: {
 					code: getCode(modelLine!.accountKey),
 					name: getAccountName(modelLine!.accountKey),
@@ -199,7 +218,7 @@ function buildFeedback(
 		case 'missing': {
 			const amount = modelLine!.debit > 0 ? modelLine!.debit : modelLine!.credit;
 			return {
-				key: 'je.feedback.missing',
+				key,
 				params: {
 					code: getCode(modelLine!.accountKey),
 					name: getAccountName(modelLine!.accountKey),
@@ -210,7 +229,7 @@ function buildFeedback(
 		}
 		case 'extra':
 			return {
-				key: 'je.feedback.extra',
+				key,
 				params: {
 					code: getCode(studentLine!.accountKey),
 					name: getAccountName(studentLine!.accountKey),

@@ -2,7 +2,7 @@
 	import { t } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
 	import { CURRENCIES } from '$lib/format';
-	import NumberField from './NumberField.svelte';
+	import NumberField from '$lib/components/playground/NumberField.svelte';
 	import type { CVPMode } from '../types';
 
 	let {

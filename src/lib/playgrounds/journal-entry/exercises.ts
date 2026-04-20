@@ -8,7 +8,7 @@ import type { ExerciseParameter, ExerciseTemplateFile } from '$lib/content/types
 import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 import type { Locale } from '$lib/i18n/types';
 import type { JournalLine } from './types';
-import { gradeJournalEntry } from './grader';
+import { gradeJournalEntry } from '$lib/grading/journal-entry';
 import { fmtNumber } from '$lib/format';
 
 type ExerciseSolver = (params: Record<string, number>) => JournalLine[];
