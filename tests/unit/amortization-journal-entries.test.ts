@@ -106,10 +106,11 @@ describe('buildLifecycleEntries — conditional stages', () => {
 	});
 
 	it('emits prepayment when a lump sum is scheduled', () => {
+		// prepaymentPenaltyPct is stored as a decimal fraction (0.02 = 2%).
 		const inputs = {
 			...baseInputs,
 			extras: { perPeriod: 0, lumpSum: 500_000, lumpPeriod: 3 },
-			fees: { origination: 0, prepaymentPenaltyPct: 2 },
+			fees: { origination: 0, prepaymentPenaltyPct: 0.02 },
 		};
 		const result = engine.computeSchedule(inputs);
 		const je = engine.buildJournalEntries(inputs, result, 'ohada');
@@ -120,14 +121,71 @@ describe('buildLifecycleEntries — conditional stages', () => {
 	});
 });
 
-describe('buildLifecycleEntries — framework independence', () => {
+describe('buildLifecycleEntries — framework-specific treatments', () => {
 	const engine = new AmortizationEngine();
 
-	it('produces the same entry count across all four frameworks', () => {
+	it('produces the same stage count across all four frameworks', () => {
 		const result = engine.computeSchedule(baseInputs);
 		const count = (fw: 'ohada' | 'pcg' | 'ifrs' | 'usgaap') =>
 			engine.buildJournalEntries(baseInputs, result, fw).entries.length;
 		const counts = [count('ohada'), count('pcg'), count('ifrs'), count('usgaap')];
 		expect(new Set(counts).size).toBe(1);
+	});
+
+	// IFRS 9 / ASC 310-20: origination fee is deferred via effective interest,
+	// not expensed immediately. SYSCOHADA and French PCG: expensed immediately.
+	describe('origination-fee treatment at disbursement', () => {
+		const withFee = {
+			...baseInputs,
+			fees: { origination: 200_000, prepaymentPenaltyPct: 0 },
+		};
+
+		function disbursement(fw: 'ohada' | 'pcg' | 'ifrs' | 'usgaap') {
+			const result = engine.computeSchedule(withFee);
+			const je = engine.buildJournalEntries(withFee, result, fw);
+			return je.entries.find((e) => e.stage === 'disbursement')!;
+		}
+
+		it('SYSCOHADA expenses the fee and credits loan at face value', () => {
+			const d = disbursement('ohada');
+			const feeLine = d.lines.find((l) => l.accountKey === 'externalServices');
+			const loanLine = d.lines.find((l) => l.accountKey === 'bankLoan');
+			expect(feeLine?.debit).toBe(200_000);
+			expect(loanLine?.credit).toBe(10_000_000);
+		});
+
+		it('French PCG expenses the fee and credits loan at face value', () => {
+			const d = disbursement('pcg');
+			const feeLine = d.lines.find((l) => l.accountKey === 'externalServices');
+			const loanLine = d.lines.find((l) => l.accountKey === 'bankLoan');
+			expect(feeLine?.debit).toBe(200_000);
+			expect(loanLine?.credit).toBe(10_000_000);
+		});
+
+		it('IFRS defers the fee — no expense line, loan at net carrying amount', () => {
+			const d = disbursement('ifrs');
+			const feeLine = d.lines.find((l) => l.accountKey === 'externalServices');
+			const loanLine = d.lines.find((l) => l.accountKey === 'bankLoan');
+			expect(feeLine).toBeUndefined();
+			expect(loanLine?.credit).toBe(9_800_000);
+		});
+
+		it('US GAAP defers the fee — no expense line, loan at net carrying amount', () => {
+			const d = disbursement('usgaap');
+			const feeLine = d.lines.find((l) => l.accountKey === 'externalServices');
+			const loanLine = d.lines.find((l) => l.accountKey === 'bankLoan');
+			expect(feeLine).toBeUndefined();
+			expect(loanLine?.credit).toBe(9_800_000);
+		});
+
+		it('disbursement balances under every framework', () => {
+			const frameworks = ['ohada', 'pcg', 'ifrs', 'usgaap'] as const;
+			for (const fw of frameworks) {
+				const d = disbursement(fw);
+				const dr = d.lines.reduce((s, l) => s + l.debit, 0);
+				const cr = d.lines.reduce((s, l) => s + l.credit, 0);
+				expect(dr, `${fw} debits should equal credits`).toBeCloseTo(cr, 2);
+			}
+		});
 	});
 });

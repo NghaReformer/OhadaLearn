@@ -3,7 +3,20 @@
  *
  * Uses Newton-Raphson iteration with a bisection fallback when the
  * derivative is ill-conditioned or the iterate diverges. Returns NaN
- * if no root can be located in the plausible range [-0.99, 10].
+ * if no root can be located in the plausible periodic-rate range
+ * [-0.5, 1.0].
+ *
+ * Bounds kept tight so that Math.pow(1 + rate, n) does not overflow
+ * for very long schedules. At the old lower bound (-0.9999) with
+ * n = 480, Math.pow(0.0001, 480) = 1e-1920 underflows to 0 and
+ * payment / 0 = Infinity, which silently broke the bisection
+ * endpoints. [-0.5, 1.0] is still far wider than any realistic loan
+ * periodic rate (−50% to +100% per period would cover weekly to
+ * quarterly schedules at any plausible APR).
+ *
+ * Newton-Raphson iterates are clamped back into the bracket when
+ * they overshoot, so a bad guess no longer skips straight to the
+ * bisection fallback with potentially infinite endpoints.
  *
  * Cash flows are indexed by period; convention is
  *   flow[0] = initial disbursement (typically negative to the lender,
@@ -13,20 +26,29 @@
 export function irr(cashFlows: number[], guess = 0.05, maxIter = 80, tol = 1e-9): number {
 	if (cashFlows.length < 2) return NaN;
 
+	const RATE_MIN = -0.5;
+	const RATE_MAX = 1.0;
+
 	let rate = guess;
 	for (let i = 0; i < maxIter; i++) {
 		const { npv, dnpv } = npvAndDerivative(cashFlows, rate);
 		if (!Number.isFinite(npv) || !Number.isFinite(dnpv)) break;
 		if (Math.abs(npv) < tol) return rate;
 		if (Math.abs(dnpv) < 1e-14) break;
-		const next = rate - npv / dnpv;
+		let next = rate - npv / dnpv;
 		if (!Number.isFinite(next)) break;
-		if (Math.abs(next - rate) < tol) return next;
+		// Clamp and damp — if Newton overshoots the bracket, pull halfway back
+		// instead of bailing out.
+		if (next <= RATE_MIN) next = (rate + RATE_MIN) / 2;
+		else if (next >= RATE_MAX) next = (rate + RATE_MAX) / 2;
+		// Only declare convergence when BOTH the step is tiny AND npv is small;
+		// a tiny step against a still-large npv means we are pinned at a
+		// clamped bound with no root in the bracket.
+		if (Math.abs(next - rate) < tol && Math.abs(npv) < tol) return next;
 		rate = next;
-		if (rate <= -0.9999 || rate > 10) break;
 	}
 
-	return bisect(cashFlows, -0.9999, 10, tol, 200);
+	return bisect(cashFlows, RATE_MIN, RATE_MAX, tol, 200);
 }
 
 function npvAndDerivative(flows: number[], rate: number): { npv: number; dnpv: number } {

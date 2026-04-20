@@ -31,6 +31,7 @@ export const amortizationFr: TranslationMap = {
 	'am.inputs.method.balloon.desc': 'Annuités puis remboursement forfaitaire',
 
 	// Inputs — dates & day count
+	'am.inputs.dates.title': 'Dates',
 	'am.inputs.startDate': 'Date de déblocage',
 	'am.inputs.firstPaymentDate': 'Première échéance',
 	'am.inputs.dayCount': 'Convention de calcul',
