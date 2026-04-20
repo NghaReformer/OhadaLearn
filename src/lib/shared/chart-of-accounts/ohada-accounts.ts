@@ -79,6 +79,7 @@ export const ohadaAccounts: Map<string, AccountBase> = new Map([
 	a('dividendsPayable', '465', 'Associés, dividendes à payer', 'Dividends Payable', 'liability', 'credit', 'current', 'otherPayables', 'financing', '46'),
 	a('prepaidExpenses', '476', 'Charges constatées d\'avance', 'Prepaid Expenses', 'asset', 'debit', 'current', 'otherReceivables', 'operating', '47'),
 	a('unearnedRevenue', '477', 'Produits constatés d\'avance', 'Unearned Revenue', 'liability', 'credit', 'current', 'otherPayables', 'operating', '47'),
+	a('suspense', '472', 'Comptes d\'attente', 'Suspense Account', 'asset', 'debit', 'current', 'otherReceivables', 'operating', '47'),
 
 	/* ── CLASS 5: Cash ── */
 	a('bank', '521', 'Banque', 'Bank', 'asset', 'debit', 'current', 'cashEquiv', 'operating', '52'),
@@ -97,6 +98,7 @@ export const ohadaAccounts: Map<string, AccountBase> = new Map([
 	a('maintenanceExpense', '624', 'Entretien, réparations et maintenance', 'Maintenance Expense', 'expense', 'debit', 'operating', 'otherOpex', 'operating', '62'),
 	a('insuranceExpense', '625', 'Primes d\'assurance', 'Insurance Expense', 'expense', 'debit', 'operating', 'otherOpex', 'operating', '62'),
 	a('telecomExpense', '626', 'Frais de télécommunications', 'Telecom Expense', 'expense', 'debit', 'operating', 'otherOpex', 'operating', '62'),
+	a('bankServiceCharges', '627', 'Services bancaires et assimilés', 'Bank Service Charges', 'expense', 'debit', 'operating', 'otherOpex', 'operating', '62'),
 	a('taxesAndDuties', '64', 'Impôts et taxes', 'Taxes & Duties', 'expense', 'debit', 'operating', 'otherOpex', 'operating', '6'),
 	a('salaryExpense', '661', 'Rémunérations directes versées au personnel', 'Salary Expense', 'expense', 'debit', 'operating', 'staffCosts', 'operating', '66'),
 	a('socialChargesExpense', '664', 'Charges sociales', 'Social Charges Expense', 'expense', 'debit', 'operating', 'staffCosts', 'operating', '66'),
