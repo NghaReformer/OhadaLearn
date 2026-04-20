@@ -2,7 +2,7 @@ import type { TranslationMap } from '../types';
 
 export const commonFr: TranslationMap = {
 	'nav.home': 'Accueil',
-	'nav.playgrounds': 'Playgrounds',
+	'nav.playgrounds': 'Ateliers',
 	'nav.learn': 'Apprendre',
 	'nav.scenarios': 'Scénarios',
 	'nav.coa': 'Plan comptable',

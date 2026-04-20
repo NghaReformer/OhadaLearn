@@ -60,6 +60,14 @@
 			<span class="kpi-value">{money(kpis.balloonAmount)}</span>
 		</div>
 	{/if}
+	{#if kpis.actualTerm < kpis.requestedTerm}
+		<div class="kpi kpi-warn">
+			<span class="kpi-label">{translate('am.kpis.actualTerm')}</span>
+			<span class="kpi-value">
+				{kpis.actualTerm} / {kpis.requestedTerm}
+			</span>
+		</div>
+	{/if}
 </div>
 
 <style>

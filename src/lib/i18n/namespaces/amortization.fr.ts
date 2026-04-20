@@ -87,6 +87,7 @@ export const amortizationFr: TranslationMap = {
 	'am.kpis.effectiveRate': 'Taux effectif annuel',
 	'am.kpis.ratio': 'Intérêts / Capital',
 	'am.kpis.balloonAmount': 'Montant ballon',
+	'am.kpis.actualTerm': 'Durée effective (réelle / saisie)',
 
 	// Schedule table
 	'am.schedule.title': "Tableau d'amortissement",

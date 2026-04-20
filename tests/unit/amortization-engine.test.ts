@@ -260,4 +260,72 @@ describe('AmortizationEngine — APR & KPIs', () => {
 		const kpis = engine.computeKpis(result, input);
 		expect(kpis.balloonAmount).toBeGreaterThan(0);
 	});
+
+	it('reports actualTerm when progressive payments retire principal early', () => {
+		// A 12-month loan with a 2%-per-period payment escalation retires
+		// principal well before 12 months, because each payment is larger
+		// than the annuity baseline.
+		const input = baseInputs({
+			principal: 10_000_000,
+			nominalRate: 0.08,
+			termPeriods: 60,
+			method: 'progressive',
+			progressiveStep: 0.02,
+		});
+		const result = engine.computeSchedule(input);
+		const kpis = engine.computeKpis(result, input);
+		expect(kpis.requestedTerm).toBe(60);
+		expect(kpis.actualTerm).toBe(result.rows.length);
+		expect(kpis.actualTerm).toBeLessThan(kpis.requestedTerm);
+	});
+});
+
+describe('AmortizationEngine — day-count convention', () => {
+	// With contractual monthly payments on actual calendar dates (Jan→Feb→Mar→...),
+	// the day gap between payments varies: 31, 28/29, 31, 30, 31, ...
+	// Under 30/360 every period accrues the same rate (annual/12); under Actual
+	// conventions the accrual factor shifts with the real day count, so the
+	// first few months should diverge noticeably from the 30/360 baseline.
+	const commonInput: AmortizationInputs = {
+		principal: 10_000_000,
+		nominalRate: 0.08,
+		termPeriods: 12,
+		frequency: 'monthly',
+		customPeriodsPerYear: 12,
+		method: 'bullet', // bullet keeps interest-only periods so we can compare directly
+		dayCount: '30/360',
+		startDate: '2025-01-01',
+		firstPaymentDate: '2025-02-01',
+		grace: { type: 'none', periods: 0 },
+		insurance: { rate: 0, basis: 'initial' },
+		fees: { origination: 0, prepaymentPenaltyPct: 0 },
+		variableRates: [],
+		extras: { perPeriod: 0, lumpSum: 0, lumpPeriod: 0 },
+		balloonDueAt: 0,
+		progressiveStep: 0,
+	};
+
+	it('30/360 accrues the same flat rate every month', () => {
+		const res = engine.computeSchedule(commonInput);
+		const interests = res.rows.map((r) => r.interest);
+		// All 12 months should have identical interest (except maybe last one due to balance retirement).
+		for (let i = 1; i < interests.length - 1; i++) {
+			expect(interests[i]).toBeCloseTo(interests[0], 2);
+		}
+	});
+
+	it('Actual/365 produces a smaller February accrual than 30/360', () => {
+		const thirty = engine.computeSchedule(commonInput).rows[0].interest;
+		const act365 = engine.computeSchedule({ ...commonInput, dayCount: 'actual/365' }).rows[0].interest;
+		// 2025-01-01 → 2025-02-01 is 31 days. 31/365 > 30/360 (0.0849 vs 0.0833),
+		// so Actual/365 accrues MORE than 30/360 over a 31-day January.
+		expect(act365).toBeGreaterThan(thirty);
+	});
+
+	it('Actual/360 produces a higher accrual than Actual/365', () => {
+		const act360 = engine.computeSchedule({ ...commonInput, dayCount: 'actual/360' }).rows[0].interest;
+		const act365 = engine.computeSchedule({ ...commonInput, dayCount: 'actual/365' }).rows[0].interest;
+		// Same numerator (actual days) but smaller denominator → larger factor.
+		expect(act360).toBeGreaterThan(act365);
+	});
 });

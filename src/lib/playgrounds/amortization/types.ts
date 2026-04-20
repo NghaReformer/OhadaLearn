@@ -106,6 +106,13 @@ export interface AmortizationKpis {
 	effectiveAnnualRate: number;
 	interestToPrincipalRatio: number;
 	balloonAmount: number | null;
+	/** Requested term (as entered by the user). */
+	requestedTerm: number;
+	/** Actual rows produced — for Progressive/Bullet with escalating payments
+	 *  this can be shorter than `requestedTerm` when the principal is retired
+	 *  early. The UI surfaces this when it differs from requestedTerm so the
+	 *  user doesn't silently receive a different term than they asked for. */
+	actualTerm: number;
 }
 
 export type SolveFor = 'payment' | 'principal' | 'rate' | 'term';

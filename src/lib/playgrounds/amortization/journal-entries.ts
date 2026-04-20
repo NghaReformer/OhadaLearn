@@ -8,6 +8,7 @@ import type {
 	LifecycleJournalEntry,
 	LifecycleStage,
 } from './types';
+import { irr } from '$lib/finance/irr';
 
 function firstRegularRow(result: AmortizationResult): AmortizationScheduleRow | null {
 	return (
@@ -98,11 +99,39 @@ export function buildLifecycleEntries(
 	entries.push(entry('disbursement', disbursementLines, loanRecognized));
 
 	// ── 2. Periodic payment ──────────────────────────────────────────
+	// Framework divergence #2: under IFRS 9 and ASC 310-20 the first-period
+	// interest expense is computed on the NET CARRYING AMOUNT using the
+	// effective interest rate (EIR), not on face principal at the nominal
+	// rate. The reviewer called this out as a material teaching error when
+	// only disbursement was fixed — so we also recompute the interest /
+	// principal split shown in the periodic journal entry when:
+	//   (a) the framework is IFRS or US GAAP, AND
+	//   (b) an origination fee was deferred (otherwise nominal = effective).
 	const regularRow = firstRegularRow(result);
 	if (regularRow) {
-		const interest = round(regularRow.interest);
-		const principal = round(regularRow.principal);
+		let interest = round(regularRow.interest);
+		let principal = round(regularRow.principal);
 		const total = round(interest + principal);
+
+		if (deferFee && originationFee > 0) {
+			// Solve for the monthly EIR by IRR on the borrower's real cash flows:
+			// net cash in at disbursement, then the contractual payment stream.
+			const cashFlows: number[] = [netCash];
+			for (const r of result.rows) cashFlows.push(-r.totalPayment);
+			const eirPeriodic = irr(cashFlows);
+			if (Number.isFinite(eirPeriodic) && eirPeriodic > 0) {
+				// Opening carrying amount at period 1 = netCash.
+				// Interest (IFRS/US GAAP) = opening carrying × EIR.
+				const eirInterest = round(netCash * eirPeriodic);
+				// Preserve cash outflow equal to the contractual payment.
+				const eirPrincipal = round(total - eirInterest);
+				if (eirInterest > 0 && eirPrincipal >= 0) {
+					interest = eirInterest;
+					principal = eirPrincipal;
+				}
+			}
+		}
+
 		const periodicLines: JournalEntryLine[] = [];
 		if (interest > 0) {
 			periodicLines.push({ accountKey: 'interestExpense', debit: interest, credit: 0 });

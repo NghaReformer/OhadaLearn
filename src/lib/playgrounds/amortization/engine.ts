@@ -46,6 +46,8 @@ export class AmortizationEngine {
 			effectiveAnnualRate,
 			interestToPrincipalRatio: ratio,
 			balloonAmount: balloonRow ? balloonRow.closingBalance + balloonRow.principal : null,
+			requestedTerm: input.termPeriods,
+			actualTerm: result.rows.length,
 		};
 	}
 
@@ -102,7 +104,7 @@ export class AmortizationEngine {
 
 		for (let i = 0; i < remainingPeriods; i++) {
 			const period = startPeriod + i;
-			const rateForPeriod = rateAtPeriod(period, input, r);
+			const rateForPeriod = periodRateFor(period, input, dates);
 			const interest = balance * rateForPeriod;
 			let principalPortion = currentPmt - interest;
 			if (principalPortion < 0) principalPortion = 0;
@@ -147,7 +149,7 @@ export class AmortizationEngine {
 
 		for (let i = 0; i < remainingPeriods; i++) {
 			const period = startPeriod + i;
-			const rateForPeriod = rateAtPeriod(period, input, r);
+			const rateForPeriod = periodRateFor(period, input, dates);
 			const interest = balance * rateForPeriod;
 			const row = this.buildRow({
 				period,
@@ -180,7 +182,7 @@ export class AmortizationEngine {
 		const dates = buildPaymentDates(input);
 
 		for (let period = 1; period <= input.termPeriods; period++) {
-			const rateForPeriod = rateAtPeriod(period, input, r);
+			const rateForPeriod = periodRateFor(period, input, dates);
 			const interest = balance * rateForPeriod;
 			const isFinal = period === input.termPeriods;
 			const principalPortion = isFinal ? balance : 0;
@@ -240,7 +242,7 @@ export class AmortizationEngine {
 
 		for (let i = 0; i < remainingPeriods && balance > EPSILON; i++) {
 			const period = startPeriod + i;
-			const rateForPeriod = rateAtPeriod(period, input, baseRate);
+			const rateForPeriod = periodRateFor(period, input, dates);
 			const rateChanged = rateForPeriod !== lastRate && i > 0;
 			if (rateChanged) {
 				currentPmt = pmt(balance, rateForPeriod, remainingPeriods - i);
@@ -291,7 +293,7 @@ export class AmortizationEngine {
 		let balance = startingBalance;
 
 		for (let period = 1; period <= input.grace.periods; period++) {
-			const rateForPeriod = rateAtPeriod(period, input, baseRate);
+			const rateForPeriod = periodRateFor(period, input, dates);
 			const interest = balance * rateForPeriod;
 			const insurance = this.insuranceFor(period, input, balance);
 			const row: AmortizationScheduleRow = {
@@ -447,6 +449,43 @@ export function rateAtPeriod(
 		if (period >= row.fromPeriod) rate = row.newRate / pPerYear;
 	}
 	return rate;
+}
+
+/**
+ * Resolve the periodic interest rate for an accrual window, honouring the
+ * day-count convention on the input. For 30/360 (and whenever the dates are
+ * unavailable) this falls back to `annualRate / periodsPerYear` — identical
+ * to the pre-day-count behaviour, which is how a classical 30/360 fixed-
+ * payment amortising loan accrues. For Actual/365, Actual/360, and
+ * Actual/Actual we use `yearFraction(prev, curr, dayCount) × annualRate`
+ * so the rate actually shifts with the calendar-day gap between payments,
+ * producing different February-period interest under Actual/Actual, etc.
+ *
+ * Variable-rate resets apply on top: the annual rate used for a period is
+ * the most-recent `variableRates[k].newRate` whose `fromPeriod ≤ period`.
+ */
+export function periodRateFor(
+	period: number,
+	input: AmortizationInputs,
+	dates: string[],
+): number {
+	// 1. Determine the active annual rate (with variable-rate resets).
+	let annualRate = input.nominalRate;
+	if (input.variableRates && input.variableRates.length > 0) {
+		for (const row of input.variableRates) {
+			if (period >= row.fromPeriod) annualRate = row.newRate;
+		}
+	}
+	// 2. 30/360 → classical periodic rate. No dates needed.
+	const pPerYear = periodsPerYear(input.frequency, input.customPeriodsPerYear);
+	if (input.dayCount === '30/360') return annualRate / pPerYear;
+	// 3. Actual conventions need valid period endpoints (ISO strings).
+	const prevDateStr = period === 1 ? input.startDate : dates[period - 2];
+	const currDateStr = dates[period - 1];
+	if (!prevDateStr || !currDateStr) return annualRate / pPerYear;
+	const yf = yearFraction(prevDateStr, currDateStr, input.dayCount);
+	if (!Number.isFinite(yf) || yf <= 0) return annualRate / pPerYear;
+	return annualRate * yf;
 }
 
 export function buildPaymentDates(input: AmortizationInputs): string[] {

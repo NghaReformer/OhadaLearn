@@ -87,6 +87,7 @@ export const amortizationEn: TranslationMap = {
 	'am.kpis.effectiveRate': 'Effective Annual Rate',
 	'am.kpis.ratio': 'Interest / Principal',
 	'am.kpis.balloonAmount': 'Balloon Amount',
+	'am.kpis.actualTerm': 'Actual Term (used / entered)',
 
 	// Schedule table
 	'am.schedule.title': 'Amortization Schedule',

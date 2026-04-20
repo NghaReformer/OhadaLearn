@@ -112,9 +112,12 @@
 				<tbody>
 					{#each currentEntry.lines as line, i (i)}
 						{@const acc = accountLabel(line.accountKey)}
+						{@const hasCode = acc.code && acc.code !== '-' && acc.code !== '—'}
 						<tr class="lc-row" class:lc-row-credit={line.credit > 0}>
 							<td class="lc-td lc-td-account">
-								<span class="lc-code">{acc.code}</span>
+								{#if hasCode}
+									<span class="lc-code">{acc.code}</span>
+								{/if}
 								<span class="lc-name">{acc.name}</span>
 							</td>
 							<td class="lc-td lc-td-num lc-td-debit">{money(line.debit)}</td>
