@@ -30,6 +30,20 @@
 		entries.entries.find((e) => e.stage === selectedStage) ?? entries.entries[0] ?? null,
 	);
 
+	// Keep the parent's selectedStage in sync with what we're actually rendering.
+	// If the user selected a stage (e.g. Prepayment) and then edited an input
+	// that removed that stage (e.g. set lumpSum back to 0), selectedStage would
+	// still be "prepayment" in the parent state while the panel silently falls
+	// back to entries[0]. That leaves no stage tab highlighted, making the
+	// displayed content look orphaned from the tab bar — the "narration drift"
+	// symptom flagged in the QA review.
+	$effect(() => {
+		if (!currentEntry) return;
+		if (currentEntry.stage !== selectedStage) {
+			onSelectStage(currentEntry.stage);
+		}
+	});
+
 	let totals = $derived.by(() => {
 		if (!currentEntry) return { debit: 0, credit: 0 };
 		let d = 0;
