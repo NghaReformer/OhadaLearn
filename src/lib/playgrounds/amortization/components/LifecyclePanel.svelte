@@ -30,19 +30,14 @@
 		entries.entries.find((e) => e.stage === selectedStage) ?? entries.entries[0] ?? null,
 	);
 
-	// Keep the parent's selectedStage in sync with what we're actually rendering.
-	// If the user selected a stage (e.g. Prepayment) and then edited an input
-	// that removed that stage (e.g. set lumpSum back to 0), selectedStage would
-	// still be "prepayment" in the parent state while the panel silently falls
-	// back to entries[0]. That leaves no stage tab highlighted, making the
-	// displayed content look orphaned from the tab bar — the "narration drift"
-	// symptom flagged in the QA review.
-	$effect(() => {
-		if (!currentEntry) return;
-		if (currentEntry.stage !== selectedStage) {
-			onSelectStage(currentEntry.stage);
-		}
-	});
+	// Stage actually rendered in the table + narration. If the user selected
+	// a stage (e.g. Prepayment) that has since disappeared from `entries`
+	// because an input change removed its trigger (lumpSum back to 0), we
+	// fall back to entries[0] — and the tab bar should light THAT tab up,
+	// not the now-orphaned selection the parent state still holds.
+	// Deriving the active-highlight from the rendered entry keeps the tab
+	// bar and the table in sync without a side-effect that could loop.
+	let activeStage = $derived(currentEntry?.stage ?? selectedStage);
 
 	let totals = $derived.by(() => {
 		if (!currentEntry) return { debit: 0, credit: 0 };
@@ -98,9 +93,9 @@
 				<button
 					type="button"
 					role="tab"
-					aria-selected={selectedStage === e.stage}
+					aria-selected={activeStage === e.stage}
 					class="lc-stage"
-					class:active={selectedStage === e.stage}
+					class:active={activeStage === e.stage}
 					onclick={() => onSelectStage(e.stage)}
 				>
 					{translate(e.labelKey as never)}
