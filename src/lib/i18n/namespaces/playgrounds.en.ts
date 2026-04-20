@@ -20,4 +20,6 @@ export const playgroundsEn: TranslationMap = {
 	'playgrounds.exit_fullscreen': 'Exit Fullscreen',
 	'pg.journal-entry.title': 'Journal Entries',
 	'pg.journal-entry.desc': 'Journal Entries playground.',
+	'pg.bank-reconciliation.title': 'Bank Reconciliation',
+	'pg.bank-reconciliation.desc': 'Reconcile bank statements with the ledger using the SYSCOHADA two-column method.',
 };

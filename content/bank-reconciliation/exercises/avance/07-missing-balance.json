@@ -1,0 +1,25 @@
+{
+  "id": "missing-balance",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "avance",
+  "template": {
+    "promptKey": "br.exercise.missingBalance.prompt",
+    "parameters": [
+      { "name": "bookBalance", "type": "currency", "min": 1000000, "max": 5000000, "step": 100000 },
+      { "name": "bankCharge", "type": "currency", "min": 1000, "max": 10000, "step": 500 },
+      { "name": "depositInTransit", "type": "currency", "min": 30000, "max": 200000, "step": 10000 },
+      { "name": "outstandingCheck", "type": "currency", "min": 20000, "max": 150000, "step": 10000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "missingBankBalance",
+    "answerType": "numeric",
+    "tolerance": 0.001,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.missingBalance.correct",
+    "incorrect": "br.exercise.missingBalance.incorrect"
+  }
+}

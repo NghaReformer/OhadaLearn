@@ -20,4 +20,6 @@ export const playgroundsFr: TranslationMap = {
 	'playgrounds.exit_fullscreen': 'Quitter le plein écran',
 	'pg.journal-entry.title': 'Écritures Comptables',
 	'pg.journal-entry.desc': 'Calculateur de écritures comptables.',
+	'pg.bank-reconciliation.title': 'Rapprochement Bancaire',
+	'pg.bank-reconciliation.desc': 'Rapprocher le relevé bancaire et le grand-livre selon la méthode SYSCOHADA à deux colonnes.',
 };

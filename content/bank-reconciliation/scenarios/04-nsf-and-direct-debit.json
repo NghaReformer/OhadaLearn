@@ -1,0 +1,21 @@
+{
+  "slug": "nsfDirectDebit",
+  "titleKey": "br.scenario.nsfDirectDebit.title",
+  "descKey": "br.scenario.nsfDirectDebit.desc",
+  "presetValues": {
+    "inputs": {
+      "periodEnd": "2026-04-30",
+      "openingBankBalance": 1500000,
+      "closingBankBalance": 1380000,
+      "openingBookBalance": 1500000,
+      "closingBookBalance": 1500000,
+      "bankTransactions": [
+        { "id": "nsf-1", "date": "2026-04-25", "description": "Chèque client impayé — Customer Alpha", "amount": -75000, "cleared": true },
+        { "id": "dd-1", "date": "2026-04-28", "description": "Prélèvement automatique électricité", "amount": -45000, "cleared": true }
+      ],
+      "ledgerEntries": [],
+      "manualMatches": [],
+      "manualClassifications": {}
+    }
+  }
+}

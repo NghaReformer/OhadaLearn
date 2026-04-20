@@ -1,0 +1,24 @@
+{
+  "id": "multi-month-roll",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "avance",
+  "template": {
+    "promptKey": "br.exercise.multiMonth.prompt",
+    "parameters": [
+      { "name": "priorOutstandingCheck", "type": "currency", "min": 20000, "max": 150000, "step": 5000 },
+      { "name": "priorDepositInTransit", "type": "currency", "min": 30000, "max": 200000, "step": 10000 },
+      { "name": "currentBankCharge", "type": "currency", "min": 1000, "max": 10000, "step": 500 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "multiMonthAdjusted",
+    "answerType": "numeric",
+    "tolerance": 0.001,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.multiMonth.correct",
+    "incorrect": "br.exercise.multiMonth.incorrect"
+  }
+}

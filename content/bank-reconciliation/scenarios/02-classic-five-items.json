@@ -1,0 +1,26 @@
+{
+  "slug": "classic5",
+  "titleKey": "br.scenario.classic5.title",
+  "descKey": "br.scenario.classic5.desc",
+  "presetValues": {
+    "inputs": {
+      "periodEnd": "2026-04-30",
+      "openingBankBalance": 2000000,
+      "closingBankBalance": 1850000,
+      "openingBookBalance": 2000000,
+      "closingBookBalance": 1885000,
+      "bankTransactions": [
+        { "id": "ch-1", "date": "2026-04-30", "description": "Frais de tenue de compte", "amount": -5000, "cleared": true },
+        { "id": "int-1", "date": "2026-04-30", "description": "Interest credited", "amount": 8000, "cleared": true },
+        { "id": "match-1", "date": "2026-04-15", "description": "Wire payment", "amount": 200000, "reference": "WIRE-001", "cleared": true }
+      ],
+      "ledgerEntries": [
+        { "id": "match-2", "date": "2026-04-15", "description": "Wire from customer", "amount": 200000, "reference": "WIRE-001", "recorded": true },
+        { "id": "dit-1", "date": "2026-04-29", "description": "Customer deposit", "amount": 75000, "recorded": true },
+        { "id": "os-1", "date": "2026-04-27", "description": "Check #2055 to vendor", "amount": -40000, "reference": "2055", "recorded": true }
+      ],
+      "manualMatches": [],
+      "manualClassifications": {}
+    }
+  }
+}

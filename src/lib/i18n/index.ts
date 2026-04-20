@@ -67,6 +67,8 @@ import { cvpEn } from './namespaces/cvp.en';
 import { cvpFr } from './namespaces/cvp.fr';
 import { amortizationEn } from './namespaces/amortization.en';
 import { amortizationFr } from './namespaces/amortization.fr';
+import { bankReconciliationEn } from './namespaces/bank-reconciliation.en';
+import { bankReconciliationFr } from './namespaces/bank-reconciliation.fr';
 
 registerNamespace('common', { en: commonEn, fr: commonFr });
 registerNamespace('landing', { en: landingEn, fr: landingFr });
@@ -75,3 +77,4 @@ registerNamespace('journal-entry', { en: journalEntryEn, fr: journalEntryFr });
 registerNamespace('tvm', { en: tvmEn, fr: tvmFr });
 registerNamespace('cvp', { en: cvpEn, fr: cvpFr });
 registerNamespace('amortization', { en: amortizationEn, fr: amortizationFr });
+registerNamespace('bank-reconciliation', { en: bankReconciliationEn, fr: bankReconciliationFr });

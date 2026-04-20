@@ -1,0 +1,24 @@
+{
+  "id": "outstanding-checks",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "br.exercise.outstandingChecks.prompt",
+    "parameters": [
+      { "name": "check1", "type": "currency", "min": 10000, "max": 100000, "step": 2500 },
+      { "name": "check2", "type": "currency", "min": 10000, "max": 100000, "step": 2500 },
+      { "name": "check3", "type": "currency", "min": 10000, "max": 100000, "step": 2500 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "outstandingChecksTotal",
+    "answerType": "numeric",
+    "tolerance": 1,
+    "toleranceType": "absolute",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.outstandingChecks.correct",
+    "incorrect": "br.exercise.outstandingChecks.incorrect"
+  }
+}

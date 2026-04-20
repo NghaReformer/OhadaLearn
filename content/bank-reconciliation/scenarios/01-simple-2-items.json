@@ -1,0 +1,21 @@
+{
+  "slug": "simple2",
+  "titleKey": "br.scenario.simple2.title",
+  "descKey": "br.scenario.simple2.desc",
+  "presetValues": {
+    "inputs": {
+      "periodEnd": "2026-04-30",
+      "openingBankBalance": 1000000,
+      "closingBankBalance": 500000,
+      "openingBookBalance": 1000000,
+      "closingBookBalance": 520000,
+      "bankTransactions": [],
+      "ledgerEntries": [
+        { "id": "dit-1", "date": "2026-04-29", "description": "Customer deposit", "amount": 50000, "recorded": true },
+        { "id": "os-1", "date": "2026-04-28", "description": "Check #1042 to supplier", "amount": -30000, "reference": "1042", "recorded": true }
+      ],
+      "manualMatches": [],
+      "manualClassifications": {}
+    }
+  }
+}

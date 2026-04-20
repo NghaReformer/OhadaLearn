@@ -54,4 +54,12 @@ export const playgrounds: PlaygroundMeta[] = [
 		category: 'financial-accounting',
 		lineCount: 3085,
 	},
+	{
+		slug: 'bank-reconciliation',
+		titleKey: 'pg.bank-reconciliation.title',
+		descKey: 'pg.bank-reconciliation.desc',
+		icon: '🏧',
+		category: 'financial-accounting',
+		lineCount: 0,
+	},
 ];

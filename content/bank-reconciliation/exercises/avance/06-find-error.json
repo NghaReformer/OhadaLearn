@@ -1,0 +1,23 @@
+{
+  "id": "find-error",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "avance",
+  "template": {
+    "promptKey": "br.exercise.findError.prompt",
+    "parameters": [
+      { "name": "seed", "type": "periods", "min": 1, "max": 100, "step": 1 },
+      { "name": "errorAmount", "type": "currency", "min": 5000, "max": 50000, "step": 1000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "findErrorItem",
+    "answerType": "id",
+    "tolerance": 0,
+    "toleranceType": "absolute",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.findError.correct",
+    "incorrect": "br.exercise.findError.incorrect"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "slug": "bankErrorFlag",
+  "titleKey": "br.scenario.bankErrorFlag.title",
+  "descKey": "br.scenario.bankErrorFlag.desc",
+  "presetValues": {
+    "inputs": {
+      "periodEnd": "2026-04-30",
+      "openingBankBalance": 1000000,
+      "closingBankBalance": 985000,
+      "openingBookBalance": 1000000,
+      "closingBookBalance": 1000000,
+      "bankTransactions": [
+        { "id": "err-1", "date": "2026-04-22", "description": "Débit erroné — opération non autorisée", "amount": -15000, "cleared": true }
+      ],
+      "ledgerEntries": [],
+      "manualMatches": [],
+      "manualClassifications": { "err-1": "bank-error" }
+    }
+  }
+}

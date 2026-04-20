@@ -1,0 +1,22 @@
+{
+  "id": "classify-items",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "br.exercise.classify.prompt",
+    "parameters": [
+      { "name": "seed", "type": "periods", "min": 1, "max": 100, "step": 1 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "classifyItems",
+    "answerType": "categories",
+    "tolerance": 0,
+    "toleranceType": "absolute",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.classify.correct",
+    "incorrect": "br.exercise.classify.incorrect"
+  }
+}

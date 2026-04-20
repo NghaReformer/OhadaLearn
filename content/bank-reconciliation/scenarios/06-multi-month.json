@@ -1,0 +1,23 @@
+{
+  "slug": "multiMonth",
+  "titleKey": "br.scenario.multiMonth.title",
+  "descKey": "br.scenario.multiMonth.desc",
+  "presetValues": {
+    "inputs": {
+      "periodEnd": "2026-05-31",
+      "openingBankBalance": 1850000,
+      "closingBankBalance": 1900000,
+      "openingBookBalance": 1885000,
+      "closingBookBalance": 1925000,
+      "bankTransactions": [
+        { "id": "carry-os", "date": "2026-05-03", "description": "Check #2055 cleared (carryforward)", "amount": -40000, "reference": "2055", "cleared": true },
+        { "id": "ch-2", "date": "2026-05-31", "description": "Frais bancaires", "amount": -2500, "cleared": true }
+      ],
+      "ledgerEntries": [
+        { "id": "dit-2", "date": "2026-05-30", "description": "Customer deposit (May)", "amount": 92500, "recorded": true }
+      ],
+      "manualMatches": [],
+      "manualClassifications": {}
+    }
+  }
+}

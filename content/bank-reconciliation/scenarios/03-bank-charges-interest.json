@@ -1,0 +1,21 @@
+{
+  "slug": "bankChargesInterest",
+  "titleKey": "br.scenario.bankChargesInterest.title",
+  "descKey": "br.scenario.bankChargesInterest.desc",
+  "presetValues": {
+    "inputs": {
+      "periodEnd": "2026-04-30",
+      "openingBankBalance": 800000,
+      "closingBankBalance": 803500,
+      "openingBookBalance": 800000,
+      "closingBookBalance": 800000,
+      "bankTransactions": [
+        { "id": "ch-1", "date": "2026-04-30", "description": "Frais bancaires mensuels", "amount": -1500, "cleared": true },
+        { "id": "int-1", "date": "2026-04-30", "description": "Intérêts créditeurs trimestriels", "amount": 5000, "cleared": true }
+      ],
+      "ledgerEntries": [],
+      "manualMatches": [],
+      "manualClassifications": {}
+    }
+  }
+}

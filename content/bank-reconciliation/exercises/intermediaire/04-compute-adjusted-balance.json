@@ -1,0 +1,25 @@
+{
+  "id": "compute-adjusted-balance",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "br.exercise.adjustedBalance.prompt",
+    "parameters": [
+      { "name": "statementBalance", "type": "currency", "min": 1000000, "max": 5000000, "step": 100000 },
+      { "name": "depositInTransit", "type": "currency", "min": 30000, "max": 250000, "step": 10000 },
+      { "name": "outstandingChecks", "type": "currency", "min": 20000, "max": 200000, "step": 10000 },
+      { "name": "bankError", "type": "currency", "min": 0, "max": 50000, "step": 5000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "adjustedBankBalance",
+    "answerType": "numeric",
+    "tolerance": 0.001,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.adjustedBalance.correct",
+    "incorrect": "br.exercise.adjustedBalance.incorrect"
+  }
+}

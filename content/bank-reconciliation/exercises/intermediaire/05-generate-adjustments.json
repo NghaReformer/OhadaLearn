@@ -1,0 +1,24 @@
+{
+  "id": "generate-adjustments",
+  "playgroundSlug": "bank-reconciliation",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "br.exercise.adjustments.prompt",
+    "parameters": [
+      { "name": "bankCharge", "type": "currency", "min": 1000, "max": 10000, "step": 500 },
+      { "name": "interest", "type": "currency", "min": 1000, "max": 15000, "step": 500 },
+      { "name": "nsfAmount", "type": "currency", "min": 20000, "max": 150000, "step": 5000 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "buildAdjustments",
+    "answerType": "journal-entries",
+    "tolerance": 1,
+    "toleranceType": "absolute",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "br.exercise.adjustments.correct",
+    "incorrect": "br.exercise.adjustments.incorrect"
+  }
+}

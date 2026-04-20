@@ -6,8 +6,8 @@ import { isRegistered } from '$lib/playgrounds/_registry';
 import '$lib/playgrounds';
 
 describe('playground catalog data', () => {
-	it('has 5 playgrounds', () => {
-		expect(playgrounds).toHaveLength(5);
+	it('has 6 playgrounds', () => {
+		expect(playgrounds).toHaveLength(6);
 	});
 
 	it('each playground has required fields', () => {
