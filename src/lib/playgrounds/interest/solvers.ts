@@ -228,3 +228,126 @@ export function solveBondFaceValue(
 		hi: issuePriceTarget * 4,
 	});
 }
+
+// ── Per-period row solvers (contextual goal-seek from schedule cells) ────
+//
+// Generic strategy: take a function that extracts a numeric value from a
+// specific row (by index) of a schedule, and bisect over an input variable
+// until that extracted value matches the target.
+
+export type SimpleRowKey = 'interestThisPeriod' | 'cumulativeInterest' | 'cumulativeTotal';
+export type CompoundRowKey =
+	| 'interestThisPeriod'
+	| 'balanceStart'
+	| 'balanceEnd'
+	| 'cumulativeInterestOnPrincipal'
+	| 'cumulativeInterestOnInterest';
+export type BondRowKey =
+	| 'openingCarryingAmount'
+	| 'cashInterest'
+	| 'interestExpense'
+	| 'discountAmortisation'
+	| 'closingCarryingAmount';
+
+export type SimpleVariable = 'nominalRate' | 'principal' | 'years';
+export type CompoundVariable = 'nominalRate' | 'principal' | 'years';
+export type BondVariable = 'marketRate' | 'couponRate' | 'faceValue' | 'termYears';
+
+export function solveSimpleCell(
+	inputs: InterestInputs,
+	rowIndex: number,
+	colKey: SimpleRowKey,
+	target: number,
+	variable: SimpleVariable,
+): SolveResult {
+	const startMs = new Date(inputs.startDate + 'T00:00:00Z').getTime();
+	const evaluate = (x: number): number => {
+		let patched: InterestInputs = inputs;
+		if (variable === 'nominalRate') patched = { ...inputs, nominalRate: x };
+		else if (variable === 'principal') patched = { ...inputs, principal: x };
+		else if (variable === 'years') {
+			const endMs = startMs + Math.max(x, 0.01) * 365.25 * 86400000;
+			patched = { ...inputs, endDate: new Date(endMs).toISOString().slice(0, 10) };
+		}
+		const result = engine.simple(patched);
+		const row = result.perPeriod[Math.min(rowIndex, result.perPeriod.length - 1)];
+		return row ? row[colKey] : 0;
+	};
+	const bounds = boundsForVariable(variable, inputs.principal);
+	return bisect({ evaluate, target, lo: bounds[0], hi: bounds[1] });
+}
+
+export function solveCompoundCell(
+	inputs: InterestInputs,
+	rowIndex: number,
+	colKey: CompoundRowKey,
+	target: number,
+	variable: CompoundVariable,
+): SolveResult {
+	const startMs = new Date(inputs.startDate + 'T00:00:00Z').getTime();
+	const evaluate = (x: number): number => {
+		let patched: InterestInputs = inputs;
+		if (variable === 'nominalRate') patched = { ...inputs, nominalRate: x };
+		else if (variable === 'principal') patched = { ...inputs, principal: x };
+		else if (variable === 'years') {
+			const endMs = startMs + Math.max(x, 0.01) * 365.25 * 86400000;
+			patched = { ...inputs, endDate: new Date(endMs).toISOString().slice(0, 10) };
+		}
+		const result = engine.compound(patched);
+		const row = result.perPeriod[Math.min(rowIndex, result.perPeriod.length - 1)];
+		return row ? row[colKey] : 0;
+	};
+	const bounds = boundsForVariable(variable, inputs.principal);
+	return bisect({ evaluate, target, lo: bounds[0], hi: bounds[1] });
+}
+
+export type BondMethod = 'straight-line' | 'eir';
+
+export function solveBondCell(
+	bond: BondInputs,
+	method: BondMethod,
+	rowIndex: number,
+	colKey: BondRowKey,
+	target: number,
+	variable: BondVariable,
+): SolveResult {
+	const evaluate = (x: number): number => {
+		let patched: BondInputs = bond;
+		if (variable === 'marketRate') patched = { ...bond, marketRate: Math.max(0.0001, x) };
+		else if (variable === 'couponRate') patched = { ...bond, couponRate: Math.max(0, x) };
+		else if (variable === 'faceValue') patched = { ...bond, faceValue: Math.max(1, x) };
+		else if (variable === 'termYears') patched = { ...bond, termYears: Math.max(0.5, x) };
+		const schedule = engine.buildSchedule(patched, method);
+		const row = schedule.rows[Math.min(rowIndex, schedule.rows.length - 1)];
+		return row ? row[colKey] : 0;
+	};
+	const bounds = boundsForBondVariable(variable, bond.faceValue);
+	return bisect({ evaluate, target, lo: bounds[0], hi: bounds[1] });
+}
+
+function boundsForVariable(variable: SimpleVariable, basePrincipal: number): [number, number] {
+	switch (variable) {
+		case 'nominalRate':
+			return [-0.5, 2]; // −50% to +200% annual
+		case 'principal':
+			return [1, Math.max(basePrincipal * 100, 1e9)];
+		case 'years':
+			return [0.01, 200];
+	}
+}
+
+function boundsForBondVariable(
+	variable: BondVariable,
+	baseFaceValue: number,
+): [number, number] {
+	switch (variable) {
+		case 'marketRate':
+			return [0.0001, 2];
+		case 'couponRate':
+			return [0, 2];
+		case 'faceValue':
+			return [1, Math.max(baseFaceValue * 100, 1e9)];
+		case 'termYears':
+			return [0.5, 100];
+	}
+}

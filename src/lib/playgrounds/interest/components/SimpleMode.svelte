@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { InterestEngine } from '../engine';
-	import { solveSimpleRate, solveSimpleYears, solveSimplePrincipal } from '../solvers';
+	import { solveSimpleCell, type SimpleRowKey } from '../solvers';
 	import type { InterestInputs } from '../types';
 	import SimpleGrowthChart from './SimpleGrowthChart.svelte';
-	import SimpleScheduleTable from './SimpleScheduleTable.svelte';
+	import SimpleScheduleTable, { type SimpleCellGoalSeekEvent } from './SimpleScheduleTable.svelte';
 	import ComputedSummary from './ComputedSummary.svelte';
 	import FormulaPanel from './FormulaPanel.svelte';
 	import WhatIfPanel, { type WhatIfSliderDef, type WhatIfMetricDef } from './WhatIfPanel.svelte';
-	import GoalSeekPanel, { type GoalSeekVariableDef, type GoalSeekTargetDef } from './GoalSeekPanel.svelte';
+	import GoalSeekPopover, {
+		type GoalSeekContext,
+		type GoalSeekVariable,
+	} from './GoalSeekPopover.svelte';
+	import RegimeComparison from './RegimeComparison.svelte';
 
 	let {
 		inputs,
@@ -19,11 +23,10 @@
 
 	const engine = new InterestEngine();
 
-	// Memoized: only recompute when inputs actually change.
 	let result = $derived(engine.simple(inputs));
 	let compoundResult = $derived(engine.compound(inputs));
 
-	// What-if state — lives inside this component; doesn't write back to the real inputs.
+	// What-if state
 	let whatIfAdjustments = $state<Record<string, number>>({ principal: 0, nominalRate: 0, term: 0 });
 
 	let whatIfSliders: WhatIfSliderDef[] = [
@@ -67,27 +70,47 @@
 		whatIfAdjustments = { principal: 0, nominalRate: 0, term: 0 };
 	}
 
-	// Goal-seek config
-	let gsVariables: GoalSeekVariableDef[] = [
+	// Contextual goal-seek popover state
+	interface PopoverState {
+		context: GoalSeekContext;
+		position: { x: number; y: number };
+		rowIndex: number;
+		colKey: SimpleRowKey;
+	}
+	let popover = $state<PopoverState | null>(null);
+
+	const gsVariables: GoalSeekVariable[] = [
 		{ key: 'nominalRate', labelKey: 'int.goalseek.varRate', unit: 'percent' },
 		{ key: 'years', labelKey: 'int.goalseek.varYears', unit: 'years' },
 		{ key: 'principal', labelKey: 'int.goalseek.varPrincipal', unit: 'currency' },
 	];
 
-	let gsTarget: GoalSeekTargetDef = {
-		key: 'total',
-		labelKey: 'int.summary.total',
-		unit: 'currency',
-	};
-
-	function runGoalSeek(variableKey: string, targetValue: number) {
-		if (variableKey === 'nominalRate') return solveSimpleRate(inputs, targetValue);
-		if (variableKey === 'years') return solveSimpleYears(inputs, targetValue);
-		if (variableKey === 'principal') return solveSimplePrincipal(inputs, targetValue);
-		return { success: false as const, reason: 'invalid-input' as const };
+	function handleCellGoalSeek(ev: SimpleCellGoalSeekEvent) {
+		popover = {
+			context: {
+				columnLabelKey: ev.columnLabelKey,
+				periodLabel: String(ev.rowIndex + 1),
+				currentValue: ev.currentValue,
+				cellUnit: 'currency',
+			},
+			position: ev.position,
+			rowIndex: ev.rowIndex,
+			colKey: ev.colKey,
+		};
 	}
 
-	function applyGoalSeek(variableKey: string, value: number) {
+	function popoverSolve(variableKey: string, target: number) {
+		if (!popover) return { success: false as const, reason: 'invalid-input' as const };
+		return solveSimpleCell(
+			inputs,
+			popover.rowIndex,
+			popover.colKey,
+			target,
+			variableKey as 'nominalRate' | 'principal' | 'years',
+		);
+	}
+
+	function popoverApply(variableKey: string, value: number) {
 		if (variableKey === 'nominalRate') {
 			onApplyInputs({ nominalRate: value });
 		} else if (variableKey === 'principal') {
@@ -110,37 +133,27 @@
 
 <SimpleGrowthChart {inputs} {result} {compoundResult} />
 
-<SimpleScheduleTable {result} />
+<SimpleScheduleTable {result} onGoalSeek={handleCellGoalSeek} />
 
-<div class="advanced-grid">
-	<WhatIfPanel
-		titleKey="int.whatif.title"
-		hintKey="int.whatif.simpleHint"
-		sliders={whatIfSliders}
-		adjustments={whatIfAdjustments}
-		metrics={whatIfMetrics}
-		onChange={(patch) => (whatIfAdjustments = { ...whatIfAdjustments, ...patch })}
-		onReset={resetWhatIf}
-	/>
-	<GoalSeekPanel
-		titleKey="int.goalseek.title"
+<RegimeComparison {inputs} />
+
+<WhatIfPanel
+	titleKey="int.whatif.title"
+	hintKey="int.whatif.simpleHint"
+	sliders={whatIfSliders}
+	adjustments={whatIfAdjustments}
+	metrics={whatIfMetrics}
+	onChange={(patch) => (whatIfAdjustments = { ...whatIfAdjustments, ...patch })}
+	onReset={resetWhatIf}
+/>
+
+{#if popover}
+	<GoalSeekPopover
+		position={popover.position}
+		context={popover.context}
 		variables={gsVariables}
-		target={gsTarget}
-		solve={runGoalSeek}
-		onApply={applyGoalSeek}
+		solve={popoverSolve}
+		onApply={popoverApply}
+		onClose={() => (popover = null)}
 	/>
-</div>
-
-<style>
-	.advanced-grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 1rem;
-	}
-
-	@media (max-width: 1180px) {
-		.advanced-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>
+{/if}

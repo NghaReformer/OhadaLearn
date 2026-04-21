@@ -11,6 +11,9 @@ import {
 	solveBondMarketRate,
 	solveBondCouponRate,
 	solveBondFaceValue,
+	solveSimpleCell,
+	solveCompoundCell,
+	solveBondCell,
 } from '$lib/playgrounds/interest/solvers';
 import type { BondInputs, InterestInputs } from '$lib/playgrounds/interest/types';
 
@@ -147,5 +150,51 @@ describe('Bond / Effective solvers', () => {
 		const r = solveBondFaceValue(bondInputs(), basePrice * 2);
 		expect(r.success).toBe(true);
 		expect(Math.abs(r.value! - 2_000_000)).toBeLessThan(5);
+	});
+});
+
+describe('Per-cell contextual solvers', () => {
+	it('solveSimpleCell: year-2 cumulative total → what rate reaches 1,250,000?', () => {
+		// Base: 1M @ 10% simple 30/360 for 5y → year-2 cumulative total ≈ 1,200,000.
+		// Target: 1,250,000. Expected rate is slightly higher.
+		const r = solveSimpleCell(
+			simpleInputs(),
+			1, // rowIndex 1 = year 2
+			'cumulativeTotal',
+			1_250_000,
+			'nominalRate',
+		);
+		expect(r.success).toBe(true);
+		// 1M × (1 + r·2) = 1.25M → r = 0.125
+		expect(r.value).toBeCloseTo(0.125, 3);
+	});
+
+	it('solveCompoundCell: year-3 balance → principal to reach target', () => {
+		// 1000 @ 10% annually at year 3 = 1331. Ask: what principal reaches 2000?
+		// 2000 / (1.10)^3 = 1503.38
+		const r = solveCompoundCell(
+			simpleInputs({ principal: 1000, frequency: 'annual' }),
+			2, // rowIndex 2 = year 3
+			'balanceEnd',
+			2000,
+			'principal',
+		);
+		expect(r.success).toBe(true);
+		expect(r.value).toBeCloseTo(2000 / Math.pow(1.1, 3), 0);
+	});
+
+	it('solveBondCell: row-1 EIR closing carrying roundtrips the baseline market rate', () => {
+		// Default bond has row-1 closing ≈ 936,603 at market=10%. Ask solver to
+		// recover market rate given that target. Expected: 0.10 (within tolerance).
+		const r = solveBondCell(
+			bondInputs(),
+			'eir',
+			0, // row 1
+			'closingCarryingAmount',
+			936_603,
+			'marketRate',
+		);
+		expect(r.success).toBe(true);
+		expect(r.value).toBeCloseTo(0.1, 2);
 	});
 });

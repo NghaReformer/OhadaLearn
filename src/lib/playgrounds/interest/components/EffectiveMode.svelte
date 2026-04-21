@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { InterestEngine } from '../engine';
-	import { solveBondMarketRate, solveBondCouponRate, solveBondFaceValue } from '../solvers';
-	import type { BondInputs } from '../types';
+	import { solveBondCell, type BondRowKey } from '../solvers';
+	import type { AmortisationMethod, BondInputs } from '../types';
 	import DivergenceRibbon from './DivergenceRibbon.svelte';
-	import ScheduleTable from './ScheduleTable.svelte';
+	import ScheduleTable, { type BondCellGoalSeekEvent } from './ScheduleTable.svelte';
 	import FormulaPanel from './FormulaPanel.svelte';
 	import WhatIfPanel, { type WhatIfSliderDef, type WhatIfMetricDef } from './WhatIfPanel.svelte';
-	import GoalSeekPanel, { type GoalSeekVariableDef, type GoalSeekTargetDef } from './GoalSeekPanel.svelte';
+	import GoalSeekPopover, {
+		type GoalSeekContext,
+		type GoalSeekVariable,
+	} from './GoalSeekPopover.svelte';
 
 	let {
 		bondInputs,
@@ -64,29 +67,55 @@
 		whatIfAdjustments = { faceValue: 0, couponRate: 0, marketRate: 0, termYears: 0 };
 	}
 
-	let gsVariables: GoalSeekVariableDef[] = [
+	// Contextual goal-seek
+	interface PopoverState {
+		context: GoalSeekContext;
+		position: { x: number; y: number };
+		rowIndex: number;
+		colKey: BondRowKey;
+		method: AmortisationMethod;
+	}
+	let popover = $state<PopoverState | null>(null);
+
+	const gsVariables: GoalSeekVariable[] = [
 		{ key: 'marketRate', labelKey: 'int.goalseek.varMarketRate', unit: 'percent' },
 		{ key: 'couponRate', labelKey: 'int.goalseek.varCouponRate', unit: 'percent' },
 		{ key: 'faceValue', labelKey: 'int.goalseek.varFaceValue', unit: 'currency' },
+		{ key: 'termYears', labelKey: 'int.goalseek.varTermYears', unit: 'years' },
 	];
 
-	let gsTarget: GoalSeekTargetDef = {
-		key: 'issuePrice',
-		labelKey: 'int.kpi.issuePrice',
-		unit: 'currency',
-	};
-
-	function runGoalSeek(variableKey: string, targetValue: number) {
-		if (variableKey === 'marketRate') return solveBondMarketRate(bondInputs, targetValue);
-		if (variableKey === 'couponRate') return solveBondCouponRate(bondInputs, targetValue);
-		if (variableKey === 'faceValue') return solveBondFaceValue(bondInputs, targetValue);
-		return { success: false as const, reason: 'invalid-input' as const };
+	function handleCellGoalSeek(ev: BondCellGoalSeekEvent) {
+		popover = {
+			context: {
+				columnLabelKey: ev.columnLabelKey,
+				periodLabel: String(ev.rowIndex + 1),
+				currentValue: ev.currentValue,
+				cellUnit: 'currency',
+			},
+			position: ev.position,
+			rowIndex: ev.rowIndex,
+			colKey: ev.colKey,
+			method: ev.method,
+		};
 	}
 
-	function applyGoalSeek(variableKey: string, value: number) {
+	function popoverSolve(variableKey: string, target: number) {
+		if (!popover) return { success: false as const, reason: 'invalid-input' as const };
+		return solveBondCell(
+			bondInputs,
+			popover.method,
+			popover.rowIndex,
+			popover.colKey,
+			target,
+			variableKey as 'marketRate' | 'couponRate' | 'faceValue' | 'termYears',
+		);
+	}
+
+	function popoverApply(variableKey: string, value: number) {
 		if (variableKey === 'marketRate') onApplyBondInputs({ marketRate: value });
 		else if (variableKey === 'couponRate') onApplyBondInputs({ couponRate: value });
 		else if (variableKey === 'faceValue') onApplyBondInputs({ faceValue: value });
+		else if (variableKey === 'termYears') onApplyBondInputs({ termYears: value });
 	}
 </script>
 
@@ -95,28 +124,30 @@
 <DivergenceRibbon {result} />
 
 <div class="schedules">
-	<ScheduleTable schedule={result.straightLine} />
-	<ScheduleTable schedule={result.eir} />
+	<ScheduleTable schedule={result.straightLine} onGoalSeek={handleCellGoalSeek} />
+	<ScheduleTable schedule={result.eir} onGoalSeek={handleCellGoalSeek} />
 </div>
 
-<div class="advanced-grid">
-	<WhatIfPanel
-		titleKey="int.whatif.title"
-		hintKey="int.whatif.effectiveHint"
-		sliders={whatIfSliders}
-		adjustments={whatIfAdjustments}
-		metrics={whatIfMetrics}
-		onChange={(patch) => (whatIfAdjustments = { ...whatIfAdjustments, ...patch })}
-		onReset={resetWhatIf}
-	/>
-	<GoalSeekPanel
-		titleKey="int.goalseek.title"
+<WhatIfPanel
+	titleKey="int.whatif.title"
+	hintKey="int.whatif.effectiveHint"
+	sliders={whatIfSliders}
+	adjustments={whatIfAdjustments}
+	metrics={whatIfMetrics}
+	onChange={(patch) => (whatIfAdjustments = { ...whatIfAdjustments, ...patch })}
+	onReset={resetWhatIf}
+/>
+
+{#if popover}
+	<GoalSeekPopover
+		position={popover.position}
+		context={popover.context}
 		variables={gsVariables}
-		target={gsTarget}
-		solve={runGoalSeek}
-		onApply={applyGoalSeek}
+		solve={popoverSolve}
+		onApply={popoverApply}
+		onClose={() => (popover = null)}
 	/>
-</div>
+{/if}
 
 <style>
 	.schedules {
@@ -125,15 +156,8 @@
 		gap: 1rem;
 	}
 
-	.advanced-grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 1rem;
-	}
-
 	@media (max-width: 1180px) {
-		.schedules,
-		.advanced-grid {
+		.schedules {
 			grid-template-columns: 1fr;
 		}
 	}

@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { InterestEngine } from '../engine';
-	import { solveCompoundRate, solveCompoundYears, solveCompoundPrincipal } from '../solvers';
+	import { solveCompoundCell, type CompoundRowKey } from '../solvers';
 	import type { InterestInputs } from '../types';
 	import CompoundGrowthChart from './CompoundGrowthChart.svelte';
-	import CompoundScheduleTable from './CompoundScheduleTable.svelte';
+	import CompoundScheduleTable, {
+		type CompoundCellGoalSeekEvent,
+	} from './CompoundScheduleTable.svelte';
 	import ComputedSummary from './ComputedSummary.svelte';
 	import FormulaPanel from './FormulaPanel.svelte';
 	import WhatIfPanel, { type WhatIfSliderDef, type WhatIfMetricDef } from './WhatIfPanel.svelte';
-	import GoalSeekPanel, { type GoalSeekVariableDef, type GoalSeekTargetDef } from './GoalSeekPanel.svelte';
+	import GoalSeekPopover, {
+		type GoalSeekContext,
+		type GoalSeekVariable,
+	} from './GoalSeekPopover.svelte';
+	import RegimeComparison from './RegimeComparison.svelte';
 
 	let {
 		inputs,
@@ -71,26 +77,47 @@
 		whatIfAdjustments = { principal: 0, nominalRate: 0, term: 0 };
 	}
 
-	let gsVariables: GoalSeekVariableDef[] = [
+	// Contextual goal-seek
+	interface PopoverState {
+		context: GoalSeekContext;
+		position: { x: number; y: number };
+		rowIndex: number;
+		colKey: CompoundRowKey;
+	}
+	let popover = $state<PopoverState | null>(null);
+
+	const gsVariables: GoalSeekVariable[] = [
 		{ key: 'nominalRate', labelKey: 'int.goalseek.varRate', unit: 'percent' },
 		{ key: 'years', labelKey: 'int.goalseek.varYears', unit: 'years' },
 		{ key: 'principal', labelKey: 'int.goalseek.varPrincipal', unit: 'currency' },
 	];
 
-	let gsTarget: GoalSeekTargetDef = {
-		key: 'futureValue',
-		labelKey: 'int.kpi.futureValue',
-		unit: 'currency',
-	};
-
-	function runGoalSeek(variableKey: string, targetValue: number) {
-		if (variableKey === 'nominalRate') return solveCompoundRate(inputs, targetValue);
-		if (variableKey === 'years') return solveCompoundYears(inputs, targetValue);
-		if (variableKey === 'principal') return solveCompoundPrincipal(inputs, targetValue);
-		return { success: false as const, reason: 'invalid-input' as const };
+	function handleCellGoalSeek(ev: CompoundCellGoalSeekEvent) {
+		popover = {
+			context: {
+				columnLabelKey: ev.columnLabelKey,
+				periodLabel: String(ev.rowIndex + 1),
+				currentValue: ev.currentValue,
+				cellUnit: 'currency',
+			},
+			position: ev.position,
+			rowIndex: ev.rowIndex,
+			colKey: ev.colKey,
+		};
 	}
 
-	function applyGoalSeek(variableKey: string, value: number) {
+	function popoverSolve(variableKey: string, target: number) {
+		if (!popover) return { success: false as const, reason: 'invalid-input' as const };
+		return solveCompoundCell(
+			inputs,
+			popover.rowIndex,
+			popover.colKey,
+			target,
+			variableKey as 'nominalRate' | 'principal' | 'years',
+		);
+	}
+
+	function popoverApply(variableKey: string, value: number) {
 		if (variableKey === 'nominalRate') {
 			onApplyInputs({ nominalRate: value });
 		} else if (variableKey === 'principal') {
@@ -114,37 +141,27 @@
 
 <CompoundGrowthChart {inputs} {result} {showContinuous} />
 
-<CompoundScheduleTable {result} />
+<CompoundScheduleTable {result} onGoalSeek={handleCellGoalSeek} />
 
-<div class="advanced-grid">
-	<WhatIfPanel
-		titleKey="int.whatif.title"
-		hintKey="int.whatif.compoundHint"
-		sliders={whatIfSliders}
-		adjustments={whatIfAdjustments}
-		metrics={whatIfMetrics}
-		onChange={(patch) => (whatIfAdjustments = { ...whatIfAdjustments, ...patch })}
-		onReset={resetWhatIf}
-	/>
-	<GoalSeekPanel
-		titleKey="int.goalseek.title"
+<RegimeComparison {inputs} />
+
+<WhatIfPanel
+	titleKey="int.whatif.title"
+	hintKey="int.whatif.compoundHint"
+	sliders={whatIfSliders}
+	adjustments={whatIfAdjustments}
+	metrics={whatIfMetrics}
+	onChange={(patch) => (whatIfAdjustments = { ...whatIfAdjustments, ...patch })}
+	onReset={resetWhatIf}
+/>
+
+{#if popover}
+	<GoalSeekPopover
+		position={popover.position}
+		context={popover.context}
 		variables={gsVariables}
-		target={gsTarget}
-		solve={runGoalSeek}
-		onApply={applyGoalSeek}
+		solve={popoverSolve}
+		onApply={popoverApply}
+		onClose={() => (popover = null)}
 	/>
-</div>
-
-<style>
-	.advanced-grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 1rem;
-	}
-
-	@media (max-width: 1180px) {
-		.advanced-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>
+{/if}

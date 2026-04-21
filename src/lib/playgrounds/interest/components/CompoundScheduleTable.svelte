@@ -3,8 +3,23 @@
 	import { currency$ } from '$lib/stores/preferences';
 	import { fmtCurrency } from '$lib/format';
 	import type { CompoundResult } from '../types';
+	import type { CompoundRowKey } from '../solvers';
 
-	let { result }: { result: CompoundResult } = $props();
+	export interface CompoundCellGoalSeekEvent {
+		rowIndex: number;
+		colKey: CompoundRowKey;
+		currentValue: number;
+		columnLabelKey: string;
+		position: { x: number; y: number };
+	}
+
+	let {
+		result,
+		onGoalSeek,
+	}: {
+		result: CompoundResult;
+		onGoalSeek?: (event: CompoundCellGoalSeekEvent) => void;
+	} = $props();
 
 	let translate = $derived($t);
 	let currencyCode = $derived($currency$);
@@ -12,12 +27,33 @@
 	function money(v: number): string {
 		return fmtCurrency(v, currencyCode);
 	}
+
+	function triggerGoalSeek(
+		e: MouseEvent,
+		rowIndex: number,
+		colKey: CompoundRowKey,
+		currentValue: number,
+		columnLabelKey: string,
+	) {
+		if (!onGoalSeek) return;
+		e.preventDefault();
+		onGoalSeek({
+			rowIndex,
+			colKey,
+			currentValue,
+			columnLabelKey,
+			position: { x: e.clientX, y: e.clientY },
+		});
+	}
 </script>
 
 <section class="table-wrap">
 	<header class="table-head">
 		<h4 class="table-title">{translate('int.schedule.compoundTitle')}</h4>
 		<span class="table-sub">{translate('int.schedule.compoundSub')}</span>
+		{#if onGoalSeek}
+			<span class="table-hint">{translate('int.goalseek.rightClickHint')}</span>
+		{/if}
 	</header>
 	<div class="table-scroll">
 		<table>
@@ -34,14 +70,85 @@
 			</thead>
 			<tbody>
 				{#each result.perPeriod as row (row.periodIndex)}
+					{@const i = row.periodIndex - 1}
 					<tr>
 						<td class="num period">{row.periodIndex}</td>
 						<td class="date">{row.periodEnd}</td>
-						<td class="num muted">{money(row.balanceStart)}</td>
-						<td class="num">{money(row.interestThisPeriod)}</td>
-						<td class="num strong">{money(row.balanceEnd)}</td>
-						<td class="num small">{money(row.cumulativeInterestOnPrincipal)}</td>
-						<td class="num small accent">{money(row.cumulativeInterestOnInterest)}</td>
+						<td
+							class="num gs muted"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'balanceStart',
+									row.balanceStart,
+									'int.schedule.openingBalance',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.balanceStart)}
+						</td>
+						<td
+							class="num gs"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'interestThisPeriod',
+									row.interestThisPeriod,
+									'int.schedule.interestThisPeriod',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.interestThisPeriod)}
+						</td>
+						<td
+							class="num gs strong"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'balanceEnd',
+									row.balanceEnd,
+									'int.schedule.closingBalance',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.balanceEnd)}
+						</td>
+						<td
+							class="num gs small"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'cumulativeInterestOnPrincipal',
+									row.cumulativeInterestOnPrincipal,
+									'int.schedule.interestOnPrincipal',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.cumulativeInterestOnPrincipal)}
+						</td>
+						<td
+							class="num gs small accent"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'cumulativeInterestOnInterest',
+									row.cumulativeInterestOnInterest,
+									'int.schedule.interestOnInterest',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.cumulativeInterestOnInterest)}
+						</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -90,6 +197,12 @@
 	.table-sub {
 		font-size: 0.6875rem;
 		color: var(--text-muted);
+	}
+
+	.table-hint {
+		font-size: 0.6875rem;
+		color: var(--accent-soft);
+		font-style: italic;
 	}
 
 	.table-scroll {
@@ -154,6 +267,19 @@
 
 	.num.small {
 		font-size: 0.6875rem;
+	}
+
+	.gs.clickable {
+		cursor: context-menu;
+		border-bottom: 1px dotted transparent;
+		transition:
+			border-color var(--transition-fast),
+			background var(--transition-fast);
+	}
+
+	.gs.clickable:hover {
+		border-bottom-color: color-mix(in srgb, var(--accent) 60%, transparent);
+		background: color-mix(in srgb, var(--accent) 4%, transparent);
 	}
 
 	.date {

@@ -1,10 +1,25 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
 	import { currency$ } from '$lib/stores/preferences';
-	import { fmtCurrency, fmtPct } from '$lib/format';
+	import { fmtCurrency } from '$lib/format';
 	import type { SimpleResult } from '../types';
+	import type { SimpleRowKey } from '../solvers';
 
-	let { result }: { result: SimpleResult } = $props();
+	export interface SimpleCellGoalSeekEvent {
+		rowIndex: number;
+		colKey: SimpleRowKey;
+		currentValue: number;
+		columnLabelKey: string;
+		position: { x: number; y: number };
+	}
+
+	let {
+		result,
+		onGoalSeek,
+	}: {
+		result: SimpleResult;
+		onGoalSeek?: (event: SimpleCellGoalSeekEvent) => void;
+	} = $props();
 
 	let translate = $derived($t);
 	let currencyCode = $derived($currency$);
@@ -12,12 +27,33 @@
 	function money(v: number): string {
 		return fmtCurrency(v, currencyCode);
 	}
+
+	function triggerGoalSeek(
+		e: MouseEvent,
+		rowIndex: number,
+		colKey: SimpleRowKey,
+		currentValue: number,
+		columnLabelKey: string,
+	) {
+		if (!onGoalSeek) return;
+		e.preventDefault();
+		onGoalSeek({
+			rowIndex,
+			colKey,
+			currentValue,
+			columnLabelKey,
+			position: { x: e.clientX, y: e.clientY },
+		});
+	}
 </script>
 
 <section class="table-wrap">
 	<header class="table-head">
 		<h4 class="table-title">{translate('int.schedule.simpleTitle')}</h4>
 		<span class="table-sub">{translate('int.schedule.simpleSub')}</span>
+		{#if onGoalSeek}
+			<span class="table-hint">{translate('int.goalseek.rightClickHint')}</span>
+		{/if}
 	</header>
 	<div class="table-scroll">
 		<table>
@@ -37,9 +73,51 @@
 						<td class="num period">{i + 1}</td>
 						<td class="date">{row.periodEnd}</td>
 						<td class="num muted">{row.fraction.toFixed(3)}</td>
-						<td class="num">{money(row.interestThisPeriod)}</td>
-						<td class="num accent">{money(row.cumulativeInterest)}</td>
-						<td class="num strong">{money(row.cumulativeTotal)}</td>
+						<td
+							class="num gs"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'interestThisPeriod',
+									row.interestThisPeriod,
+									'int.schedule.interestThisPeriod',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.interestThisPeriod)}
+						</td>
+						<td
+							class="num gs accent"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'cumulativeInterest',
+									row.cumulativeInterest,
+									'int.schedule.cumulativeInterest',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.cumulativeInterest)}
+						</td>
+						<td
+							class="num gs strong"
+							class:clickable={!!onGoalSeek}
+							oncontextmenu={(e) =>
+								triggerGoalSeek(
+									e,
+									i,
+									'cumulativeTotal',
+									row.cumulativeTotal,
+									'int.schedule.runningTotal',
+								)}
+							title={onGoalSeek ? translate('int.goalseek.rightClickCell') : undefined}
+						>
+							{money(row.cumulativeTotal)}
+						</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -82,6 +160,12 @@
 	.table-sub {
 		font-size: 0.6875rem;
 		color: var(--text-muted);
+	}
+
+	.table-hint {
+		font-size: 0.6875rem;
+		color: var(--accent-soft);
+		font-style: italic;
 	}
 
 	.table-scroll {
@@ -133,6 +217,18 @@
 	.num.strong {
 		color: var(--text-primary);
 		font-weight: 700;
+	}
+
+	.gs.clickable {
+		cursor: context-menu;
+		position: relative;
+		border-bottom: 1px dotted transparent;
+		transition: border-color var(--transition-fast);
+	}
+
+	.gs.clickable:hover {
+		border-bottom-color: color-mix(in srgb, var(--accent) 60%, transparent);
+		background: color-mix(in srgb, var(--accent) 4%, transparent);
 	}
 
 	.date {

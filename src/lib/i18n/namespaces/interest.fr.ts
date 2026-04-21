@@ -152,7 +152,7 @@ export const interestFr: TranslationMap = {
 	'int.whatif.couponRate': 'Taux de coupon',
 	'int.whatif.marketRate': 'Taux du marché',
 
-	// Goal-seek panel
+	// Goal-seek popover
 	'int.goalseek.title': 'Valeur cible',
 	'int.goalseek.solveFor': 'Résoudre pour',
 	'int.goalseek.targetLabel': 'Cible',
@@ -167,6 +167,34 @@ export const interestFr: TranslationMap = {
 	'int.goalseek.varMarketRate': 'Taux du marché',
 	'int.goalseek.varCouponRate': 'Taux de coupon',
 	'int.goalseek.varFaceValue': 'Valeur nominale',
+	'int.goalseek.varTermYears': 'Durée (années)',
+	'int.goalseek.atPeriod': 'à la période',
+	'int.goalseek.current': 'Valeur actuelle',
+	'int.goalseek.setTo': 'Cible',
+	'int.goalseek.byChanging': 'En modifiant',
+	'int.goalseek.rightClickHint': 'Clic droit sur une cellule pour atteindre sa valeur cible',
+	'int.goalseek.rightClickCell': 'Clic droit pour atteindre la valeur cible',
+
+	// Regime comparison
+	'int.compare.title': 'Comparer les régimes d\u2019intérêts',
+	'int.compare.sub': 'Même capital, taux et durée sous chaque régime. Le graphique superpose les courbes ; le tableau les classe par montant final.',
+	'int.compare.regime': 'Régime',
+	'int.compare.frequency': 'Fréquence',
+	'int.compare.final': 'Montant final',
+	'int.compare.interest': 'Intérêts totaux',
+	'int.compare.ear': 'Taux effectif annuel',
+	'int.compare.gainOverSimple': 'Gain vs simple',
+	'int.compare.best': 'Meilleur',
+	'int.compare.chartAxis': 'Solde',
+	'int.compare.simple': 'Simple',
+	'int.compare.annual': 'Composé annuel',
+	'int.compare.semi': 'Composé semestriel',
+	'int.compare.quarterly': 'Composé trimestriel',
+	'int.compare.monthly': 'Composé mensuel',
+	'int.compare.daily': 'Composé journalier',
+	'int.compare.continuous': 'Continu',
+
+	'int.popover.close': 'Fermer',
 
 	// Exercises (parameter-free — les apprenants lisent les valeurs actives
 	// depuis le panneau Paramètres. ExercisePanel partagé ne substitue pas

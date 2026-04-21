@@ -152,7 +152,7 @@ export const interestEn: TranslationMap = {
 	'int.whatif.couponRate': 'Coupon rate',
 	'int.whatif.marketRate': 'Market rate',
 
-	// Goal-seek panel
+	// Goal-seek popover (contextual, opens on right-click of a schedule cell)
 	'int.goalseek.title': 'Goal seek',
 	'int.goalseek.solveFor': 'Solve for',
 	'int.goalseek.targetLabel': 'Target',
@@ -167,6 +167,34 @@ export const interestEn: TranslationMap = {
 	'int.goalseek.varMarketRate': 'Market rate',
 	'int.goalseek.varCouponRate': 'Coupon rate',
 	'int.goalseek.varFaceValue': 'Face value',
+	'int.goalseek.varTermYears': 'Term (years)',
+	'int.goalseek.atPeriod': 'at period',
+	'int.goalseek.current': 'Current',
+	'int.goalseek.setTo': 'Set to',
+	'int.goalseek.byChanging': 'By changing',
+	'int.goalseek.rightClickHint': 'Right-click any cell to goal-seek its value',
+	'int.goalseek.rightClickCell': 'Right-click to goal seek',
+
+	// Regime comparison
+	'int.compare.title': 'Compare interest regimes',
+	'int.compare.sub': 'Same principal, rate, and term under every regime. Chart overlays all curves; the table ranks them by final amount.',
+	'int.compare.regime': 'Regime',
+	'int.compare.frequency': 'Frequency',
+	'int.compare.final': 'Final amount',
+	'int.compare.interest': 'Total interest',
+	'int.compare.ear': 'Effective annual rate',
+	'int.compare.gainOverSimple': 'Gain vs simple',
+	'int.compare.best': 'Best',
+	'int.compare.chartAxis': 'Balance',
+	'int.compare.simple': 'Simple',
+	'int.compare.annual': 'Compound annual',
+	'int.compare.semi': 'Compound semi-annual',
+	'int.compare.quarterly': 'Compound quarterly',
+	'int.compare.monthly': 'Compound monthly',
+	'int.compare.daily': 'Compound daily',
+	'int.compare.continuous': 'Continuous',
+
+	'int.popover.close': 'Close',
 
 	// Exercises (parameter-free prompts — learner reads current values from
 	// the Parameters panel. The shared ExercisePanel does not substitute
