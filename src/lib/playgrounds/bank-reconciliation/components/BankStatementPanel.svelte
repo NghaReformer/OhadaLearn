@@ -44,6 +44,7 @@
 						class:matched={isMatched}
 						class:unmatched={!isMatched}
 						class:selected={isSelected}
+						data-bank-tx-id={tx.id}
 						onclick={() => onSelect(isSelected ? null : tx.id)}
 					>
 						<td>{tx.date}</td>

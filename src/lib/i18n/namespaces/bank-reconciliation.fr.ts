@@ -82,6 +82,25 @@ export const bankReconciliationFr: TranslationMap = {
 	'br.kpi.statusUnbalanced': 'Non rapproché',
 	'br.kpi.statusPending': 'En cours',
 
+	// Balance interactive (visuel principal)
+	'br.scale.bankLabel': 'Banque',
+	'br.scale.booksLabel': 'Livres',
+	'br.scale.reconciled': 'Rapproché',
+	'br.scale.unbalanced': 'Déséquilibré',
+	'br.scale.varianceLabel': 'Écart',
+
+	// Donut de répartition par catégorie
+	'br.donut.title': 'Éléments par catégorie',
+	'br.donut.empty': 'Aucun élément à classer.',
+
+	// Flux de rapprochement (waterfall)
+	'br.flow.title': 'Comment les soldes se rapprochent',
+	'br.flow.bankSide': 'Côté banque',
+	'br.flow.booksSide': 'Côté entreprise',
+	'br.flow.start': 'Départ',
+	'br.flow.end': 'Rapproché',
+	'br.flow.match': 'Équilibré',
+
 	// Écritures de régularisation
 	'br.adjustments.title': 'Écritures de régularisation',
 	'br.adjustments.empty': 'Aucune écriture de régularisation nécessaire.',

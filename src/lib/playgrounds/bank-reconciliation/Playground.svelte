@@ -26,6 +26,10 @@
 	import ReconciliationStatement from './components/ReconciliationStatement.svelte';
 	import AdjustingEntriesPanel from './components/AdjustingEntriesPanel.svelte';
 	import UnmatchedItemsPanel from './components/UnmatchedItemsPanel.svelte';
+	import VarianceScale from './components/VarianceScale.svelte';
+	import CategoryBreakdownDonut from './components/CategoryBreakdownDonut.svelte';
+	import ReconciliationFlow from './components/ReconciliationFlow.svelte';
+	import MatchingPairsOverlay from './components/MatchingPairsOverlay.svelte';
 
 	const standardToFramework: Record<AccountingStandard, AccountingFramework> = {
 		syscohada: 'ohada',
@@ -72,6 +76,8 @@
 
 	const engine = new BankReconciliationEngine();
 
+	let gridContainer = $state<HTMLDivElement | null>(null);
+
 	function buildKpiItems(kpis: BankReconciliationKpis, translate: (k: string) => string, currency: string): KpiItem[] {
 		const statusLabel =
 			kpis.reconciliationStatus === 'reconciled'
@@ -87,6 +93,20 @@
 			{ label: translate('br.kpi.status'), value: statusLabel, variant: 'accent' },
 		];
 		return items;
+	}
+
+	function buildCategoryLabels(translate: (k: string) => string): Record<ItemCategory, string> {
+		return {
+			'outstanding-check': translate('br.category.outstandingCheck.label'),
+			'deposit-in-transit': translate('br.category.depositInTransit.label'),
+			'bank-charge': translate('br.category.bankCharge.label'),
+			'interest-earned': translate('br.category.interestEarned.label'),
+			'nsf-check': translate('br.category.nsfCheck.label'),
+			'direct-debit': translate('br.category.directDebit.label'),
+			'standing-order': translate('br.category.standingOrder.label'),
+			'bank-error': translate('br.category.bankError.label'),
+			'company-error': translate('br.category.companyError.label'),
+		};
 	}
 </script>
 
@@ -105,6 +125,8 @@
 		{@const result = engine.reconcile(inputs)}
 		{@const kpis = result.kpis ?? EMPTY_KPIS}
 		{@const adjustingEntries = buildAdjustingEntries(result, framework)}
+		{@const bankItemCount = result.items.filter((i) => i.side === 'bank').length}
+		{@const booksItemCount = result.items.filter((i) => i.side === 'books').length}
 
 		<div class="br-layout">
 			<InputsPanel
@@ -113,9 +135,23 @@
 			/>
 
 			<div class="br-workspace">
+				<VarianceScale
+					adjustedBank={result.statement.bankSide.adjustedBalance}
+					adjustedBooks={result.statement.booksSide.adjustedBalance}
+					variance={result.statement.variance}
+					isReconciled={result.statement.isReconciled}
+					{bankItemCount}
+					{booksItemCount}
+					bankLabel={$t('br.scale.bankLabel')}
+					booksLabel={$t('br.scale.booksLabel')}
+					reconciledLabel={$t('br.scale.reconciled')}
+					unbalancedLabel={$t('br.scale.unbalanced')}
+					varianceLabel={$t('br.scale.varianceLabel')}
+				/>
+
 				<KpiStrip items={buildKpiItems(kpis, $t, $currency$)} />
 
-				<div class="br-grid">
+				<div class="br-grid" bind:this={gridContainer}>
 					<BankStatementPanel
 						transactions={inputs.bankTransactions}
 						matches={result.matches}
@@ -127,6 +163,11 @@
 						matches={result.matches}
 						selectedId={typedState.selectedItemId}
 						onSelect={(id) => updateState({ selectedItemId: id })}
+					/>
+					<MatchingPairsOverlay
+						matches={result.matches}
+						container={gridContainer}
+						highlightId={typedState.selectedItemId}
 					/>
 				</div>
 
@@ -142,6 +183,24 @@
 							},
 						})}
 				/>
+
+				<div class="br-insights">
+					<ReconciliationFlow
+						statement={result.statement}
+						titleLabel={$t('br.flow.title')}
+						bankSideLabel={$t('br.flow.bankSide')}
+						booksSideLabel={$t('br.flow.booksSide')}
+						startLabel={$t('br.flow.start')}
+						endLabel={$t('br.flow.end')}
+						matchLabel={$t('br.flow.match')}
+					/>
+					<CategoryBreakdownDonut
+						{kpis}
+						categoryLabels={buildCategoryLabels($t)}
+						emptyLabel={$t('br.donut.empty')}
+						titleLabel={$t('br.donut.title')}
+					/>
+				</div>
 
 				<ReconciliationStatement
 					statement={result.statement}
@@ -174,6 +233,13 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
+		position: relative;
+	}
+
+	.br-insights {
+		display: grid;
+		grid-template-columns: 1.5fr 1fr;
+		gap: 1rem;
 	}
 
 	@media (max-width: 1200px) {
@@ -181,6 +247,9 @@
 			grid-template-columns: 1fr;
 		}
 		.br-grid {
+			grid-template-columns: 1fr;
+		}
+		.br-insights {
 			grid-template-columns: 1fr;
 		}
 	}

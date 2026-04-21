@@ -44,6 +44,7 @@
 						class:matched={isMatched}
 						class:unmatched={!isMatched}
 						class:selected={isSelected}
+						data-ledger-entry-id={entry.id}
 						onclick={() => onSelect(isSelected ? null : entry.id)}
 					>
 						<td>{entry.date}</td>

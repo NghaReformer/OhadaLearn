@@ -47,4 +47,28 @@ test.describe('Bank Reconciliation playground — native module', () => {
 		// After selection, the playground tab is active and the bank-statement panel shows entries
 		await expect(page.getByText(/Frais de tenue de compte/i).first()).toBeVisible({ timeout: 10_000 });
 	});
+
+	test('renders the variance scale, donut, and flow visuals', async ({ page }) => {
+		await page.goto('/en/playgrounds/bank-reconciliation');
+		// Variance scale renders an SVG with both pan labels (Bank, Books)
+		const scaleSvg = page.locator('svg').filter({ hasText: 'Bank' }).filter({ hasText: 'Books' }).first();
+		await expect(scaleSvg).toBeVisible({ timeout: 10_000 });
+		// Status pill on the scale shows Reconciled by default (empty inputs)
+		await expect(page.getByText(/^Reconciled$/).first()).toBeVisible();
+		// Donut and flow titles are present
+		await expect(page.getByText(/Items by category/i).first()).toBeVisible();
+		await expect(page.getByText(/How balances reconcile/i).first()).toBeVisible();
+	});
+
+	test('matching pairs overlay renders SVG curves when matches exist', async ({ page }) => {
+		await page.goto('/en/playgrounds/bank-reconciliation');
+		const scenariosTab = page.getByRole('tab', { name: /Scenarios/i });
+		await scenariosTab.click();
+		await page.getByText(/Classic 5-item reconciliation/i).first().click();
+		// Wait for state to load
+		await expect(page.getByText(/Frais de tenue de compte/i).first()).toBeVisible({ timeout: 10_000 });
+		// Overlay produces <path class="match-line"> per matched pair (the classic scenario has 1 reference match)
+		const lines = page.locator('path.match-line');
+		await expect(lines.first()).toBeAttached({ timeout: 5_000 });
+	});
 });

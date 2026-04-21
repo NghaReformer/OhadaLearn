@@ -82,6 +82,25 @@ export const bankReconciliationEn: TranslationMap = {
 	'br.kpi.statusUnbalanced': 'Unbalanced',
 	'br.kpi.statusPending': 'Pending',
 
+	// Variance scale (centerpiece visual)
+	'br.scale.bankLabel': 'Bank',
+	'br.scale.booksLabel': 'Books',
+	'br.scale.reconciled': 'Reconciled',
+	'br.scale.unbalanced': 'Out of balance',
+	'br.scale.varianceLabel': 'Variance',
+
+	// Category breakdown donut
+	'br.donut.title': 'Items by category',
+	'br.donut.empty': 'No reconciling items yet.',
+
+	// Reconciliation flow (waterfall)
+	'br.flow.title': 'How balances reconcile',
+	'br.flow.bankSide': 'Bank side',
+	'br.flow.booksSide': 'Books side',
+	'br.flow.start': 'Start',
+	'br.flow.end': 'Adjusted',
+	'br.flow.match': 'Balanced',
+
 	// Adjusting JEs
 	'br.adjustments.title': 'Adjusting Journal Entries',
 	'br.adjustments.empty': 'No adjusting entries needed.',
