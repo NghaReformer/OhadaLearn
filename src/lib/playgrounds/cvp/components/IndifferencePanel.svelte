@@ -158,11 +158,11 @@
 	}
 
 	.struct-a {
-		border-left: 2px solid #2dd4a0;
+		border-left: 2px solid var(--green);
 	}
 
 	.struct-b {
-		border-left: 2px solid #7c7fff;
+		border-left: 2px solid var(--accent);
 	}
 
 	.struct-label {
@@ -203,18 +203,18 @@
 	}
 
 	.result-block.ok {
-		border-color: color-mix(in srgb, #2dd4a0 30%, transparent);
-		background: color-mix(in srgb, #2dd4a0 6%, transparent);
+		border-color: color-mix(in srgb, var(--green) 30%, transparent);
+		background: color-mix(in srgb, var(--green) 6%, transparent);
 	}
 
 	.result-block.warn {
-		border-color: color-mix(in srgb, #e8a840 30%, transparent);
-		background: color-mix(in srgb, #e8a840 6%, transparent);
+		border-color: color-mix(in srgb, var(--amber) 30%, transparent);
+		background: color-mix(in srgb, var(--amber) 6%, transparent);
 	}
 
 	.result-block.info {
-		border-color: color-mix(in srgb, #7c7fff 30%, transparent);
-		background: color-mix(in srgb, #7c7fff 6%, transparent);
+		border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+		background: color-mix(in srgb, var(--accent) 6%, transparent);
 	}
 
 	.result-icon {
@@ -245,7 +245,7 @@
 		font-family: var(--font-mono);
 		font-size: 1.5rem;
 		font-weight: 700;
-		color: #2dd4a0;
+		color: var(--green);
 		letter-spacing: -0.01em;
 	}
 

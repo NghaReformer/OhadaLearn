@@ -86,8 +86,8 @@
 		<text
 			x={(PAD.left + bepPx) / 2}
 			y={H - PAD.bottom - 20}
-			fill="#f0605e"
-			font-family="Fraunces, serif"
+			fill="var(--error)"
+			font-family="var(--font-display)"
 			font-size="13"
 			font-weight="500"
 			font-style="italic"
@@ -99,8 +99,8 @@
 		<text
 			x={(bepPx + W - PAD.right) / 2}
 			y={Math.max(yScale((rightRevY + rightCostY) / 2), PAD.top + 20)}
-			fill="#2dd4a0"
-			font-family="Fraunces, serif"
+			fill="var(--green)"
+			font-family="var(--font-display)"
 			font-size="13"
 			font-weight="500"
 			font-style="italic"
@@ -117,7 +117,7 @@
 		y1={yScale(fc)}
 		x2={xScale(maxQ)}
 		y2={yScale(fc)}
-		stroke="#e8a840"
+		stroke="var(--amber)"
 		stroke-width="1"
 		stroke-dasharray="8,5"
 		opacity="0.4"
@@ -125,8 +125,8 @@
 	<text
 		x={W - PAD.right + 4}
 		y={yScale(fc) - 2}
-		fill="#e8a840"
-		font-family="DM Sans, sans-serif"
+		fill="var(--amber)"
+		font-family="var(--font-body)"
 		font-size="8"
 		font-weight="600"
 		opacity="0.5"
@@ -157,12 +157,12 @@
 	/>
 
 	<!-- Line labels -->
-	<rect x={W - PAD.right - 66} y={revLabelY - 8} width="66" height="16" rx="4" fill="#111525" opacity="0.8" />
+	<rect x={W - PAD.right - 66} y={revLabelY - 8} width="66" height="16" rx="4" fill="var(--panel)" opacity="0.8" />
 	<text
 		x={W - PAD.right - 33}
 		y={revLabelY + 3}
-		fill="#2dd4a0"
-		font-family="DM Sans, sans-serif"
+		fill="var(--green)"
+		font-family="var(--font-body)"
 		font-size="9"
 		font-weight="700"
 		text-anchor="middle"
@@ -170,12 +170,12 @@
 		{translate('cvp.chart.revenue')}
 	</text>
 
-	<rect x={W - PAD.right - 70} y={costLabelY - 8} width="70" height="16" rx="4" fill="#111525" opacity="0.8" />
+	<rect x={W - PAD.right - 70} y={costLabelY - 8} width="70" height="16" rx="4" fill="var(--panel)" opacity="0.8" />
 	<text
 		x={W - PAD.right - 35}
 		y={costLabelY + 3}
-		fill="#f0605e"
-		font-family="DM Sans, sans-serif"
+		fill="var(--error)"
+		font-family="var(--font-body)"
 		font-size="9"
 		font-weight="700"
 		text-anchor="middle"
@@ -193,7 +193,7 @@
 			y1={yScale(0)}
 			x2={xScale(maxQ)}
 			y2={yScale(wp * maxQ)}
-			stroke="#2dd4a0"
+			stroke="var(--green)"
 			stroke-width="1.5"
 			stroke-dasharray="6,4"
 			opacity="0.3"
@@ -204,7 +204,7 @@
 			y1={yScale(wfc)}
 			x2={xScale(maxQ)}
 			y2={yScale(wfc + wv * maxQ)}
-			stroke="#f0605e"
+			stroke="var(--error)"
 			stroke-width="1.5"
 			stroke-dasharray="6,4"
 			opacity="0.3"
@@ -216,7 +216,7 @@
 				cy={yScale(wp * wBep)}
 				r="5"
 				fill="none"
-				stroke="#7c7fff"
+				stroke="var(--accent)"
 				stroke-width="1"
 				stroke-dasharray="3,2"
 				opacity="0.3"

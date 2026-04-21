@@ -87,16 +87,16 @@
 	}
 
 	function heatColor(v: number): string {
-		if (!isFinite(v)) return 'rgba(240, 96, 94, 0.15)';
+		if (!isFinite(v)) return 'color-mix(in srgb, var(--error) 15%, transparent)';
 		const invertedMetrics: SensitivityMetric[] = ['bepUnits'];
 		const norm = (v - minVal) / range;
 		const score = invertedMetrics.includes(config.targetMetric) ? 1 - norm : norm;
 		if (score < 0.5) {
 			const t = score * 2;
-			return `color-mix(in srgb, #f0605e ${((1 - t) * 22).toFixed(0)}%, transparent)`;
+			return `color-mix(in srgb, var(--error) ${((1 - t) * 22).toFixed(0)}%, transparent)`;
 		}
 		const t = (score - 0.5) * 2;
-		return `color-mix(in srgb, #2dd4a0 ${(t * 22).toFixed(0)}%, transparent)`;
+		return `color-mix(in srgb, var(--green) ${(t * 22).toFixed(0)}%, transparent)`;
 	}
 
 	function headerLabel(varKey: SensitivityVar, val: number): string {

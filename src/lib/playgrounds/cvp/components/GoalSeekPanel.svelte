@@ -263,13 +263,13 @@
 	}
 
 	.result-box.ok {
-		border-color: color-mix(in srgb, #2dd4a0 30%, transparent);
-		background: color-mix(in srgb, #2dd4a0 6%, transparent);
+		border-color: color-mix(in srgb, var(--green) 30%, transparent);
+		background: color-mix(in srgb, var(--green) 6%, transparent);
 	}
 
 	.result-box.err {
-		border-color: color-mix(in srgb, #f0605e 30%, transparent);
-		background: color-mix(in srgb, #f0605e 6%, transparent);
+		border-color: color-mix(in srgb, var(--error) 30%, transparent);
+		background: color-mix(in srgb, var(--error) 6%, transparent);
 	}
 
 	.result-main {
@@ -289,7 +289,7 @@
 		font-family: var(--font-mono);
 		font-size: 1.125rem;
 		font-weight: 700;
-		color: #2dd4a0;
+		color: var(--green);
 	}
 
 	.result-note {
@@ -302,9 +302,9 @@
 	.apply-btn {
 		padding: 0.375rem 0.625rem;
 		background: transparent;
-		border: 1px solid #2dd4a0;
+		border: 1px solid var(--green);
 		border-radius: var(--radius-sm);
-		color: #2dd4a0;
+		color: var(--green);
 		font-family: var(--font-mono);
 		font-size: 0.6875rem;
 		font-weight: 700;
@@ -317,7 +317,7 @@
 	}
 
 	.apply-btn:hover {
-		background: #2dd4a0;
+		background: var(--green);
 		color: var(--bg);
 	}
 </style>

@@ -151,13 +151,13 @@
 
 	.warning {
 		padding: 0.625rem 0.75rem;
-		background: color-mix(in srgb, var(--loss, #f0605e) 12%, transparent);
-		border: 1px solid color-mix(in srgb, var(--loss, #f0605e) 35%, transparent);
+		background: color-mix(in srgb, var(--error) 12%, transparent);
+		border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
 		border-radius: var(--radius-sm);
 		font-family: var(--font-body);
 		font-size: 0.75rem;
 		line-height: 1.4;
-		color: var(--loss, #f0605e);
+		color: var(--error);
 	}
 
 	.cvp-table {
@@ -241,11 +241,11 @@
 	}
 
 	.total.profit .num {
-		color: var(--green, #2dd4a0);
+		color: var(--green);
 	}
 
 	.total.loss .num {
-		color: var(--loss, #f0605e);
+		color: var(--error);
 	}
 
 	.kpi-list {
@@ -285,6 +285,6 @@
 	}
 
 	.kpi.danger .kpi-value {
-		color: var(--loss, #f0605e);
+		color: var(--error);
 	}
 </style>

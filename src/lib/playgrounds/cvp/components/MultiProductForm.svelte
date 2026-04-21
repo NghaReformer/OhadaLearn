@@ -296,8 +296,8 @@
 	}
 
 	.remove-btn:hover:not(:disabled) {
-		color: #f0605e;
-		background: color-mix(in srgb, #f0605e 10%, transparent);
+		color: var(--error);
+		background: color-mix(in srgb, var(--error) 10%, transparent);
 	}
 
 	.remove-btn:disabled {
@@ -323,7 +323,7 @@
 	}
 
 	.total-val.err {
-		color: #f0605e;
+		color: var(--error);
 	}
 
 	.warn-banner {
@@ -331,10 +331,10 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.5rem 0.75rem;
-		background: color-mix(in srgb, #f0605e 10%, transparent);
-		border: 1px solid color-mix(in srgb, #f0605e 30%, transparent);
+		background: color-mix(in srgb, var(--error) 10%, transparent);
+		border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
 		border-radius: var(--radius-sm);
-		color: #f0605e;
+		color: var(--error);
 		font-size: 0.75rem;
 		font-weight: 600;
 	}
