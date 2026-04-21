@@ -37,7 +37,7 @@
 		y1={by}
 		x2={bx}
 		y2={H - PAD.bottom}
-		stroke="#7c7fff"
+		stroke="var(--accent)"
 		stroke-width="1"
 		stroke-dasharray="4,3"
 		opacity="0.4"
@@ -47,28 +47,28 @@
 		cy={by}
 		r="8"
 		fill="none"
-		stroke="#7c7fff"
+		stroke="var(--accent)"
 		stroke-width="1.5"
 		opacity="0.3"
 		filter="url(#cvp-glow)"
 	/>
-	<circle cx={bx} cy={by} r="4" fill="#7c7fff" filter="url(#cvp-glow)" />
+	<circle cx={bx} cy={by} r="4" fill="var(--accent)" filter="url(#cvp-glow)" />
 	<rect
 		x={bx - bepLabelLen / 2}
 		y={by + 6}
 		width={bepLabelLen}
 		height="20"
 		rx="6"
-		fill="#111525"
-		stroke="#7c7fff"
+		fill="var(--panel)"
+		stroke="var(--accent)"
 		stroke-width="1"
 		opacity="0.9"
 	/>
 	<text
 		x={bx}
 		y={by + 20}
-		fill="#7c7fff"
-		font-family="JetBrains Mono, monospace"
+		fill="var(--accent)"
+		font-family="var(--font-mono)"
 		font-size="9"
 		font-weight="600"
 		text-anchor="middle"
@@ -85,17 +85,17 @@
 		y1={ty}
 		x2={W - PAD.right}
 		y2={ty}
-		stroke="#e8a840"
+		stroke="var(--amber)"
 		stroke-width="1"
 		stroke-dasharray="6,3"
 		opacity="0.6"
 	/>
-	<circle cx={tx} cy={ty} r="4" fill="#e8a840" opacity="0.7" />
+	<circle cx={tx} cy={ty} r="4" fill="var(--amber)" opacity="0.7" />
 	<text
 		x={tx + 8}
 		y={ty - 6}
-		fill="#e8a840"
-		font-family="DM Sans, sans-serif"
+		fill="var(--amber)"
+		font-family="var(--font-body)"
 		font-size="8"
 		font-weight="600"
 		opacity="0.8"
@@ -109,7 +109,7 @@
 	{@const vx = xScale(data.volume)}
 	{@const isNegative = data.volume < data.bepUnits}
 	{@const bracketY = H - PAD.bottom - 8}
-	{@const color = isNegative ? '#f0605e' : '#b4a0f4'}
+	{@const color = isNegative ? 'var(--error)' : 'var(--accent-soft)'}
 	{@const leftX = isNegative ? vx : bx}
 	{@const rightX = isNegative ? bx : vx}
 	<line x1={leftX} y1={bracketY} x2={rightX} y2={bracketY} stroke={color} stroke-width="1.5" opacity="0.6" />
@@ -127,7 +127,7 @@
 		x={(leftX + rightX) / 2}
 		y={bracketY - 4}
 		fill={color}
-		font-family="JetBrains Mono, monospace"
+		font-family="var(--font-mono)"
 		font-size="8"
 		font-weight="600"
 		text-anchor="middle"
@@ -148,21 +148,21 @@
 		width="56"
 		height="16"
 		rx="4"
-		fill="#111525"
+		fill="var(--panel)"
 		opacity="0.85"
-		stroke="#b4a0f4"
+		stroke="var(--accent-soft)"
 		stroke-width="0.5"
 	/>
 	<text
 		x={vx + 36}
 		y={vy - 7}
-		fill="#b4a0f4"
-		font-family="JetBrains Mono, monospace"
+		fill="var(--accent-soft)"
+		font-family="var(--font-mono)"
 		font-size="8"
 		font-weight="600"
 		text-anchor="middle"
 	>
 		DOL {isFinite(data.dol) ? data.dol.toFixed(2) : '∞'}×
 	</text>
-	<circle cx={vx} cy={vy} r="3" fill={data.isProfit ? '#2dd4a0' : '#f0605e'} opacity="0.8" />
+	<circle cx={vx} cy={vy} r="3" fill={data.isProfit ? 'var(--green)' : 'var(--error)'} opacity="0.8" />
 {/if}

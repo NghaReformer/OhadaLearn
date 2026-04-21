@@ -50,14 +50,14 @@
 	<!-- Fixed cost area -->
 	<polygon
 		points="{xScale(0)},{yScale(0)} {xScale(maxQ)},{yScale(0)} {xScale(maxQ)},{yScale(fc)} {xScale(0)},{yScale(fc)}"
-		fill="#e8a840"
+		fill="var(--amber)"
 		opacity="0.1"
 	/>
 
 	<!-- Variable cost area stacked on FC -->
 	<polygon
 		points="{xScale(0)},{yScale(fc)} {xScale(maxQ)},{yScale(fc)} {xScale(maxQ)},{yScale(fc + v * maxQ)} {xScale(0)},{yScale(fc)}"
-		fill="#f0605e"
+		fill="var(--error)"
 		opacity="0.1"
 	/>
 
@@ -67,7 +67,7 @@
 		y1={yScale(fc)}
 		x2={xScale(maxQ)}
 		y2={yScale(fc)}
-		stroke="#e8a840"
+		stroke="var(--amber)"
 		stroke-width="1"
 		stroke-dasharray="6,4"
 		opacity="0.5"
@@ -99,8 +99,8 @@
 	<text
 		x={PAD.left + 16}
 		y={yScale(fc / 2)}
-		fill="#e8a840"
-		font-family="DM Sans, sans-serif"
+		fill="var(--amber)"
+		font-family="var(--font-body)"
 		font-size="9"
 		font-weight="600"
 		opacity="0.4"
@@ -111,8 +111,8 @@
 	<text
 		x={xScale(maxQ * 0.6)}
 		y={yScale(fc + (v * maxQ * 0.6) / 2)}
-		fill="#f0605e"
-		font-family="DM Sans, sans-serif"
+		fill="var(--error)"
+		font-family="var(--font-body)"
 		font-size="9"
 		font-weight="600"
 		opacity="0.4"

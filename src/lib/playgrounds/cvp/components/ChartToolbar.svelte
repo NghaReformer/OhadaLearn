@@ -23,10 +23,10 @@
 	];
 
 	const overlayDefs: Array<{ key: keyof OverlayToggles; labelKey: string; color: string }> = [
-		{ key: 'bep', labelKey: 'cvp.overlay.bep', color: '#7c7fff' },
-		{ key: 'target', labelKey: 'cvp.overlay.target', color: '#e8a840' },
-		{ key: 'mos', labelKey: 'cvp.overlay.mos', color: '#b4a0f4' },
-		{ key: 'dol', labelKey: 'cvp.overlay.dol', color: '#b4a0f4' },
+		{ key: 'bep', labelKey: 'cvp.overlay.bep', color: 'var(--accent)' },
+		{ key: 'target', labelKey: 'cvp.overlay.target', color: 'var(--amber)' },
+		{ key: 'mos', labelKey: 'cvp.overlay.mos', color: 'var(--accent-soft)' },
+		{ key: 'dol', labelKey: 'cvp.overlay.dol', color: 'var(--accent-soft)' },
 	];
 </script>
 

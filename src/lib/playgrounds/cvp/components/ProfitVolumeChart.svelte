@@ -37,7 +37,7 @@
 	let yScale = $derived(scaleLinear([yMin, yMax], [H - PAD.bottom, PAD.top]));
 
 	let curProfit = $derived(cm * vol - fc);
-	let opColor = $derived(curProfit >= 0 ? '#2dd4a0' : '#f0605e');
+	let opColor = $derived(curProfit >= 0 ? 'var(--green)' : 'var(--error)');
 
 	let whatIfActive = $derived(
 		!!whatIfData &&
@@ -63,7 +63,7 @@
 		y1={yScale(0)}
 		x2={W - PAD.right}
 		y2={yScale(0)}
-		stroke="#4a5578"
+		stroke="var(--text-dim)"
 		stroke-width="0.5"
 		opacity="0.5"
 	/>
@@ -83,7 +83,7 @@
 		x={xScale(vol) + 8}
 		y={yScale(curProfit) - 6}
 		fill={opColor}
-		font-family="JetBrains Mono, monospace"
+		font-family="var(--font-mono)"
 		font-size="8"
 		font-weight="600"
 	>
@@ -98,7 +98,7 @@
 			y1={yScale(-wfc)}
 			x2={xScale(maxQ)}
 			y2={yScale(wcm * maxQ - wfc)}
-			stroke="#7c7fff"
+			stroke="var(--accent)"
 			stroke-width="1.5"
 			stroke-dasharray="6,4"
 			opacity="0.3"

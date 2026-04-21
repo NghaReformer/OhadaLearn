@@ -243,11 +243,11 @@
 	}
 
 	.slider-val.pos {
-		color: #2dd4a0;
+		color: var(--green);
 	}
 
 	.slider-val.neg {
-		color: #f0605e;
+		color: var(--error);
 	}
 
 	input[type='range'] {
@@ -335,7 +335,7 @@
 	}
 
 	.cell-val.loss {
-		color: #f0605e;
+		color: var(--error);
 	}
 
 	.cell-delta {
@@ -346,10 +346,10 @@
 	}
 
 	.cell-delta.up {
-		color: #2dd4a0;
+		color: var(--green);
 	}
 
 	.cell-delta.down {
-		color: #f0605e;
+		color: var(--error);
 	}
 </style>

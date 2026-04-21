@@ -13,16 +13,21 @@ export interface ThemeTokens {
 		panelHover: string;
 		border: string;
 		borderSubtle: string;
+		borderStrong: string;
 		accent: string;
 		accentDim: string;
+		accentSoft: string;
 		accentGlow: string;
 		green: string;
+		greenDeep: string;
 		greenGlow: string;
 		amber: string;
 		amberGlow: string;
 		error: string;
+		errorDeep: string;
 		textPrimary: string;
 		textSecondary: string;
+		textDim: string;
 		textMuted: string;
 	};
 	fonts: {
@@ -44,16 +49,21 @@ export const defaultTheme: ThemeTokens = {
 		panelHover: '#1a1e2e',
 		border: '#232840',
 		borderSubtle: '#1c2035',
+		borderStrong: '#1e2540',
 		accent: '#7c7fff',
 		accentDim: '#6366f1',
+		accentSoft: '#b4a0f4',
 		accentGlow: '#7c7fff30',
 		green: '#34d399',
+		greenDeep: '#1aae82',
 		greenGlow: '#34d39920',
 		amber: '#f5a623',
 		amberGlow: '#f5a62320',
 		error: '#f06070',
+		errorDeep: '#d44a48',
 		textPrimary: '#eef0f6',
 		textSecondary: '#8b92a8',
+		textDim: '#4a5578',
 		textMuted: '#555c74',
 	},
 	fonts: {
