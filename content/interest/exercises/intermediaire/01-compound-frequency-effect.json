@@ -1,0 +1,24 @@
+{
+  "id": "compound-frequency-effect",
+  "playgroundSlug": "interest",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "int.exercise.compound-frequency-effect.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 500000, "max": 5000000, "step": 100000 },
+      { "name": "rate", "type": "rate", "min": 6, "max": 14, "step": 1 },
+      { "name": "years", "type": "integer", "min": 3, "max": 10, "step": 1 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "compoundFrequencyEffect",
+    "answerType": "numeric",
+    "tolerance": 0.005,
+    "toleranceType": "relative",
+    "partialCredit": true
+  },
+  "feedbackTemplates": {
+    "correct": "int.exercise.compound-frequency-effect.correct",
+    "incorrect": "int.exercise.compound-frequency-effect.incorrect"
+  }
+}

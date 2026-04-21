@@ -62,4 +62,12 @@ export const playgrounds: PlaygroundMeta[] = [
 		category: 'financial-accounting',
 		lineCount: 0,
 	},
+	{
+		slug: 'interest',
+		titleKey: 'pg.interest.title',
+		descKey: 'pg.interest.desc',
+		icon: '📈',
+		category: 'business-math',
+		lineCount: 0,
+	},
 ];

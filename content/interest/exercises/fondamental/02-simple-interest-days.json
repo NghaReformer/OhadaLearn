@@ -1,0 +1,24 @@
+{
+  "id": "simple-interest-days",
+  "playgroundSlug": "interest",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "int.exercise.simple-interest-days.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 200000, "max": 3000000, "step": 100000 },
+      { "name": "rate", "type": "rate", "min": 5, "max": 14, "step": 0.5 },
+      { "name": "days", "type": "integer", "min": 30, "max": 180, "step": 15 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "simpleInterestDays",
+    "answerType": "numeric",
+    "tolerance": 0.01,
+    "toleranceType": "relative",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "int.exercise.simple-interest-days.correct",
+    "incorrect": "int.exercise.simple-interest-days.incorrect"
+  }
+}

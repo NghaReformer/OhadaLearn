@@ -1,0 +1,22 @@
+{
+  "id": "nominal-to-eir",
+  "playgroundSlug": "interest",
+  "difficulty": "fondamental",
+  "template": {
+    "promptKey": "int.exercise.nominal-to-eir.prompt",
+    "parameters": [
+      { "name": "rate", "type": "rate", "min": 4, "max": 18, "step": 0.25 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "nominalToEir",
+    "answerType": "numeric",
+    "tolerance": 0.0001,
+    "toleranceType": "absolute",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "int.exercise.nominal-to-eir.correct",
+    "incorrect": "int.exercise.nominal-to-eir.incorrect"
+  }
+}
