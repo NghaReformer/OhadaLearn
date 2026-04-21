@@ -30,6 +30,15 @@
 		entries.entries.find((e) => e.stage === selectedStage) ?? entries.entries[0] ?? null,
 	);
 
+	// Stage actually rendered in the table + narration. If the user selected
+	// a stage (e.g. Prepayment) that has since disappeared from `entries`
+	// because an input change removed its trigger (lumpSum back to 0), we
+	// fall back to entries[0] — and the tab bar should light THAT tab up,
+	// not the now-orphaned selection the parent state still holds.
+	// Deriving the active-highlight from the rendered entry keeps the tab
+	// bar and the table in sync without a side-effect that could loop.
+	let activeStage = $derived(currentEntry?.stage ?? selectedStage);
+
 	let totals = $derived.by(() => {
 		if (!currentEntry) return { debit: 0, credit: 0 };
 		let d = 0;
@@ -84,9 +93,9 @@
 				<button
 					type="button"
 					role="tab"
-					aria-selected={selectedStage === e.stage}
+					aria-selected={activeStage === e.stage}
 					class="lc-stage"
-					class:active={selectedStage === e.stage}
+					class:active={activeStage === e.stage}
 					onclick={() => onSelectStage(e.stage)}
 				>
 					{translate(e.labelKey as never)}
@@ -112,9 +121,12 @@
 				<tbody>
 					{#each currentEntry.lines as line, i (i)}
 						{@const acc = accountLabel(line.accountKey)}
+						{@const hasCode = acc.code && acc.code !== '-' && acc.code !== '—'}
 						<tr class="lc-row" class:lc-row-credit={line.credit > 0}>
 							<td class="lc-td lc-td-account">
-								<span class="lc-code">{acc.code}</span>
+								{#if hasCode}
+									<span class="lc-code">{acc.code}</span>
+								{/if}
 								<span class="lc-name">{acc.name}</span>
 							</td>
 							<td class="lc-td lc-td-num lc-td-debit">{money(line.debit)}</td>

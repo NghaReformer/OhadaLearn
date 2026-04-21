@@ -31,6 +31,7 @@ export const amortizationEn: TranslationMap = {
 	'am.inputs.method.balloon.desc': 'Annuity payments, lump-sum principal at cutoff',
 
 	// Inputs — dates & day count
+	'am.inputs.dates.title': 'Dates',
 	'am.inputs.startDate': 'Disbursement Date',
 	'am.inputs.firstPaymentDate': 'First Payment Date',
 	'am.inputs.dayCount': 'Day-Count Convention',
@@ -81,11 +82,12 @@ export const amortizationEn: TranslationMap = {
 	'am.kpis.totalInterest': 'Total Interest',
 	'am.kpis.totalInsurance': 'Total Insurance',
 	'am.kpis.totalPaid': 'Total Paid',
-	'am.kpis.apr': 'APR',
-	'am.kpis.apr.hint': 'Annual Percentage Rate — true cost including fees',
+	'am.kpis.apr': 'Effective APR (TAEG)',
+	'am.kpis.apr.hint': 'Effective annual cost of credit, fees included — matches the TAEG convention used across OHADA consumer credit disclosures.',
 	'am.kpis.effectiveRate': 'Effective Annual Rate',
 	'am.kpis.ratio': 'Interest / Principal',
 	'am.kpis.balloonAmount': 'Balloon Amount',
+	'am.kpis.actualTerm': 'Actual Term (used / entered)',
 
 	// Schedule table
 	'am.schedule.title': 'Amortization Schedule',

@@ -1,9 +1,9 @@
 import type { TranslationMap } from '../types';
 
 export const playgroundsFr: TranslationMap = {
-	'playgrounds.title': 'Playgrounds',
+	'playgrounds.title': 'Ateliers',
 	'playgrounds.subtitle': 'Choisissez un thème et apprenez en pratiquant.',
-	'playgrounds.open': 'Ouvrir le Playground',
+	'playgrounds.open': "Ouvrir l'atelier",
 	'pg.tvm.title': "Valeur Temporelle de l'Argent",
 	'pg.tvm.desc': 'VA, VF, PMT, Taux, Périodes, VAN, TRI et TRIM — maîtrisez les fondamentaux de la finance.',
 	'pg.cvp.title': 'Coût-Volume-Profit',
@@ -14,8 +14,8 @@ export const playgroundsFr: TranslationMap = {
 	'pg.amort.desc': "Annuité, linéaire, in fine, progressif et ballon — avec écritures multi-référentiels.",
 	'pg.deprec.title': 'Amortissement des immobilisations',
 	'pg.deprec.desc': 'Méthodes linéaire, dégressive, SOFTY et MACRS.',
-	'playgrounds.back': 'Playgrounds',
-	'playgrounds.loading': 'Chargement du playground…',
+	'playgrounds.back': 'Ateliers',
+	'playgrounds.loading': "Chargement de l'atelier…",
 	'playgrounds.fullscreen': 'Plein écran',
 	'playgrounds.exit_fullscreen': 'Quitter le plein écran',
 	'pg.journal-entry.title': 'Écritures Comptables',

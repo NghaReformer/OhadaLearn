@@ -114,6 +114,13 @@
 		if (kpis.balloonAmount !== null) {
 			items.push({ label: translate('am.kpis.balloonAmount'), value: money(kpis.balloonAmount), variant: 'warn' });
 		}
+		if (kpis.actualTerm < kpis.requestedTerm) {
+			items.push({
+				label: translate('am.kpis.actualTerm'),
+				value: `${kpis.actualTerm} / ${kpis.requestedTerm}`,
+				variant: 'warn',
+			});
+		}
 		return items;
 	}
 </script>

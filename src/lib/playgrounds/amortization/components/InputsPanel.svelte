@@ -47,6 +47,14 @@
 	}
 
 	function updateMethod(m: AmortMethod) {
+		// Provide a sensible default balloon cutoff when switching to balloon
+		// so the schedule doesn't render empty. Users can still edit the
+		// field directly; we only patch when the current value is unusable.
+		if (m === 'balloon' && (!inputs.balloonDueAt || inputs.balloonDueAt < 1 || inputs.balloonDueAt > inputs.termPeriods)) {
+			const defaultCutoff = Math.max(1, Math.round(inputs.termPeriods * 0.75));
+			onChange({ method: m, balloonDueAt: defaultCutoff });
+			return;
+		}
 		onChange({ method: m });
 	}
 
@@ -225,7 +233,7 @@
 	</section>
 
 	<section class="ip-section">
-		<h3 class="ip-section-title">{$t('am.inputs.startDate')}</h3>
+		<h3 class="ip-section-title">{$t('am.inputs.dates.title')}</h3>
 		<div class="ip-row">
 			<label class="ip-field">
 				<span class="ip-label">{$t('am.inputs.startDate')}</span>

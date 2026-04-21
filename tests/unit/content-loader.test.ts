@@ -1,70 +1,71 @@
-import { describe, it, expect, afterAll } from 'vitest';
-import fs from 'fs';
-import path from 'path';
+import { describe, it, expect } from 'vitest';
 
-const TEST_SLUG = 'test-pg-tmp';
-const CONTENT_ROOT = path.resolve('content');
-const TEST_DIR = path.join(CONTENT_ROOT, TEST_SLUG);
+// The content loader is backed by Vite's import.meta.glob, which bundles
+// everything under /content/** at build time. Tests exercise real fixtures
+// so the assertions double as deployment canaries — if the glob misses a
+// playground's content, these tests fail instead of production.
 
 describe('content loader', () => {
-	afterAll(() => {
-		if (fs.existsSync(TEST_DIR)) {
-			fs.rmSync(TEST_DIR, { recursive: true });
-		}
-	});
-
-	it('loadLearnSections returns empty array if no content directory', async () => {
+	it('loadLearnSections returns empty array for an unknown slug', async () => {
 		const { loadLearnSections } = await import('$lib/content/loader');
 		const sections = await loadLearnSections('nonexistent', 'en');
 		expect(sections).toEqual([]);
 	});
 
-	it('loadLearnSections reads and renders Markdown files', async () => {
-		const learnDir = path.join(TEST_DIR, 'learn', 'en');
-		fs.mkdirSync(learnDir, { recursive: true });
-		fs.writeFileSync(path.join(learnDir, '01-intro.md'), '# Introduction\n\nHello world');
-		fs.writeFileSync(path.join(learnDir, '02-details.md'), '# Details\n\nMore info');
-
+	it('loadLearnSections loads the Amortization EN sections in order', async () => {
 		const { loadLearnSections } = await import('$lib/content/loader');
-		const sections = await loadLearnSections(TEST_SLUG, 'en');
-
-		expect(sections).toHaveLength(2);
-		expect(sections[0].order).toBe(1);
-		expect(sections[0].html).toContain('<h1>Introduction</h1>');
-		expect(sections[1].order).toBe(2);
-		expect(sections[1].html).toContain('<h1>Details</h1>');
+		const sections = await loadLearnSections('amortization', 'en');
+		// The amortization pack authors 10 learn sections (01-intro through 10-*).
+		expect(sections.length).toBeGreaterThanOrEqual(10);
+		// Orders should be monotonically increasing, derived from the filename prefix.
+		for (let i = 1; i < sections.length; i++) {
+			expect(sections[i].order).toBeGreaterThanOrEqual(sections[i - 1].order);
+		}
+		// First section renders a heading.
+		expect(sections[0].html).toContain('<h1');
 	});
 
-	it('loadScenarios returns empty array if no scenarios directory', async () => {
+	it('loadLearnSections serves separate FR content', async () => {
+		const { loadLearnSections } = await import('$lib/content/loader');
+		const fr = await loadLearnSections('amortization', 'fr');
+		expect(fr.length).toBeGreaterThanOrEqual(10);
+	});
+
+	it('loadScenarios returns empty array for an unknown slug', async () => {
 		const { loadScenarios } = await import('$lib/content/loader');
 		const scenarios = await loadScenarios('nonexistent');
 		expect(scenarios).toEqual([]);
 	});
 
-	it('loadScenarios reads JSON files', async () => {
-		const scenarioDir = path.join(TEST_DIR, 'scenarios');
-		fs.mkdirSync(scenarioDir, { recursive: true });
-		fs.writeFileSync(
-			path.join(scenarioDir, 'car-loan.json'),
-			JSON.stringify({
-				slug: 'car-loan',
-				titleKey: 'scenarios.car-loan.title',
-				descKey: 'scenarios.car-loan.desc',
-				presetValues: { principal: 5000000, rate: 8.5 },
-			})
-		);
-
+	it('loadScenarios loads Amortization presets', async () => {
 		const { loadScenarios } = await import('$lib/content/loader');
-		const scenarios = await loadScenarios(TEST_SLUG);
-
-		expect(scenarios).toHaveLength(1);
-		expect(scenarios[0].slug).toBe('car-loan');
-		expect(scenarios[0].presetValues.principal).toBe(5000000);
+		const scenarios = await loadScenarios('amortization');
+		expect(scenarios.length).toBeGreaterThanOrEqual(8);
+		// Each scenario carries a slug, titleKey, descKey, and preset state.
+		for (const sc of scenarios) {
+			expect(typeof sc.slug).toBe('string');
+			expect(typeof sc.titleKey).toBe('string');
+			expect(typeof sc.descKey).toBe('string');
+			expect(sc.presetValues).toBeTruthy();
+		}
 	});
 
-	it('loadExercises returns empty array if no exercises directory', async () => {
+	it('loadExercises returns empty array for an unknown slug', async () => {
 		const { loadExercises } = await import('$lib/content/loader');
 		const exercises = await loadExercises('nonexistent');
 		expect(exercises).toEqual([]);
+	});
+
+	it('loadExercises preserves fondamental → intermediaire → avance order', async () => {
+		const { loadExercises } = await import('$lib/content/loader');
+		const exercises = await loadExercises('amortization');
+		expect(exercises.length).toBeGreaterThanOrEqual(5);
+		// Difficulty ordering is an enumerated rank; verify no advanced exercise
+		// appears before a fondamental one by checking overall structure.
+		const difficulties = exercises.map((e) => e.difficulty);
+		const idx = (d: string) => ['fondamental', 'intermediaire', 'avance'].indexOf(d);
+		for (let i = 1; i < difficulties.length; i++) {
+			expect(idx(difficulties[i])).toBeGreaterThanOrEqual(idx(difficulties[i - 1]));
+		}
 	});
 });

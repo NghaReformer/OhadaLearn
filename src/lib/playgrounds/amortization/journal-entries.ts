@@ -8,6 +8,7 @@ import type {
 	LifecycleJournalEntry,
 	LifecycleStage,
 } from './types';
+import { irr } from '$lib/finance/irr';
 
 function firstRegularRow(result: AmortizationResult): AmortizationScheduleRow | null {
 	return (
@@ -69,31 +70,68 @@ export function buildLifecycleEntries(
 	const entries: LifecycleJournalEntry[] = [];
 
 	// ── 1. Disbursement ──────────────────────────────────────────────
+	// Framework divergence: SYSCOHADA and French PCG expense origination fees
+	// immediately (local-GAAP practice). IFRS 9 and US GAAP (ASC 310-20) defer
+	// the fee by netting it against the loan carrying amount and amortising via
+	// the effective interest method — so the fee is NOT expensed at disbursement.
 	const originationFee = input.fees.origination ?? 0;
 	const netCash = round(input.principal - originationFee);
+	const deferFee = _framework === 'ifrs' || _framework === 'usgaap';
 	const disbursementLines: JournalEntryLine[] = [
 		{ accountKey: 'bank', debit: netCash, credit: 0 },
 	];
-	if (originationFee > 0) {
+	if (originationFee > 0 && !deferFee) {
+		// SYSCOHADA / PCG: expense the fee immediately.
 		disbursementLines.push({
 			accountKey: 'externalServices',
 			debit: round(originationFee),
 			credit: 0,
 		});
 	}
+	// IFRS / US GAAP: credit the loan at its NET carrying amount (principal − fee).
+	// SYSCOHADA / PCG: credit the loan at its FACE value (principal).
+	const loanRecognized = deferFee ? netCash : round(input.principal);
 	disbursementLines.push({
 		accountKey: 'bankLoan',
 		debit: 0,
-		credit: round(input.principal),
+		credit: loanRecognized,
 	});
-	entries.push(entry('disbursement', disbursementLines, round(input.principal)));
+	entries.push(entry('disbursement', disbursementLines, loanRecognized));
 
 	// ── 2. Periodic payment ──────────────────────────────────────────
+	// Framework divergence #2: under IFRS 9 and ASC 310-20 the first-period
+	// interest expense is computed on the NET CARRYING AMOUNT using the
+	// effective interest rate (EIR), not on face principal at the nominal
+	// rate. The reviewer called this out as a material teaching error when
+	// only disbursement was fixed — so we also recompute the interest /
+	// principal split shown in the periodic journal entry when:
+	//   (a) the framework is IFRS or US GAAP, AND
+	//   (b) an origination fee was deferred (otherwise nominal = effective).
 	const regularRow = firstRegularRow(result);
 	if (regularRow) {
-		const interest = round(regularRow.interest);
-		const principal = round(regularRow.principal);
+		let interest = round(regularRow.interest);
+		let principal = round(regularRow.principal);
 		const total = round(interest + principal);
+
+		if (deferFee && originationFee > 0) {
+			// Solve for the monthly EIR by IRR on the borrower's real cash flows:
+			// net cash in at disbursement, then the contractual payment stream.
+			const cashFlows: number[] = [netCash];
+			for (const r of result.rows) cashFlows.push(-r.totalPayment);
+			const eirPeriodic = irr(cashFlows);
+			if (Number.isFinite(eirPeriodic) && eirPeriodic > 0) {
+				// Opening carrying amount at period 1 = netCash.
+				// Interest (IFRS/US GAAP) = opening carrying × EIR.
+				const eirInterest = round(netCash * eirPeriodic);
+				// Preserve cash outflow equal to the contractual payment.
+				const eirPrincipal = round(total - eirInterest);
+				if (eirInterest > 0 && eirPrincipal >= 0) {
+					interest = eirInterest;
+					principal = eirPrincipal;
+				}
+			}
+		}
+
 		const periodicLines: JournalEntryLine[] = [];
 		if (interest > 0) {
 			periodicLines.push({ accountKey: 'interestExpense', debit: interest, credit: 0 });
@@ -142,7 +180,8 @@ export function buildLifecycleEntries(
 	const penaltyRate = input.fees.prepaymentPenaltyPct ?? 0;
 	if (extraRow && extraRow.extra > 0) {
 		const extraPrincipal = round(extraRow.extra);
-		const penalty = round(extraPrincipal * (penaltyRate / 100));
+		// penaltyRate is already stored as a decimal fraction (0.02 for 2%).
+		const penalty = round(extraPrincipal * penaltyRate);
 		const cashOut = round(extraPrincipal + penalty);
 		const prepaymentLines: JournalEntryLine[] = [
 			{ accountKey: 'bankLoan', debit: extraPrincipal, credit: 0 },

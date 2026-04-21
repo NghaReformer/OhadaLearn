@@ -43,4 +43,19 @@ describe('irr', () => {
 	it('returns NaN for degenerate input', () => {
 		expect(Number.isNaN(irr([1]))).toBe(true);
 	});
+
+	// Regression: a 480-period progressive loan used to return NaN because the
+	// upper bisection bound was 10 and Math.pow(11, 480) overflows to Infinity.
+	// With the bound tightened to 2.0, the solver converges cleanly.
+	it('handles long schedules (480 periods) without overflowing', () => {
+		const principal = 10_000_000;
+		const r = 0.08 / 12;
+		const n = 480;
+		// Constant annuity payment so there is a genuine IRR at the nominal rate.
+		const pmt = (principal * r) / (1 - Math.pow(1 + r, -n));
+		const flows = [-principal, ...Array(n).fill(pmt)];
+		const rate = irr(flows);
+		expect(Number.isFinite(rate)).toBe(true);
+		expect(rate).toBeCloseTo(r, 6);
+	});
 });
