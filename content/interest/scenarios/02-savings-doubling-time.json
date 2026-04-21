@@ -1,0 +1,25 @@
+{
+  "slug": "02-savings-doubling-time",
+  "titleKey": "int.scenario.02-savings-doubling-time.title",
+  "descKey": "int.scenario.02-savings-doubling-time.desc",
+  "presetValues": {
+    "mode": "compound",
+    "inputs": {
+      "principal": 1000000,
+      "nominalRate": 0.06,
+      "startDate": "2026-01-01",
+      "endDate": "2038-01-01",
+      "dayCount": "30/360",
+      "frequency": "annual",
+      "continuous": true
+    },
+    "bondInputs": {
+      "faceValue": 1000000,
+      "couponRate": 0.08,
+      "marketRate": 0.1,
+      "termYears": 5,
+      "paymentFrequency": "annual"
+    },
+    "snapshots": []
+  }
+}

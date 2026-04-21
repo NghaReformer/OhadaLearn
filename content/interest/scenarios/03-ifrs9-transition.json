@@ -1,0 +1,54 @@
+{
+  "slug": "03-ifrs9-transition",
+  "titleKey": "int.scenario.03-ifrs9-transition.title",
+  "descKey": "int.scenario.03-ifrs9-transition.desc",
+  "presetValues": {
+    "mode": "effective",
+    "inputs": {
+      "principal": 1000000,
+      "nominalRate": 0.1,
+      "startDate": "2024-01-01",
+      "endDate": "2029-01-01",
+      "dayCount": "30/360",
+      "frequency": "annual",
+      "continuous": false
+    },
+    "bondInputs": {
+      "faceValue": 1000000,
+      "couponRate": 0.08,
+      "marketRate": 0.1,
+      "termYears": 5,
+      "paymentFrequency": "annual"
+    },
+    "snapshots": [
+      {
+        "id": "legacy-sl",
+        "mode": "effective",
+        "label": "Legacy straight-line carrying (year 2)",
+        "inputsHash": "ifrs9-sl",
+        "summary": {
+          "principal": 1000000,
+          "rate": 0.1,
+          "termYears": 5,
+          "resultHeadline": 954510,
+          "resultLabelKey": "int.kpi.issuePrice"
+        },
+        "createdAt": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": "restated-eir",
+        "mode": "effective",
+        "label": "Restated EIR carrying (year 2)",
+        "inputsHash": "ifrs9-eir",
+        "summary": {
+          "principal": 1000000,
+          "rate": 0.1,
+          "termYears": 5,
+          "resultHeadline": 950263,
+          "resultLabelKey": "int.kpi.issuePrice"
+        },
+        "createdAt": "2026-01-01T00:00:00Z"
+      }
+    ]
+  }
+}

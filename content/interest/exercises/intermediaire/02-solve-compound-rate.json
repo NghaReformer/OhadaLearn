@@ -1,0 +1,24 @@
+{
+  "id": "solve-compound-rate",
+  "playgroundSlug": "interest",
+  "difficulty": "intermediaire",
+  "template": {
+    "promptKey": "int.exercise.solve-compound-rate.prompt",
+    "parameters": [
+      { "name": "principal", "type": "currency", "min": 500000, "max": 5000000, "step": 100000 },
+      { "name": "futureValue", "type": "currency", "min": 700000, "max": 15000000, "step": 100000 },
+      { "name": "years", "type": "integer", "min": 2, "max": 10, "step": 1 }
+    ]
+  },
+  "solutionLogic": {
+    "solverFunction": "solveCompoundRate",
+    "answerType": "numeric",
+    "tolerance": 0.0005,
+    "toleranceType": "absolute",
+    "partialCredit": false
+  },
+  "feedbackTemplates": {
+    "correct": "int.exercise.solve-compound-rate.correct",
+    "incorrect": "int.exercise.solve-compound-rate.incorrect"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "slug": "01-bank-loan-comparison",
+  "titleKey": "int.scenario.01-bank-loan-comparison.title",
+  "descKey": "int.scenario.01-bank-loan-comparison.desc",
+  "presetValues": {
+    "mode": "compound",
+    "inputs": {
+      "principal": 10000000,
+      "nominalRate": 0.118,
+      "startDate": "2026-05-01",
+      "endDate": "2029-05-01",
+      "dayCount": "30/360",
+      "frequency": "monthly",
+      "continuous": false
+    },
+    "bondInputs": {
+      "faceValue": 1000000,
+      "couponRate": 0.1,
+      "marketRate": 0.1,
+      "termYears": 5,
+      "paymentFrequency": "annual"
+    },
+    "snapshots": [
+      {
+        "id": "offer-a",
+        "mode": "compound",
+        "label": "Offer A — 11.8% monthly",
+        "inputsHash": "preset-a",
+        "summary": {
+          "principal": 10000000,
+          "rate": 0.118,
+          "termYears": 3,
+          "resultHeadline": 14235110,
+          "resultLabelKey": "int.kpi.futureValue"
+        },
+        "createdAt": "2026-04-21T00:00:00Z"
+      },
+      {
+        "id": "offer-b",
+        "mode": "compound",
+        "label": "Offer B — 12.0% quarterly",
+        "inputsHash": "preset-b",
+        "summary": {
+          "principal": 10000000,
+          "rate": 0.12,
+          "termYears": 3,
+          "resultHeadline": 14257609,
+          "resultLabelKey": "int.kpi.futureValue"
+        },
+        "createdAt": "2026-04-21T00:00:00Z"
+      },
+      {
+        "id": "offer-c",
+        "mode": "compound",
+        "label": "Offer C — 12.2% annual",
+        "inputsHash": "preset-c",
+        "summary": {
+          "principal": 10000000,
+          "rate": 0.122,
+          "termYears": 3,
+          "resultHeadline": 14129860,
+          "resultLabelKey": "int.kpi.futureValue"
+        },
+        "createdAt": "2026-04-21T00:00:00Z"
+      }
+    ]
+  }
+}
