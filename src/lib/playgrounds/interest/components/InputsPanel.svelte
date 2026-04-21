@@ -30,6 +30,12 @@
 		{ key: 'actual/360', labelKey: 'int.dayCount.actual_360' },
 		{ key: 'actual/actual', labelKey: 'int.dayCount.actual_actual' },
 	];
+
+	// Round to 4 decimal places for display to avoid IEEE-754 artifacts
+	// (e.g. 11.7999999999 → 11.8).
+	function displayRate(v: number): number {
+		return Math.round(v * 1_000_000) / 1_000_000;
+	}
 </script>
 
 <section class="inputs">
@@ -41,12 +47,17 @@
 		onChange={(v) => onChange({ principal: v })}
 	/>
 
-	<NumberField
-		label={translate('int.inputs.nominalRate')}
-		value={inputs.nominalRate * 100}
-		suffix="%"
-		onChange={(v) => onChange({ nominalRate: v / 100 })}
-	/>
+	<label class="field">
+		<span class="field-label">{translate('int.inputs.nominalRate')}</span>
+		<input
+			class="field-input"
+			type="number"
+			step="0.01"
+			value={displayRate(inputs.nominalRate * 100)}
+			onchange={(e) =>
+				onChange({ nominalRate: Number((e.target as HTMLInputElement).value) / 100 })}
+		/>
+	</label>
 
 	<label class="field">
 		<span class="field-label">{translate('int.inputs.startDate')}</span>
@@ -96,14 +107,18 @@
 		</select>
 	</label>
 
-	<label class="field toggle-field">
-		<input
-			type="checkbox"
-			checked={inputs.continuous}
-			onchange={(e) => onChange({ continuous: (e.target as HTMLInputElement).checked })}
-		/>
-		<span>{translate('int.inputs.continuousToggle')}</span>
-	</label>
+	<!-- Hide the continuous overlay toggle when frequency is already continuous -
+	     it would otherwise draw a redundant, visually-identical curve. -->
+	{#if inputs.frequency !== 'continuous'}
+		<label class="field toggle-field">
+			<input
+				type="checkbox"
+				checked={inputs.continuous}
+				onchange={(e) => onChange({ continuous: (e.target as HTMLInputElement).checked })}
+			/>
+			<span>{translate('int.inputs.continuousToggle')}</span>
+		</label>
+	{/if}
 </section>
 
 <style>
@@ -141,9 +156,11 @@
 		font-weight: 600;
 	}
 
+	/* 40px min-height for touch targets (WCAG 2.5.5). */
 	.field-input,
 	.field-select {
-		padding: 0.375rem 0.5rem;
+		min-height: 40px;
+		padding: 0.5rem 0.625rem;
 		background: var(--bg-subtle);
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-sm);
@@ -162,7 +179,14 @@
 		flex-direction: row;
 		align-items: center;
 		gap: 0.5rem;
+		min-height: 40px;
 		font-size: 0.75rem;
 		color: var(--text-secondary);
+	}
+
+	.toggle-field input[type='checkbox'] {
+		min-width: 18px;
+		min-height: 18px;
+		cursor: pointer;
 	}
 </style>

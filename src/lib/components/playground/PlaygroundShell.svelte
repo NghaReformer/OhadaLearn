@@ -108,7 +108,10 @@
 	<header class="shell-header">
 		<div class="header-left">
 			<span class="shell-icon" aria-hidden="true">{manifest.icon}</span>
-			<h1 class="shell-title">{$t(manifest.titleKey)}</h1>
+			<!-- Demoted from h1 to h2 because the route ([slug]/+page.svelte)
+			     already renders an h1 with the same title. Two h1s on one page is a
+			     WCAG semantic issue flagged in the Interest QA report (m-2). -->
+			<h2 class="shell-title">{$t(manifest.titleKey)}</h2>
 		</div>
 
 		<div class="header-tabs">

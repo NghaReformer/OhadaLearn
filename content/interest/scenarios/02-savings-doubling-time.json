@@ -3,6 +3,7 @@
   "titleKey": "int.scenario.02-savings-doubling-time.title",
   "descKey": "int.scenario.02-savings-doubling-time.desc",
   "presetValues": {
+    "scenarioSlug": "02-savings-doubling-time",
     "mode": "compound",
     "inputs": {
       "principal": 1000000,

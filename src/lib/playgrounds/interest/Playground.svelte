@@ -1,24 +1,15 @@
 <script lang="ts">
 	import PlaygroundShell from '$lib/components/playground/PlaygroundShell.svelte';
 	import { manifest } from './manifest';
-	import { InterestEngine } from './engine';
-	import type {
-		BondInputs,
-		CompoundResult,
-		InterestInputs,
-		InterestMode,
-		InterestState,
-		SimpleResult,
-	} from './types';
+	import type { BondInputs, InterestInputs, InterestMode, InterestState } from './types';
 	import type { LearnSection, Scenario, ExerciseTemplateFile } from '$lib/content/types';
 	import ModeTabs from './components/ModeTabs.svelte';
 	import InputsPanel from './components/InputsPanel.svelte';
 	import BondInputsPanel from './components/BondInputsPanel.svelte';
-	import RateSummaryStrip from './components/RateSummaryStrip.svelte';
-	import SimpleGrowthChart from './components/SimpleGrowthChart.svelte';
-	import CompoundGrowthChart from './components/CompoundGrowthChart.svelte';
-	import DivergenceRibbon from './components/DivergenceRibbon.svelte';
-	import ScheduleTable from './components/ScheduleTable.svelte';
+	import ScenarioFramingBlock from './components/ScenarioFramingBlock.svelte';
+	import SimpleMode from './components/SimpleMode.svelte';
+	import CompoundMode from './components/CompoundMode.svelte';
+	import EffectiveMode from './components/EffectiveMode.svelte';
 
 	let {
 		learnSections = [],
@@ -30,8 +21,6 @@
 		exercises?: ExerciseTemplateFile[];
 	} = $props();
 
-	const engine = new InterestEngine();
-
 	const defaultInputs: InterestInputs = {
 		principal: 1_000_000,
 		nominalRate: 0.1,
@@ -40,7 +29,9 @@
 			.toISOString()
 			.slice(0, 10),
 		dayCount: '30/360',
-		frequency: 'annual',
+		// Default to monthly so Compound mode shows a visibly curved line at
+		// 10%/5y (vs. the near-flat line produced by annual compounding).
+		frequency: 'monthly',
 		continuous: false,
 	};
 
@@ -57,9 +48,10 @@
 		inputs: defaultInputs,
 		bondInputs: defaultBondInputs,
 		snapshots: [],
-	} satisfies InterestState;
+		scenarioSlug: null as string | null,
+	};
 
-	const shareableKeys = ['mode', 'inputs', 'bondInputs', 'snapshots'];
+	const shareableKeys = ['mode', 'inputs', 'bondInputs', 'snapshots', 'scenarioSlug'];
 </script>
 
 <PlaygroundShell
@@ -72,32 +64,27 @@
 	{shareableKeys}
 >
 	{#snippet playground(state, updateState)}
-		{@const typedState = state as unknown as InterestState}
+		{@const typedState = state as unknown as InterestState & { scenarioSlug: string | null }}
 		{@const mode = typedState.mode ?? 'simple'}
 		{@const inputs = typedState.inputs ?? defaultInputs}
 		{@const bondInputs = typedState.bondInputs ?? defaultBondInputs}
-
-		{@const simpleResult =
-			mode === 'simple' ? engine.simple(inputs) : (null as SimpleResult | null)}
-		{@const compoundResult =
-			mode === 'compound' ? engine.compound(inputs) : (null as CompoundResult | null)}
-		{@const eirResult = mode === 'effective' ? engine.eirAnalysis(bondInputs) : null}
-
-		{@const rateNominal = mode === 'effective' ? bondInputs.marketRate : inputs.nominalRate}
-		{@const rateFreq = mode === 'effective' ? bondInputs.paymentFrequency : inputs.frequency}
-		{@const rateEir = engine.nominalToEir(rateNominal, rateFreq)}
-		{@const rateContinuous = Math.log(1 + rateEir)}
+		{@const scenarioSlug = typedState.scenarioSlug ?? null}
 
 		<div class="int-layout">
 			<aside class="int-sidebar">
 				<InputsPanel
 					{inputs}
-					onChange={(patch) => updateState({ inputs: { ...inputs, ...patch } })}
+					onChange={(patch) =>
+						updateState({ inputs: { ...inputs, ...patch }, scenarioSlug: null })}
 				/>
 				{#if mode === 'effective'}
 					<BondInputsPanel
 						{bondInputs}
-						onChange={(patch) => updateState({ bondInputs: { ...bondInputs, ...patch } })}
+						onChange={(patch) =>
+							updateState({
+								bondInputs: { ...bondInputs, ...patch },
+								scenarioSlug: null,
+							})}
 					/>
 				{/if}
 			</aside>
@@ -105,26 +92,14 @@
 			<main class="int-workspace">
 				<ModeTabs {mode} onChange={(m) => updateState({ mode: m })} />
 
-				<RateSummaryStrip
-					nominal={rateNominal}
-					eir={rateEir}
-					continuousEquivalent={rateContinuous}
-				/>
+				<ScenarioFramingBlock {scenarioSlug} />
 
-				{#if mode === 'simple' && simpleResult}
-					<SimpleGrowthChart {inputs} result={simpleResult} />
-				{:else if mode === 'compound' && compoundResult}
-					<CompoundGrowthChart
-						{inputs}
-						result={compoundResult}
-						showContinuous={inputs.continuous || inputs.frequency === 'continuous'}
-					/>
-				{:else if mode === 'effective' && eirResult}
-					<DivergenceRibbon result={eirResult} />
-					<div class="int-schedules">
-						<ScheduleTable schedule={eirResult.straightLine} />
-						<ScheduleTable schedule={eirResult.eir} />
-					</div>
+				{#if mode === 'simple'}
+					<SimpleMode {inputs} />
+				{:else if mode === 'compound'}
+					<CompoundMode {inputs} />
+				{:else if mode === 'effective'}
+					<EffectiveMode {bondInputs} />
 				{/if}
 			</main>
 		</div>
@@ -146,6 +121,9 @@
 		flex-direction: column;
 		gap: 1rem;
 		min-width: 0;
+		align-self: start;
+		position: sticky;
+		top: 1.25rem;
 	}
 
 	.int-workspace {
@@ -155,16 +133,13 @@
 		min-width: 0;
 	}
 
-	.int-schedules {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 1rem;
-	}
-
 	@media (max-width: 1180px) {
-		.int-layout,
-		.int-schedules {
+		.int-layout {
 			grid-template-columns: 1fr;
+		}
+
+		.int-sidebar {
+			position: static;
 		}
 	}
 </style>

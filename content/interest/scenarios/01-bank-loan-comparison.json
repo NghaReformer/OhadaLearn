@@ -3,6 +3,7 @@
   "titleKey": "int.scenario.01-bank-loan-comparison.title",
   "descKey": "int.scenario.01-bank-loan-comparison.desc",
   "presetValues": {
+    "scenarioSlug": "01-bank-loan-comparison",
     "mode": "compound",
     "inputs": {
       "principal": 10000000,

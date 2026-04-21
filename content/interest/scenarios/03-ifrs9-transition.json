@@ -3,6 +3,7 @@
   "titleKey": "int.scenario.03-ifrs9-transition.title",
   "descKey": "int.scenario.03-ifrs9-transition.desc",
   "presetValues": {
+    "scenarioSlug": "03-ifrs9-transition",
     "mode": "effective",
     "inputs": {
       "principal": 1000000,

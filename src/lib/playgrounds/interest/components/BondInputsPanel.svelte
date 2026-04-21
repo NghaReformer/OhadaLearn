@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
+	import { currency$ } from '$lib/stores/preferences';
+	import { fmtCurrency } from '$lib/format';
 	import NumberField from '$lib/components/playground/NumberField.svelte';
+	import { InterestEngine } from '../engine';
 	import type { BondInputs } from '../types';
 	import type { CompoundingFrequency } from '$lib/playgrounds/tvm/types';
 
@@ -13,6 +16,9 @@
 	} = $props();
 
 	let translate = $derived($t);
+	let currencyCode = $derived($currency$);
+
+	const engine = new InterestEngine();
 
 	const payFrequencies: Array<{ key: Exclude<CompoundingFrequency, 'continuous'>; labelKey: string }> = [
 		{ key: 'annual', labelKey: 'int.freq.annual' },
@@ -36,6 +42,16 @@
 				? 'int.bond.discountNote'
 				: 'int.bond.premiumNote',
 	);
+
+	let issuePrice = $derived(engine.issuePrice(bondInputs));
+
+	function roundPct(v: number): number {
+		return Math.round(v * 10000) / 10000;
+	}
+
+	function money(v: number): string {
+		return fmtCurrency(v, currencyCode);
+	}
 </script>
 
 <section class="bond-inputs">
@@ -47,19 +63,31 @@
 		onChange={(v) => onChange({ faceValue: v })}
 	/>
 
-	<NumberField
-		label={translate('int.bond.couponRate')}
-		value={bondInputs.couponRate * 100}
-		suffix="%"
-		onChange={(v) => onChange({ couponRate: v / 100 })}
-	/>
+	<label class="field">
+		<span class="field-label">{translate('int.bond.couponRate')}</span>
+		<span class="field-help">{translate('int.bond.couponRate.help')}</span>
+		<input
+			class="field-input"
+			type="number"
+			step="0.01"
+			value={roundPct(bondInputs.couponRate * 100)}
+			onchange={(e) =>
+				onChange({ couponRate: Number((e.target as HTMLInputElement).value) / 100 })}
+		/>
+	</label>
 
-	<NumberField
-		label={translate('int.bond.marketRate')}
-		value={bondInputs.marketRate * 100}
-		suffix="%"
-		onChange={(v) => onChange({ marketRate: v / 100 })}
-	/>
+	<label class="field">
+		<span class="field-label">{translate('int.bond.marketRate')}</span>
+		<span class="field-help">{translate('int.bond.marketRate.help')}</span>
+		<input
+			class="field-input"
+			type="number"
+			step="0.01"
+			value={roundPct(bondInputs.marketRate * 100)}
+			onchange={(e) =>
+				onChange({ marketRate: Number((e.target as HTMLInputElement).value) / 100 })}
+		/>
+	</label>
 
 	<NumberField
 		label={translate('int.bond.termYears')}
@@ -85,6 +113,11 @@
 			{/each}
 		</select>
 	</label>
+
+	<div class="issue-price">
+		<span class="issue-price-label">{translate('int.bond.issuePrice')}</span>
+		<span class="issue-price-value">{money(issuePrice)}</span>
+	</div>
 
 	<p class="bond-relation" class:discount={relation === 'discount'} class:premium={relation === 'premium'}>
 		{translate(relationKey)}
@@ -126,8 +159,18 @@
 		font-weight: 600;
 	}
 
+	.field-help {
+		font-family: var(--font-body);
+		font-size: 0.6875rem;
+		color: var(--text-dim);
+		line-height: 1.35;
+		font-style: italic;
+	}
+
+	.field-input,
 	.field-select {
-		padding: 0.375rem 0.5rem;
+		min-height: 40px;
+		padding: 0.5rem 0.625rem;
 		background: var(--bg-subtle);
 		border: 1px solid var(--border-subtle);
 		border-radius: var(--radius-sm);
@@ -136,9 +179,36 @@
 		font-size: 0.8125rem;
 	}
 
+	.field-input:focus,
 	.field-select:focus {
 		outline: none;
 		border-color: var(--accent);
+	}
+
+	.issue-price {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		padding: 0.625rem 0.75rem;
+		background: color-mix(in srgb, var(--accent) 6%, transparent);
+		border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+		border-radius: var(--radius-sm);
+	}
+
+	.issue-price-label {
+		font-size: 0.625rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+		font-weight: 600;
+	}
+
+	.issue-price-value {
+		font-family: var(--font-mono);
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--accent);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.bond-relation {

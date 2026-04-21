@@ -46,7 +46,8 @@
 
 	.mode-tab {
 		flex: 1;
-		padding: 0.5rem 1rem;
+		min-height: 44px;
+		padding: 0.625rem 1rem;
 		background: transparent;
 		border: none;
 		border-radius: var(--radius-sm);
