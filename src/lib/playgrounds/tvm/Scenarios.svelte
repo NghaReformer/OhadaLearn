@@ -4,7 +4,7 @@
 
 	let { scenarios = [], onSelect }: {
 		scenarios: Scenario[];
-		onSelect: (presetValues: Record<string, number | string | boolean>) => void;
+		onSelect: (presetValues: Record<string, unknown>) => void;
 	} = $props();
 </script>
 

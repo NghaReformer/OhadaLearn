@@ -8,12 +8,14 @@
 	import type {
 		BankReconciliationKpis,
 		BankReconciliationPlaygroundState,
+		BankTransaction,
 		ItemCategory,
+		LedgerEntry,
 		ReconciliationInputs,
 		StatementSkin,
 	} from './types';
 	import { EMPTY_KPIS } from './types';
-	import type { LearnSection, Scenario, ExerciseTemplateFile } from '$lib/content/types';
+	import type { LearnSection, Scenario, ExerciseTemplateFile, ScenarioMissingTransaction } from '$lib/content/types';
 	import type { AccountingFramework } from '$lib/shared/chart-of-accounts/types';
 	import type { AccountingStandard } from '$lib/contracts/playground';
 	import { accountingStandard$, currency$ } from '$lib/stores/preferences';
@@ -30,6 +32,8 @@
 	import CategoryBreakdownDonut from './components/CategoryBreakdownDonut.svelte';
 	import ReconciliationFlow from './components/ReconciliationFlow.svelte';
 	import MatchingPairsOverlay from './components/MatchingPairsOverlay.svelte';
+	import TransactionJournal from './components/TransactionJournal.svelte';
+	import ScenarioWalkthrough from './components/ScenarioWalkthrough.svelte';
 
 	const standardToFramework: Record<AccountingStandard, AccountingFramework> = {
 		syscohada: 'ohada',
@@ -70,13 +74,23 @@
 		statementSkin: null,
 		selectedExerciseId: null,
 		exerciseParams: null,
+		loadedScenarioSlug: null,
+		addedMissingIds: [],
 	} satisfies Omit<BankReconciliationPlaygroundState, never>;
 
-	const shareableKeys = ['inputs', 'selectedView', 'statementSkin', 'selectedExerciseId', 'exerciseParams'];
+	const shareableKeys = ['inputs', 'selectedView', 'statementSkin', 'selectedExerciseId', 'exerciseParams', 'loadedScenarioSlug', 'addedMissingIds'];
 
 	const engine = new BankReconciliationEngine();
 
 	let gridContainer = $state<HTMLDivElement | null>(null);
+	let recentlyAddedIds = $state(new Set<string>());
+
+	function flagRecentlyAdded(id: string): void {
+		recentlyAddedIds = new Set([...recentlyAddedIds, id]);
+		setTimeout(() => {
+			recentlyAddedIds = new Set([...recentlyAddedIds].filter((x) => x !== id));
+		}, 1500);
+	}
 
 	function buildKpiItems(kpis: BankReconciliationKpis, translate: (k: string) => string, currency: string): KpiItem[] {
 		const statusLabel =
@@ -108,6 +122,28 @@
 			'company-error': translate('br.category.companyError.label'),
 		};
 	}
+
+	function txFromMissing(item: ScenarioMissingTransaction): BankTransaction | LedgerEntry {
+		const base = {
+			id: item.id,
+			date: item.date,
+			description: item.description,
+			amount: item.amount,
+			reference: item.reference,
+		};
+		if (item.side === 'bank') {
+			return { ...base, cleared: true } satisfies BankTransaction;
+		}
+		return { ...base, recorded: true } satisfies LedgerEntry;
+	}
+
+	function applyClassifications(
+		current: ReconciliationInputs,
+		item: ScenarioMissingTransaction,
+	): Record<string, ItemCategory> {
+		if (!item.expectedCategory) return current.manualClassifications;
+		return { ...current.manualClassifications, [item.id]: item.expectedCategory as ItemCategory };
+	}
 </script>
 
 <PlaygroundShell
@@ -127,6 +163,10 @@
 		{@const adjustingEntries = buildAdjustingEntries(result, framework)}
 		{@const bankItemCount = result.items.filter((i) => i.side === 'bank').length}
 		{@const booksItemCount = result.items.filter((i) => i.side === 'books').length}
+		{@const loadedScenario = typedState.loadedScenarioSlug
+			? scenarios.find((s) => s.presetValues?.loadedScenarioSlug === typedState.loadedScenarioSlug)
+			: null}
+		{@const addedMissingIds = typedState.addedMissingIds ?? []}
 
 		<div class="br-layout">
 			<InputsPanel
@@ -149,6 +189,89 @@
 					varianceLabel={$t('br.scale.varianceLabel')}
 				/>
 
+				{#if loadedScenario && loadedScenario.missingTransactions && loadedScenario.missingTransactions.length > 0}
+					<ScenarioWalkthrough
+						scenario={loadedScenario}
+						addedIds={addedMissingIds}
+						onAdd={(item) => {
+							if (addedMissingIds.includes(item.id)) return;
+							const tx = txFromMissing(item);
+							const newInputs = item.side === 'bank'
+								? { ...inputs, bankTransactions: [...inputs.bankTransactions, tx as BankTransaction], manualClassifications: applyClassifications(inputs, item) }
+								: { ...inputs, ledgerEntries: [...inputs.ledgerEntries, tx as LedgerEntry], manualClassifications: applyClassifications(inputs, item) };
+							updateState({
+								inputs: newInputs,
+								addedMissingIds: [...addedMissingIds, item.id],
+							});
+							flagRecentlyAdded(item.id);
+						}}
+						onAddAll={() => {
+							const remaining = (loadedScenario?.missingTransactions ?? []).filter((m) => !addedMissingIds.includes(m.id));
+							let nextInputs = inputs;
+							const ids: string[] = [];
+							for (const item of remaining) {
+								const tx = txFromMissing(item);
+								if (item.side === 'bank') {
+									nextInputs = { ...nextInputs, bankTransactions: [...nextInputs.bankTransactions, tx as BankTransaction] };
+								} else {
+									nextInputs = { ...nextInputs, ledgerEntries: [...nextInputs.ledgerEntries, tx as LedgerEntry] };
+								}
+								nextInputs = { ...nextInputs, manualClassifications: applyClassifications(nextInputs, item) };
+								ids.push(item.id);
+								flagRecentlyAdded(item.id);
+							}
+							updateState({
+								inputs: nextInputs,
+								addedMissingIds: [...addedMissingIds, ...ids],
+							});
+						}}
+						onReset={() => {
+							const ids = (loadedScenario?.missingTransactions ?? []).map((m) => m.id);
+							const idSet = new Set(ids);
+							updateState({
+								inputs: {
+									...inputs,
+									bankTransactions: inputs.bankTransactions.filter((t) => !idSet.has(t.id)),
+									ledgerEntries: inputs.ledgerEntries.filter((e) => !idSet.has(e.id)),
+									manualClassifications: Object.fromEntries(
+										Object.entries(inputs.manualClassifications).filter(([k]) => !idSet.has(k)),
+									),
+								},
+								addedMissingIds: [],
+							});
+						}}
+					/>
+				{/if}
+
+				<TransactionJournal
+					{inputs}
+					variance={result.statement.variance}
+					isReconciled={result.statement.isReconciled}
+					onAddBank={(tx) => {
+						updateState({ inputs: { ...inputs, bankTransactions: [...inputs.bankTransactions, tx] } });
+						flagRecentlyAdded(tx.id);
+					}}
+					onAddLedger={(entry) => {
+						updateState({ inputs: { ...inputs, ledgerEntries: [...inputs.ledgerEntries, entry] } });
+						flagRecentlyAdded(entry.id);
+					}}
+					titleLabel={$t('br.journal.title')}
+					sideBankLabel={$t('br.journal.sideBank')}
+					sideBooksLabel={$t('br.journal.sideBooks')}
+					directionInflowLabel={$t('br.journal.directionInflow')}
+					directionOutflowLabel={$t('br.journal.directionOutflow')}
+					dateLabel={$t('br.journal.date')}
+					descriptionLabel={$t('br.journal.description')}
+					descriptionPlaceholder={$t('br.journal.descriptionPlaceholder')}
+					referenceLabel={$t('br.journal.reference')}
+					referencePlaceholder={$t('br.journal.referencePlaceholder')}
+					amountLabel={$t('br.journal.amount')}
+					addLabel={$t('br.journal.add')}
+					hintReconciled={$t('br.journal.hintReconciled')}
+					hintBankHeavier={$t('br.journal.hintBankHeavier')}
+					hintBooksHeavier={$t('br.journal.hintBooksHeavier')}
+				/>
+
 				<KpiStrip items={buildKpiItems(kpis, $t, $currency$)} />
 
 				<div class="br-grid" bind:this={gridContainer}>
@@ -157,12 +280,34 @@
 						matches={result.matches}
 						selectedId={typedState.selectedItemId}
 						onSelect={(id) => updateState({ selectedItemId: id })}
+						onRemove={(id) => updateState({
+							inputs: {
+								...inputs,
+								bankTransactions: inputs.bankTransactions.filter((t) => t.id !== id),
+								manualClassifications: Object.fromEntries(
+									Object.entries(inputs.manualClassifications).filter(([k]) => k !== id),
+								),
+							},
+							addedMissingIds: addedMissingIds.filter((x) => x !== id),
+						})}
+						{recentlyAddedIds}
 					/>
 					<LedgerPanel
 						entries={inputs.ledgerEntries}
 						matches={result.matches}
 						selectedId={typedState.selectedItemId}
 						onSelect={(id) => updateState({ selectedItemId: id })}
+						onRemove={(id) => updateState({
+							inputs: {
+								...inputs,
+								ledgerEntries: inputs.ledgerEntries.filter((e) => e.id !== id),
+								manualClassifications: Object.fromEntries(
+									Object.entries(inputs.manualClassifications).filter(([k]) => k !== id),
+								),
+							},
+							addedMissingIds: addedMissingIds.filter((x) => x !== id),
+						})}
+						{recentlyAddedIds}
 					/>
 					<MatchingPairsOverlay
 						matches={result.matches}

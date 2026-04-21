@@ -9,13 +9,32 @@
       "closingBankBalance": 803500,
       "openingBookBalance": 800000,
       "closingBookBalance": 800000,
-      "bankTransactions": [
-        { "id": "ch-1", "date": "2026-04-30", "description": "Frais bancaires mensuels", "amount": -1500, "cleared": true },
-        { "id": "int-1", "date": "2026-04-30", "description": "Intérêts créditeurs trimestriels", "amount": 5000, "cleared": true }
-      ],
+      "bankTransactions": [],
       "ledgerEntries": [],
       "manualMatches": [],
       "manualClassifications": {}
+    },
+    "loadedScenarioSlug": "bankChargesInterest",
+    "addedMissingIds": []
+  },
+  "missingTransactions": [
+    {
+      "id": "miss-charge",
+      "side": "bank",
+      "date": "2026-04-30",
+      "description": "Frais bancaires mensuels",
+      "amount": -1500,
+      "hintKey": "br.walkthrough.bankChargesInterest.charge",
+      "expectedCategory": "bank-charge"
+    },
+    {
+      "id": "miss-interest",
+      "side": "bank",
+      "date": "2026-04-30",
+      "description": "Intérêts créditeurs trimestriels",
+      "amount": 5000,
+      "hintKey": "br.walkthrough.bankChargesInterest.interest",
+      "expectedCategory": "interest-earned"
     }
-  }
+  ]
 }

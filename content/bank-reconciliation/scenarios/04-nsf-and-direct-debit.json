@@ -9,13 +9,32 @@
       "closingBankBalance": 1380000,
       "openingBookBalance": 1500000,
       "closingBookBalance": 1500000,
-      "bankTransactions": [
-        { "id": "nsf-1", "date": "2026-04-25", "description": "Chèque client impayé — Customer Alpha", "amount": -75000, "cleared": true },
-        { "id": "dd-1", "date": "2026-04-28", "description": "Prélèvement automatique électricité", "amount": -45000, "cleared": true }
-      ],
+      "bankTransactions": [],
       "ledgerEntries": [],
       "manualMatches": [],
       "manualClassifications": {}
+    },
+    "loadedScenarioSlug": "nsfDirectDebit",
+    "addedMissingIds": []
+  },
+  "missingTransactions": [
+    {
+      "id": "miss-nsf",
+      "side": "bank",
+      "date": "2026-04-25",
+      "description": "Chèque client impayé — Customer Alpha",
+      "amount": -75000,
+      "hintKey": "br.walkthrough.nsfDirectDebit.nsf",
+      "expectedCategory": "nsf-check"
+    },
+    {
+      "id": "miss-dd",
+      "side": "bank",
+      "date": "2026-04-28",
+      "description": "Prélèvement automatique électricité",
+      "amount": -45000,
+      "hintKey": "br.walkthrough.nsfDirectDebit.dd",
+      "expectedCategory": "direct-debit"
     }
-  }
+  ]
 }

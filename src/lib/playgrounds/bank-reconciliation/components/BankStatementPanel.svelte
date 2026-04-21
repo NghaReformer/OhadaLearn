@@ -9,11 +9,15 @@
 		matches,
 		selectedId = null,
 		onSelect = () => {},
+		onRemove,
+		recentlyAddedIds = new Set<string>(),
 	}: {
 		transactions: BankTransaction[];
 		matches: MatchPair[];
 		selectedId?: string | null;
 		onSelect?: (id: string | null) => void;
+		onRemove?: (id: string) => void;
+		recentlyAddedIds?: Set<string>;
 	} = $props();
 
 	let translate = $derived($t);
@@ -33,6 +37,9 @@
 					<th scope="col">{translate('br.bank.headerDescription')}</th>
 					<th scope="col">{translate('br.bank.headerReference')}</th>
 					<th scope="col" class="amount-col">{translate('br.bank.headerAmount')}</th>
+					{#if onRemove}
+						<th scope="col" class="action-col" aria-label="Actions"></th>
+					{/if}
 				</tr>
 			</thead>
 			<tbody>
@@ -44,6 +51,7 @@
 						class:matched={isMatched}
 						class:unmatched={!isMatched}
 						class:selected={isSelected}
+						class:just-added={recentlyAddedIds.has(tx.id)}
 						data-bank-tx-id={tx.id}
 						onclick={() => onSelect(isSelected ? null : tx.id)}
 					>
@@ -53,6 +61,24 @@
 						<td class="amount-col" class:negative={tx.amount < 0}>
 							{fmtCurrency(tx.amount, currency)}
 						</td>
+						{#if onRemove}
+							<td class="action-col">
+								<button
+									type="button"
+									class="remove-btn"
+									aria-label={translate('br.row.remove')}
+									title={translate('br.row.remove')}
+									onclick={(e) => {
+										e.stopPropagation();
+										onRemove(tx.id);
+									}}
+								>
+									<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+										<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+									</svg>
+								</button>
+							</td>
+						{/if}
 					</tr>
 				{/each}
 			</tbody>
@@ -152,5 +178,55 @@
 	.tx-row.selected {
 		background: var(--accent-glow);
 		box-shadow: inset 3px 0 0 0 var(--accent);
+	}
+
+	.action-col {
+		width: 28px;
+		text-align: center;
+		padding: 0;
+	}
+
+	.remove-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		padding: 0;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: 4px;
+		color: var(--text-muted);
+		cursor: pointer;
+		opacity: 0.6;
+		transition: all 0.15s ease;
+	}
+	.tx-row:hover .remove-btn {
+		opacity: 1;
+	}
+	.remove-btn:hover {
+		background: color-mix(in srgb, var(--error, #ef4444) 18%, transparent);
+		border-color: var(--error, #ef4444);
+		color: var(--error, #ef4444);
+	}
+
+	.tx-row.just-added {
+		animation: row-pulse 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	@keyframes row-pulse {
+		0% {
+			background: color-mix(in srgb, var(--accent, #6ea8fe) 32%, transparent);
+			box-shadow: inset 4px 0 0 0 var(--accent, #6ea8fe);
+		}
+		60% {
+			background: color-mix(in srgb, var(--accent, #6ea8fe) 14%, transparent);
+		}
+		100% {
+			background: transparent;
+			box-shadow: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.tx-row.just-added { animation: none; }
 	}
 </style>

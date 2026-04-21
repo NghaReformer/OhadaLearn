@@ -9,15 +9,42 @@
       "closingBankBalance": 1900000,
       "openingBookBalance": 1885000,
       "closingBookBalance": 1925000,
-      "bankTransactions": [
-        { "id": "carry-os", "date": "2026-05-03", "description": "Check #2055 cleared (carryforward)", "amount": -40000, "reference": "2055", "cleared": true },
-        { "id": "ch-2", "date": "2026-05-31", "description": "Frais bancaires", "amount": -2500, "cleared": true }
-      ],
-      "ledgerEntries": [
-        { "id": "dit-2", "date": "2026-05-30", "description": "Customer deposit (May)", "amount": 92500, "recorded": true }
-      ],
+      "bankTransactions": [],
+      "ledgerEntries": [],
       "manualMatches": [],
       "manualClassifications": {}
+    },
+    "loadedScenarioSlug": "multiMonth",
+    "addedMissingIds": []
+  },
+  "missingTransactions": [
+    {
+      "id": "miss-carry-os",
+      "side": "bank",
+      "date": "2026-05-03",
+      "description": "Check #2055 finally cleared (April carryforward)",
+      "amount": -40000,
+      "reference": "2055",
+      "hintKey": "br.walkthrough.multiMonth.carryOs",
+      "expectedCategory": "outstanding-check"
+    },
+    {
+      "id": "miss-charge",
+      "side": "bank",
+      "date": "2026-05-31",
+      "description": "Frais bancaires mensuels",
+      "amount": -2500,
+      "hintKey": "br.walkthrough.multiMonth.charge",
+      "expectedCategory": "bank-charge"
+    },
+    {
+      "id": "miss-dit",
+      "side": "books",
+      "date": "2026-05-30",
+      "description": "Customer deposit recorded May 30",
+      "amount": 92500,
+      "hintKey": "br.walkthrough.multiMonth.dit",
+      "expectedCategory": "deposit-in-transit"
     }
-  }
+  ]
 }

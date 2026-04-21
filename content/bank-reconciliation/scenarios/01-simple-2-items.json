@@ -10,12 +10,32 @@
       "openingBookBalance": 1000000,
       "closingBookBalance": 520000,
       "bankTransactions": [],
-      "ledgerEntries": [
-        { "id": "dit-1", "date": "2026-04-29", "description": "Customer deposit", "amount": 50000, "recorded": true },
-        { "id": "os-1", "date": "2026-04-28", "description": "Check #1042 to supplier", "amount": -30000, "reference": "1042", "recorded": true }
-      ],
+      "ledgerEntries": [],
       "manualMatches": [],
       "manualClassifications": {}
+    },
+    "loadedScenarioSlug": "simple2",
+    "addedMissingIds": []
+  },
+  "missingTransactions": [
+    {
+      "id": "miss-dit",
+      "side": "books",
+      "date": "2026-04-29",
+      "description": "Customer deposit",
+      "amount": 50000,
+      "hintKey": "br.walkthrough.simple2.dit",
+      "expectedCategory": "deposit-in-transit"
+    },
+    {
+      "id": "miss-os",
+      "side": "books",
+      "date": "2026-04-28",
+      "description": "Check #1042 to supplier",
+      "amount": -30000,
+      "reference": "1042",
+      "hintKey": "br.walkthrough.simple2.os",
+      "expectedCategory": "outstanding-check"
     }
-  }
+  ]
 }

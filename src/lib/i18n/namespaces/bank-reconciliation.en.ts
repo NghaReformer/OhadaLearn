@@ -101,6 +101,53 @@ export const bankReconciliationEn: TranslationMap = {
 	'br.flow.end': 'Adjusted',
 	'br.flow.match': 'Balanced',
 
+	// Transaction Journal (in-playground entry form)
+	'br.journal.title': 'Add a transaction',
+	'br.journal.sideBank': 'Bank statement',
+	'br.journal.sideBooks': 'Books / Ledger',
+	'br.journal.directionInflow': 'Inflow',
+	'br.journal.directionOutflow': 'Outflow',
+	'br.journal.date': 'Date',
+	'br.journal.description': 'Description',
+	'br.journal.descriptionPlaceholder': 'e.g. Bank service fee, Customer wire...',
+	'br.journal.reference': 'Reference',
+	'br.journal.referencePlaceholder': 'Check #, wire id (optional)',
+	'br.journal.amount': 'Amount',
+	'br.journal.add': 'Add transaction',
+	'br.journal.hintReconciled': 'Reconciled — both sides balance perfectly. Add more transactions to see how each one moves the scale.',
+	'br.journal.hintBankHeavier': 'Bank side is {amount} heavier. Try adding a missing ledger entry (a check that has not yet cleared) or a credit on the bank side that has not been recorded in the books.',
+	'br.journal.hintBooksHeavier': 'Books side is {amount} heavier. Try adding an unrecorded bank charge or a deposit you have made that the bank has not yet processed.',
+
+	// Scenario walkthrough (teacher-led missing-transactions pool)
+	'br.walkthrough.title': 'Walkthrough — missing transactions',
+	'br.walkthrough.empty': 'This scenario has no walkthrough transactions.',
+	'br.walkthrough.sideBank': 'Bank',
+	'br.walkthrough.sideBooks': 'Books',
+	'br.walkthrough.add': 'Add',
+	'br.walkthrough.added': 'Added',
+	'br.walkthrough.addAll': 'Add all',
+	'br.walkthrough.reset': 'Reset walkthrough',
+	'br.walkthrough.done': 'All transactions added — see how the reconciliation balanced!',
+
+	// Walkthrough hints — per scenario, per item
+	'br.walkthrough.simple2.dit': 'A customer payment recorded in the books on Apr 29 but not yet on the bank statement (deposit in transit).',
+	'br.walkthrough.simple2.os': 'A check issued to a supplier and recorded in the books, but not yet cleared by the bank (outstanding check).',
+	'br.walkthrough.classic5.charge': 'Monthly account-keeping fee debited by the bank. Books need to recognise the expense.',
+	'br.walkthrough.classic5.interest': 'Interest credited by the bank — needs to be recorded as financial income in the books.',
+	'br.walkthrough.classic5.dit': 'Customer cash deposit recorded in the books but not yet appearing on the bank statement.',
+	'br.walkthrough.classic5.os': 'Vendor payment check #2055 — books recorded; bank has not cleared it yet.',
+	'br.walkthrough.bankChargesInterest.charge': 'Monthly bank service charges that the bank has already taken from the account.',
+	'br.walkthrough.bankChargesInterest.interest': 'Quarterly interest credited by the bank.',
+	'br.walkthrough.nsfDirectDebit.nsf': 'Customer Alpha\u2019s check bounced — bank reversed the deposit. Reduces accounts receivable from cash collection.',
+	'br.walkthrough.nsfDirectDebit.dd': 'Direct debit for the electricity bill — bank already processed it but books have not.',
+	'br.walkthrough.bankErrorFlag.err': 'Bank charged us for a transaction we never authorised. Flag as a bank error — we should NOT post a journal entry; the bank must correct it.',
+	'br.walkthrough.multiMonth.carryOs': 'Last month\u2019s outstanding check #2055 has finally cleared this period.',
+	'br.walkthrough.multiMonth.charge': 'New monthly bank charges to record.',
+	'br.walkthrough.multiMonth.dit': 'A customer deposit recorded May 30 that did not reach the bank by month-end.',
+
+	// Row actions
+	'br.row.remove': 'Remove transaction',
+
 	// Adjusting JEs
 	'br.adjustments.title': 'Adjusting Journal Entries',
 	'br.adjustments.empty': 'No adjusting entries needed.',

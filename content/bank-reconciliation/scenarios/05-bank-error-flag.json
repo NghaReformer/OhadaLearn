@@ -9,12 +9,23 @@
       "closingBankBalance": 985000,
       "openingBookBalance": 1000000,
       "closingBookBalance": 1000000,
-      "bankTransactions": [
-        { "id": "err-1", "date": "2026-04-22", "description": "Débit erroné — opération non autorisée", "amount": -15000, "cleared": true }
-      ],
+      "bankTransactions": [],
       "ledgerEntries": [],
       "manualMatches": [],
-      "manualClassifications": { "err-1": "bank-error" }
+      "manualClassifications": {}
+    },
+    "loadedScenarioSlug": "bankErrorFlag",
+    "addedMissingIds": []
+  },
+  "missingTransactions": [
+    {
+      "id": "miss-err",
+      "side": "bank",
+      "date": "2026-04-22",
+      "description": "Débit erroné — opération non autorisée",
+      "amount": -15000,
+      "hintKey": "br.walkthrough.bankErrorFlag.err",
+      "expectedCategory": "bank-error"
     }
-  }
+  ]
 }

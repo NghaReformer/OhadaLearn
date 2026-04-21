@@ -125,6 +125,11 @@ export interface BankReconciliationPlaygroundState {
 	statementSkin: StatementSkin | null;
 	selectedExerciseId: string | null;
 	exerciseParams: Record<string, number | string> | null;
+	/** Slug of the scenario currently driving the walkthrough panel, or null. */
+	loadedScenarioSlug: string | null;
+	/** IDs from the scenario's missingTransactions array that have already been
+	 *  added to the bank/ledger panels. Used to grey them out in the walkthrough. */
+	addedMissingIds: string[];
 }
 
 export const EMPTY_KPIS: BankReconciliationKpis = {

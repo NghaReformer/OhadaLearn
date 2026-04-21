@@ -101,6 +101,53 @@ export const bankReconciliationFr: TranslationMap = {
 	'br.flow.end': 'Rapproché',
 	'br.flow.match': 'Équilibré',
 
+	// Journal de transactions (saisie en direct)
+	'br.journal.title': 'Saisir une transaction',
+	'br.journal.sideBank': 'Relevé bancaire',
+	'br.journal.sideBooks': 'Grand-livre',
+	'br.journal.directionInflow': 'Entrée',
+	'br.journal.directionOutflow': 'Sortie',
+	'br.journal.date': 'Date',
+	'br.journal.description': 'Libellé',
+	'br.journal.descriptionPlaceholder': 'ex. frais bancaires, virement client...',
+	'br.journal.reference': 'Référence',
+	'br.journal.referencePlaceholder': 'N° chèque, id virement (optionnel)',
+	'br.journal.amount': 'Montant',
+	'br.journal.add': 'Ajouter la transaction',
+	'br.journal.hintReconciled': 'Rapproché — les deux soldes coïncident parfaitement. Continuez d\u2019ajouter des transactions pour voir l\u2019effet sur la balance.',
+	'br.journal.hintBankHeavier': 'Le côté banque est plus lourd de {amount}. Essayez d\u2019ajouter une écriture comptable manquante (un chèque non encaissé) ou un crédit bancaire que la comptabilité n\u2019a pas encore enregistré.',
+	'br.journal.hintBooksHeavier': 'Le côté entreprise est plus lourd de {amount}. Essayez d\u2019ajouter des frais bancaires non comptabilisés ou un dépôt enregistré dans les livres mais pas encore sur le relevé.',
+
+	// Parcours de scénario (transactions à ajouter pas à pas)
+	'br.walkthrough.title': 'Parcours — transactions à ajouter',
+	'br.walkthrough.empty': 'Ce scénario ne contient pas de parcours guidé.',
+	'br.walkthrough.sideBank': 'Banque',
+	'br.walkthrough.sideBooks': 'Livres',
+	'br.walkthrough.add': 'Ajouter',
+	'br.walkthrough.added': 'Ajouté',
+	'br.walkthrough.addAll': 'Tout ajouter',
+	'br.walkthrough.reset': 'Réinitialiser',
+	'br.walkthrough.done': 'Toutes les transactions sont ajoutées — observez comment le rapprochement s\u2019équilibre !',
+
+	// Indices pédagogiques par scénario / par élément
+	'br.walkthrough.simple2.dit': 'Un règlement client comptabilisé le 29 avril mais pas encore sur le relevé bancaire (dépôt en transit).',
+	'br.walkthrough.simple2.os': 'Un chèque émis à un fournisseur, comptabilisé mais pas encore débité par la banque (chèque émis non encaissé).',
+	'br.walkthrough.classic5.charge': 'Frais mensuels de tenue de compte prélevés par la banque. Les livres doivent enregistrer la charge.',
+	'br.walkthrough.classic5.interest': 'Intérêts créditeurs de la banque — à enregistrer comme produit financier.',
+	'br.walkthrough.classic5.dit': 'Dépôt en espèces du client comptabilisé mais pas encore sur le relevé.',
+	'br.walkthrough.classic5.os': 'Chèque #2055 au fournisseur — comptabilisé mais pas encore débité par la banque.',
+	'br.walkthrough.bankChargesInterest.charge': 'Frais bancaires mensuels déjà prélevés par la banque.',
+	'br.walkthrough.bankChargesInterest.interest': 'Intérêts trimestriels crédités par la banque.',
+	'br.walkthrough.nsfDirectDebit.nsf': 'Chèque du client Alpha impayé — la banque a inversé le dépôt. Il faut redébiter le compte client.',
+	'br.walkthrough.nsfDirectDebit.dd': 'Prélèvement automatique de la facture d\u2019électricité — la banque l\u2019a déjà traité mais pas la comptabilité.',
+	'br.walkthrough.bankErrorFlag.err': 'La banque nous a débité une opération non autorisée. À signaler comme erreur bancaire — pas d\u2019écriture chez nous, c\u2019est à la banque de corriger.',
+	'br.walkthrough.multiMonth.carryOs': 'Le chèque #2055 du mois précédent a finalement été débité ce mois-ci.',
+	'br.walkthrough.multiMonth.charge': 'Nouveaux frais bancaires mensuels à enregistrer.',
+	'br.walkthrough.multiMonth.dit': 'Un dépôt client comptabilisé le 30 mai qui n\u2019est pas arrivé à la banque avant la fin du mois.',
+
+	// Actions sur ligne
+	'br.row.remove': 'Retirer la transaction',
+
 	// Écritures de régularisation
 	'br.adjustments.title': 'Écritures de régularisation',
 	'br.adjustments.empty': 'Aucune écriture de régularisation nécessaire.',

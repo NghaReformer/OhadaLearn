@@ -55,7 +55,7 @@
 		pgState.update((s) => ({ ...s, ...partial }));
 	}
 
-	function loadScenario(presetValues: Record<string, number | string | boolean>) {
+	function loadScenario(presetValues: Record<string, unknown>) {
 		pgState.update((s) => ({ ...s, ...presetValues }));
 		activeTab = 'playground';
 	}

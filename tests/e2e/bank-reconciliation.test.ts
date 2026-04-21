@@ -65,10 +65,55 @@ test.describe('Bank Reconciliation playground — native module', () => {
 		const scenariosTab = page.getByRole('tab', { name: /Scenarios/i });
 		await scenariosTab.click();
 		await page.getByText(/Classic 5-item reconciliation/i).first().click();
-		// Wait for state to load
-		await expect(page.getByText(/Frais de tenue de compte/i).first()).toBeVisible({ timeout: 10_000 });
-		// Overlay produces <path class="match-line"> per matched pair (the classic scenario has 1 reference match)
+		// Wait for the pre-loaded matched pair to appear (Wire payment, not a walkthrough item)
+		await expect(page.getByText(/Wire payment/i).first()).toBeVisible({ timeout: 10_000 });
+		// Overlay produces <path class="match-line"> per matched pair
 		const lines = page.locator('path.match-line');
 		await expect(lines.first()).toBeAttached({ timeout: 5_000 });
+	});
+
+	test('scenario walkthrough lets you add transactions one by one and balances the scale', async ({ page }) => {
+		await page.goto('/en/playgrounds/bank-reconciliation');
+		const scenariosTab = page.getByRole('tab', { name: /Scenarios/i });
+		await scenariosTab.click();
+		await page.getByText(/Simple 2-item reconciliation/i).first().click();
+
+		// Walkthrough panel should be visible with the title and progress 0/2
+		await expect(page.getByText(/Walkthrough — missing transactions/i)).toBeVisible({ timeout: 10_000 });
+		await expect(page.getByText(/^0 \/ 2$/)).toBeVisible();
+
+		// Initially: bank/ledger panels are EMPTY (the empty-state message is shown)
+		// Click first "Add" button (Customer deposit)
+		const addButtons = page.locator('button.wt-btn-add');
+		await addButtons.first().click();
+
+		// Progress moves to 1/2; the new row appears in the ledger panel
+		await expect(page.getByText(/^1 \/ 2$/)).toBeVisible();
+		await expect(page.getByText(/Customer deposit/i).first()).toBeVisible();
+
+		// Add the second item (outstanding check)
+		await addButtons.first().click();
+		await expect(page.getByText(/^2 \/ 2$/)).toBeVisible();
+		await expect(page.getByText(/Check #1042 to supplier/i).first()).toBeVisible();
+
+		// Done message appears
+		await expect(page.getByText(/All transactions added/i)).toBeVisible();
+
+		// Reset returns the panels to empty walkthrough state
+		await page.getByRole('button', { name: /Reset walkthrough/i }).click();
+		await expect(page.getByText(/^0 \/ 2$/)).toBeVisible();
+	});
+
+	test('transaction journal lets a teacher add a free-form transaction', async ({ page }) => {
+		await page.goto('/en/playgrounds/bank-reconciliation');
+		// Default playground state — fill the journal form
+		await page.getByLabel(/^Description$/i).fill('Bank service fee');
+		// The amount field comes from NumberField which renders an input
+		const amountInputs = page.getByRole('textbox', { name: /Amount/i });
+		await amountInputs.first().fill('2500');
+		// Submit (the Outflow direction is default)
+		await page.getByRole('button', { name: /Add transaction/i }).click();
+		// New row appears in the bank statement panel
+		await expect(page.getByText(/Bank service fee/i).first()).toBeVisible({ timeout: 5_000 });
 	});
 });

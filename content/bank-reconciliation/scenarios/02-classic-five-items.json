@@ -10,17 +10,54 @@
       "openingBookBalance": 2000000,
       "closingBookBalance": 1885000,
       "bankTransactions": [
-        { "id": "ch-1", "date": "2026-04-30", "description": "Frais de tenue de compte", "amount": -5000, "cleared": true },
-        { "id": "int-1", "date": "2026-04-30", "description": "Interest credited", "amount": 8000, "cleared": true },
         { "id": "match-1", "date": "2026-04-15", "description": "Wire payment", "amount": 200000, "reference": "WIRE-001", "cleared": true }
       ],
       "ledgerEntries": [
-        { "id": "match-2", "date": "2026-04-15", "description": "Wire from customer", "amount": 200000, "reference": "WIRE-001", "recorded": true },
-        { "id": "dit-1", "date": "2026-04-29", "description": "Customer deposit", "amount": 75000, "recorded": true },
-        { "id": "os-1", "date": "2026-04-27", "description": "Check #2055 to vendor", "amount": -40000, "reference": "2055", "recorded": true }
+        { "id": "match-2", "date": "2026-04-15", "description": "Wire from customer", "amount": 200000, "reference": "WIRE-001", "recorded": true }
       ],
       "manualMatches": [],
       "manualClassifications": {}
+    },
+    "loadedScenarioSlug": "classic5",
+    "addedMissingIds": []
+  },
+  "missingTransactions": [
+    {
+      "id": "miss-charge",
+      "side": "bank",
+      "date": "2026-04-30",
+      "description": "Frais de tenue de compte",
+      "amount": -5000,
+      "hintKey": "br.walkthrough.classic5.charge",
+      "expectedCategory": "bank-charge"
+    },
+    {
+      "id": "miss-interest",
+      "side": "bank",
+      "date": "2026-04-30",
+      "description": "Interest credited",
+      "amount": 8000,
+      "hintKey": "br.walkthrough.classic5.interest",
+      "expectedCategory": "interest-earned"
+    },
+    {
+      "id": "miss-dit",
+      "side": "books",
+      "date": "2026-04-29",
+      "description": "Customer deposit not yet on bank",
+      "amount": 75000,
+      "hintKey": "br.walkthrough.classic5.dit",
+      "expectedCategory": "deposit-in-transit"
+    },
+    {
+      "id": "miss-os",
+      "side": "books",
+      "date": "2026-04-27",
+      "description": "Check #2055 to vendor",
+      "amount": -40000,
+      "reference": "2055",
+      "hintKey": "br.walkthrough.classic5.os",
+      "expectedCategory": "outstanding-check"
     }
-  }
+  ]
 }

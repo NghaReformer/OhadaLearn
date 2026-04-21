@@ -11,7 +11,24 @@ export interface Scenario {
 	slug: string;
 	titleKey: string;
 	descKey: string;
-	presetValues: Record<string, number | string | boolean>;
+	presetValues: Record<string, unknown>;
+	/** Optional teacher-led walkthrough: ordered list of transactions
+	 *  that start outside the bank/ledger panels and can be added one
+	 *  at a time so students see live impact on the reconciliation. */
+	missingTransactions?: ScenarioMissingTransaction[];
+}
+
+export interface ScenarioMissingTransaction {
+	id: string;
+	side: 'bank' | 'books';
+	date: string;
+	description: string;
+	amount: number;
+	reference?: string;
+	/** i18n key for an explanatory hint shown on the card. */
+	hintKey?: string;
+	/** Optional expected reconciling-item category for downstream tooling. */
+	expectedCategory?: string;
 }
 
 export interface ExerciseTemplateFile {
