@@ -84,6 +84,7 @@ export const journalEntryEn: TranslationMap = {
 	'je.validation.noAmount': 'Line for account {account} has no amount.',
 	'je.validation.bothSides': 'Account {account} cannot be debited and credited on the same line.',
 	'je.validation.unbalanced': 'Entry is unbalanced — debits and credits differ by {diff}.',
+	'je.validation.duplicateAccount': 'Account {account} appears more than once — combine into a single line.',
 
 	/* ── Grader feedback (status badges; per-line explanations are rendered by the grader) ── */
 	'je.feedback.status.correct': 'Correct',

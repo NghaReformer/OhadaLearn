@@ -84,6 +84,7 @@ export const journalEntryFr: TranslationMap = {
 	'je.validation.noAmount': 'La ligne du compte {account} n\u2019a pas de montant.',
 	'je.validation.bothSides': 'Le compte {account} ne peut pas \u00eatre d\u00e9bit\u00e9 et cr\u00e9dit\u00e9 sur la m\u00eame ligne.',
 	'je.validation.unbalanced': '\u00c9criture d\u00e9s\u00e9quilibr\u00e9e \u2014 \u00e9cart entre d\u00e9bits et cr\u00e9dits : {diff}.',
+	'je.validation.duplicateAccount': 'Le compte {account} appara\u00eet plusieurs fois \u2014 regroupez-le sur une seule ligne.',
 
 	/* ── Retour de correction (badges de statut ; les explications par ligne sont rendues par le correcteur) ── */
 	'je.feedback.status.correct': 'Correct',

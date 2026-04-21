@@ -95,10 +95,12 @@ describe('JournalEntryEngine.validate', () => {
 		};
 		const result = engine.validate(draft, 'ohada');
 		expect(result.valid).toBe(false);
-		expect(result.errors.some((e) => e.key === 'je.validation.duplicateAccount')).toBe(true);
+		const dup = result.errors.find((e) => e.key === 'je.validation.duplicateAccount');
+		expect(dup).toBeTruthy();
+		expect(dup!.params?.account).toBe('521');
 	});
 
-	it('surfaces the account reference on missing-amount errors via structured params', () => {
+	it('references accounts by code (not camelCase) in no-amount errors', () => {
 		const draft: DraftEntry = {
 			date: '2024-03-15',
 			description: 'Missing amount',
@@ -111,13 +113,10 @@ describe('JournalEntryEngine.validate', () => {
 		expect(result.valid).toBe(false);
 		const noAmount = result.errors.find((e) => e.key === 'je.validation.noAmount');
 		expect(noAmount).toBeTruthy();
-		// The engine emits the framework code (e.g. "101" for shareCapital); the
-		// UI is responsible for resolving that code to the account name.
-		expect(noAmount?.params?.account).toBeTruthy();
-		expect(String(noAmount?.params?.account)).not.toBe('shareCapital');
+		expect(noAmount!.params?.account).toBe('101');
 	});
 
-	it('carries both totals as numeric params on the unbalanced error', () => {
+	it('emits unbalanced error with raw numeric params for locale-aware rendering', () => {
 		const draft: DraftEntry = {
 			date: '2024-03-15',
 			description: 'Unbalanced',
@@ -130,8 +129,9 @@ describe('JournalEntryEngine.validate', () => {
 		expect(result.valid).toBe(false);
 		const unbalanced = result.errors.find((e) => e.key === 'je.validation.unbalanced');
 		expect(unbalanced).toBeTruthy();
-		expect(unbalanced?.params?.debit).toBe(1000000);
-		expect(unbalanced?.params?.credit).toBe(900000);
+		expect(unbalanced!.params?.debit).toBe(1000000);
+		expect(unbalanced!.params?.credit).toBe(900000);
+		expect(unbalanced!.params?.diff).toBe(100000);
 	});
 });
 
