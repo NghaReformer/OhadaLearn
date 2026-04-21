@@ -123,6 +123,51 @@ export const interestFr: TranslationMap = {
 	'int.schedule.methodSl': 'Linéaire',
 	'int.schedule.methodEir': 'TIE',
 
+	// Simple / Compound schedule table columns
+	'int.schedule.simpleTitle': 'Détail période par période',
+	'int.schedule.simpleSub': 'Les intérêts s\u2019accumulent linéairement sur le capital initial.',
+	'int.schedule.compoundTitle': 'Solde période par période',
+	'int.schedule.compoundSub': 'Solde fin = solde début + intérêts ; ventilation sur capital / sur intérêts.',
+	'int.schedule.yearFraction': 'Fraction d\u2019année',
+	'int.schedule.interestThisPeriod': 'Intérêts (période)',
+	'int.schedule.cumulativeInterest': 'Intérêts cumulés',
+	'int.schedule.runningTotal': 'Total courant',
+	'int.schedule.openingBalance': 'Solde début',
+	'int.schedule.closingBalance': 'Solde fin',
+	'int.schedule.interestOnPrincipal': 'Sur capital',
+	'int.schedule.interestOnInterest': 'Sur intérêts',
+	'int.schedule.interestTotal': 'Total intérêts',
+
+	// What-if panel
+	'int.whatif.title': 'Analyse de sensibilité',
+	'int.whatif.simpleHint': 'Ajustez les curseurs pour voir comment chaque variable modifie les intérêts.',
+	'int.whatif.compoundHint': 'Ajustez les curseurs pour voir l\u2019interaction entre fréquence, taux et durée.',
+	'int.whatif.effectiveHint': 'Ajustez les paramètres de l\u2019obligation pour observer le prix d\u2019émission et les charges d\u2019intérêts.',
+	'int.whatif.impactTitle': 'Impact vs base',
+	'int.whatif.reset': 'Réinitialiser',
+	'int.whatif.principal': 'Capital',
+	'int.whatif.rate': 'Taux',
+	'int.whatif.term': 'Durée',
+	'int.whatif.faceValue': 'Valeur nominale',
+	'int.whatif.couponRate': 'Taux de coupon',
+	'int.whatif.marketRate': 'Taux du marché',
+
+	// Goal-seek panel
+	'int.goalseek.title': 'Valeur cible',
+	'int.goalseek.solveFor': 'Résoudre pour',
+	'int.goalseek.targetLabel': 'Cible',
+	'int.goalseek.solve': 'Résoudre',
+	'int.goalseek.apply': 'Appliquer aux entrées',
+	'int.goalseek.approximate': 'Convergé vers une solution approchée (dans la tolérance).',
+	'int.goalseek.noSolution': 'Aucune solution trouvée dans la plage de recherche.',
+	'int.goalseek.invalid': 'Saisissez une valeur cible numérique pour résoudre.',
+	'int.goalseek.varRate': 'Taux nominal',
+	'int.goalseek.varYears': 'Durée en années',
+	'int.goalseek.varPrincipal': 'Capital',
+	'int.goalseek.varMarketRate': 'Taux du marché',
+	'int.goalseek.varCouponRate': 'Taux de coupon',
+	'int.goalseek.varFaceValue': 'Valeur nominale',
+
 	// Exercises (parameter-free — les apprenants lisent les valeurs actives
 	// depuis le panneau Paramètres. ExercisePanel partagé ne substitue pas
 	// les variables de template.)

@@ -123,6 +123,51 @@ export const interestEn: TranslationMap = {
 	'int.schedule.methodSl': 'Straight-line',
 	'int.schedule.methodEir': 'EIR',
 
+	// Simple / Compound schedule table columns
+	'int.schedule.simpleTitle': 'Period-by-period interest',
+	'int.schedule.simpleSub': 'Interest accrues linearly on the original principal.',
+	'int.schedule.compoundTitle': 'Period-by-period balance',
+	'int.schedule.compoundSub': 'Closing balance = opening + interest; interest splits into on-principal and on-interest.',
+	'int.schedule.yearFraction': 'Year fraction',
+	'int.schedule.interestThisPeriod': 'Interest (period)',
+	'int.schedule.cumulativeInterest': 'Cumulative interest',
+	'int.schedule.runningTotal': 'Running total',
+	'int.schedule.openingBalance': 'Opening balance',
+	'int.schedule.closingBalance': 'Closing balance',
+	'int.schedule.interestOnPrincipal': 'On principal',
+	'int.schedule.interestOnInterest': 'On interest',
+	'int.schedule.interestTotal': 'Total interest',
+
+	// What-if panel
+	'int.whatif.title': 'What-if analysis',
+	'int.whatif.simpleHint': 'Adjust the sliders to see how each variable changes total interest.',
+	'int.whatif.compoundHint': 'Adjust the sliders to see how frequency, rate, and term interact.',
+	'int.whatif.effectiveHint': 'Adjust bond parameters to see issue price and interest expense respond.',
+	'int.whatif.impactTitle': 'Impact vs base',
+	'int.whatif.reset': 'Reset',
+	'int.whatif.principal': 'Principal',
+	'int.whatif.rate': 'Rate',
+	'int.whatif.term': 'Term',
+	'int.whatif.faceValue': 'Face value',
+	'int.whatif.couponRate': 'Coupon rate',
+	'int.whatif.marketRate': 'Market rate',
+
+	// Goal-seek panel
+	'int.goalseek.title': 'Goal seek',
+	'int.goalseek.solveFor': 'Solve for',
+	'int.goalseek.targetLabel': 'Target',
+	'int.goalseek.solve': 'Solve',
+	'int.goalseek.apply': 'Apply to inputs',
+	'int.goalseek.approximate': 'Converged to an approximate solution (within tolerance).',
+	'int.goalseek.noSolution': 'No solution found in the search range.',
+	'int.goalseek.invalid': 'Enter a numeric target value to solve.',
+	'int.goalseek.varRate': 'Nominal rate',
+	'int.goalseek.varYears': 'Term in years',
+	'int.goalseek.varPrincipal': 'Principal',
+	'int.goalseek.varMarketRate': 'Market rate',
+	'int.goalseek.varCouponRate': 'Coupon rate',
+	'int.goalseek.varFaceValue': 'Face value',
+
 	// Exercises (parameter-free prompts — learner reads current values from
 	// the Parameters panel. The shared ExercisePanel does not substitute
 	// template variables; this matches the bank-reconciliation convention.)

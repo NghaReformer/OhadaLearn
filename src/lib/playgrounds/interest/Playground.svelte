@@ -95,11 +95,26 @@
 				<ScenarioFramingBlock {scenarioSlug} />
 
 				{#if mode === 'simple'}
-					<SimpleMode {inputs} />
+					<SimpleMode
+						{inputs}
+						onApplyInputs={(patch) =>
+							updateState({ inputs: { ...inputs, ...patch }, scenarioSlug: null })}
+					/>
 				{:else if mode === 'compound'}
-					<CompoundMode {inputs} />
+					<CompoundMode
+						{inputs}
+						onApplyInputs={(patch) =>
+							updateState({ inputs: { ...inputs, ...patch }, scenarioSlug: null })}
+					/>
 				{:else if mode === 'effective'}
-					<EffectiveMode {bondInputs} />
+					<EffectiveMode
+						{bondInputs}
+						onApplyBondInputs={(patch) =>
+							updateState({
+								bondInputs: { ...bondInputs, ...patch },
+								scenarioSlug: null,
+							})}
+					/>
 				{/if}
 			</main>
 		</div>
