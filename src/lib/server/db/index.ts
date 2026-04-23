@@ -1,2 +1,10 @@
 export * as waitlist from './waitlist';
-export type { WaitlistEntry, ExerciseTemplate, ExerciseAttempt } from './types';
+export * as feedback from './feedback';
+export type {
+	WaitlistEntry,
+	ExerciseTemplate,
+	ExerciseAttempt,
+	FeedbackEntry,
+	FeedbackType,
+	FeedbackSeverity,
+} from './types';

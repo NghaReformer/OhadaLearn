@@ -5,6 +5,20 @@ export interface WaitlistEntry {
 	role: string;
 }
 
+export type FeedbackType = 'bug' | 'feature' | 'other';
+export type FeedbackSeverity = 'low' | 'medium' | 'high' | 'blocker';
+
+export interface FeedbackEntry {
+	type: FeedbackType;
+	severity?: FeedbackSeverity | null;
+	title: string;
+	description: string;
+	steps?: string | null;
+	email?: string | null;
+	screenshotPath?: string | null;
+	context: Record<string, unknown>;
+}
+
 export interface ExerciseTemplate {
 	id: string;
 	playground_slug: string;

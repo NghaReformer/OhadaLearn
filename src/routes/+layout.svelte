@@ -4,6 +4,7 @@
 	import { defaultTheme, generateCssVars } from '$lib/theme';
 	import { buildFontFaceCss } from '$lib/theme/fonts';
 	import { locale } from '$lib/i18n';
+	import FeedbackLauncher from '$lib/components/feedback/FeedbackLauncher.svelte';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children }: { children: Snippet } = $props();
@@ -24,6 +25,8 @@
 <div class="app-shell">
 	{@render children()}
 </div>
+
+<FeedbackLauncher />
 
 <style>
 	.app-shell {
