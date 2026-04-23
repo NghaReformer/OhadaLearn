@@ -9,6 +9,12 @@
 
 	let dialogEl: HTMLDivElement | undefined = $state();
 	let previouslyFocused: HTMLElement | null = null;
+	// Only treat a backdrop click as "click outside" when the press AND release
+	// both landed on the backdrop itself. Prevents spurious closes from synthetic
+	// clicks fired when a browser-level dialog (e.g. getDisplayMedia picker)
+	// dismisses, which can land on the backdrop coordinates without a matching
+	// mousedown.
+	let backdropPressedOnSelf = false;
 
 	$effect(() => {
 		if (!open) return;
@@ -50,8 +56,14 @@
 		}
 	}
 
-	function onBackdrop(e: MouseEvent) {
-		if (e.target === e.currentTarget) onclose();
+	function onBackdropMouseDown(e: MouseEvent) {
+		backdropPressedOnSelf = e.target === e.currentTarget;
+	}
+
+	function onBackdropClick(e: MouseEvent) {
+		const shouldClose = backdropPressedOnSelf && e.target === e.currentTarget;
+		backdropPressedOnSelf = false;
+		if (shouldClose) onclose();
 	}
 </script>
 
@@ -59,7 +71,8 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 	<div
 		class="backdrop"
-		onclick={onBackdrop}
+		onmousedown={onBackdropMouseDown}
+		onclick={onBackdropClick}
 		onkeydown={onKeyDown}
 		role="presentation"
 	>
